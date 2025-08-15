@@ -1,0 +1,74 @@
+import express from 'express';
+import { ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, GetAllGame, getUserBetHistory, MSMEForm, SendOTP, UserLogin, UserRegister, UserShop } from '../contollers/User.controller.js';
+import upload from '../middlewares/upload.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+
+const router = express.Router();
+
+// Define fields for file uploads
+const fileFields = [
+  { name: 'profileImage' },
+  { name: 'aadharFrontImage' },
+  { name: 'aadharBackImage' },
+  { name: 'panCardImage' },
+  { name: 'tenthMarksheetImage' },
+  { name: 'twelthMarksheetImage' },
+  { name: 'postGraduateImage' },
+  { name: 'graduateImage' },
+  { name: 'bankCheque' },
+  { name: 'technicalCertification' },
+  { name: 'academicCertification' }
+];
+
+// ✅ API Route
+router.post('/submit-form', upload.fields(fileFields), ApplicationForm);
+
+router.post('/msme-submit', upload.single('file'), MSMEForm);
+
+const buyFileFields = [
+  { name: 'aadharCard' },
+  { name: 'passportPhoto' }
+];
+
+router.post('/user-buy', authMiddleware, upload.fields(buyFileFields), UserShop);
+
+router.get('/get-games',  GetAllGame);
+
+router.post('/bet-game-jodi', authMiddleware,  BetGameJodi);
+router.post('/bet-game-manual',authMiddleware,  BetGameManual);
+router.post('/bet-game-harraf',authMiddleware,  BetGameHarraf);
+router.post('/bet-game-crossing',authMiddleware,  BetGameCrossing);
+router.post('/bet-game-copypaste', authMiddleware, BetGameCopyPaste);
+
+
+router.get('/bet-game-history', authMiddleware, getUserBetHistory);
+
+
+router.post('/bet-game-result',  CalculateGameResults);
+
+
+
+
+
+
+
+
+
+
+router.post('/register', upload.single('image'), UserRegister);
+
+router.post('/send-otp', SendOTP);
+
+router.post('/login', UserLogin);
+
+router.get('/me', authMiddleware, (req, res) => {
+  res.json({
+    message: 'Access granted to protected route',
+    user: req.user,
+  });
+});
+
+
+
+
+export default router;

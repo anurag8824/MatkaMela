@@ -1,0 +1,271 @@
+
+
+
+
+
+
+import React, { useEffect, useRef, useState } from "react";
+
+export default function CarRoadGame() {
+  const canvasRef = useRef(null);
+  const rafRef = useRef(null);
+  const lastTimeRef = useRef(0);
+
+  const [isRunning, setIsRunning] = useState(true);
+  const [showHUD, setShowHUD] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0);
+
+  const inputRef = useRef({ left: false, right: false, up: false, down: false });
+
+  const carRef = useRef({ x: 0, y: 0, vx: 0, speed: 0 });
+  const obstaclesRef = useRef([]);
+  const obstacleTimerRef = useRef(0);
+  const difficultyRef = useRef(1);
+
+  const cfg = useRef({
+    lanes: 3,
+    laneWidth: 120,
+    roadMargin: 40,
+    roadColor: "#2e2e2e",
+    shoulderColor: "#3a3a3a",
+    grassColor: "#0f5d2f",
+    lineColor: "#f0f0f0",
+    carColor: "#2dd4bf",
+    carShadow: "rgba(0,0,0,0.35)",
+    maxSpeed: 900,
+    accel: 850,
+    brakeDecel: 1400,
+    friction: 400,
+    turnAccel: 2200,
+    turnFriction: 1800,
+    dashLength: 40,
+    dashGap: 30,
+    obstacleWidth: 56,
+    obstacleHeight: 96,
+    obstacleColor: "#ef4444",
+  });
+
+  const resizeCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = parent.clientWidth;
+    const height = parent.clientHeight;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+  };
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (["ArrowLeft", "a", "A"].includes(e.key)) inputRef.current.left = true;
+      if (["ArrowRight", "d", "D"].includes(e.key)) inputRef.current.right = true;
+      if (["ArrowUp", "w", "W"].includes(e.key)) inputRef.current.up = true;
+      if (["ArrowDown", "s", "S"].includes(e.key)) inputRef.current.down = true;
+      if (e.key === " ") setIsRunning((r) => !r);
+    };
+    const onKeyUp = (e) => {
+      if (["ArrowLeft", "a", "A"].includes(e.key)) inputRef.current.left = false;
+      if (["ArrowRight", "d", "D"].includes(e.key)) inputRef.current.right = false;
+      if (["ArrowUp", "w", "W"].includes(e.key)) inputRef.current.up = false;
+      if (["ArrowDown", "s", "S"].includes(e.key)) inputRef.current.down = false;
+    };
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, []);
+
+  const press = (dir, v) => {
+    inputRef.current[dir] = v;
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+    const totalRoadWidth = cfg.current.lanes * cfg.current.laneWidth;
+    const roadLeft = (w - totalRoadWidth) / 2;
+    carRef.current.x = roadLeft + totalRoadWidth / 2;
+    carRef.current.y = h * 0.78;
+    carRef.current.vx = 0;
+    carRef.current.speed = 0;
+  }, []);
+
+  useEffect(() => {
+    const loop = (t) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+
+      let dt = 0;
+      if (lastTimeRef.current) dt = Math.min((t - lastTimeRef.current) / 1000, 0.033);
+      lastTimeRef.current = t;
+
+      if (isRunning && !gameOver) {
+        const car = carRef.current;
+        const C = cfg.current;
+
+        if (inputRef.current.up) car.speed += C.accel * dt;
+        else if (inputRef.current.down) car.speed -= C.brakeDecel * dt;
+        else car.speed = Math.max(0, car.speed - C.friction * dt);
+
+        car.speed = Math.max(0, Math.min(C.maxSpeed, car.speed));
+
+        const targetAx = (inputRef.current.left ? -1 : 0) + (inputRef.current.right ? 1 : 0);
+        car.vx += targetAx * C.turnAccel * dt;
+        if (car.vx > 0) car.vx = Math.max(0, car.vx - C.turnFriction * dt);
+        else if (car.vx < 0) car.vx = Math.min(0, car.vx + C.turnFriction * dt);
+
+        car.x += car.vx * dt;
+
+        const totalRoadWidth = C.lanes * C.laneWidth;
+        const roadLeft = (w - totalRoadWidth) / 2;
+        const minX = roadLeft + C.roadMargin;
+        const maxX = roadLeft + totalRoadWidth - C.roadMargin;
+        if (car.x < minX) { car.x = minX; car.vx = 0; }
+        if (car.x > maxX) { car.x = maxX; car.vx = 0; }
+
+        obstacleTimerRef.current -= dt;
+        if (obstacleTimerRef.current <= 0) {
+          const lane = Math.floor(Math.random() * C.lanes);
+          const ox = roadLeft + lane * C.laneWidth + C.laneWidth / 2;
+          obstaclesRef.current.push({ x: ox, y: -C.obstacleHeight });
+          obstacleTimerRef.current = 1 / difficultyRef.current;
+          difficultyRef.current += 0.01;
+        }
+
+        obstaclesRef.current.forEach((obs) => {
+          obs.y += car.speed * dt;
+        });
+
+        obstaclesRef.current = obstaclesRef.current.filter((obs) => {
+          if (obs.y > h + C.obstacleHeight) {
+            setScore((s) => s + 1);
+            return false;
+          }
+          return true;
+        });
+
+        obstaclesRef.current.forEach((obs) => {
+          if (
+            Math.abs(obs.x - car.x) < C.obstacleWidth / 2 + 20 &&
+            Math.abs(obs.y - car.y) < C.obstacleHeight / 2 + 20
+          ) {
+            setGameOver(true);
+            setIsRunning(false);
+          }
+        });
+      }
+
+      drawScene(ctx, w, h, dpr);
+      rafRef.current = requestAnimationFrame(loop);
+    };
+
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isRunning, gameOver]);
+
+  const drawScene = (ctx, w, h, dpr) => {
+    const C = cfg.current;
+    const car = carRef.current;
+
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = C.grassColor;
+    ctx.fillRect(0, 0, w, h);
+
+    const totalRoadWidth = C.lanes * C.laneWidth;
+    const roadLeft = (w - totalRoadWidth) / 2;
+
+    ctx.fillStyle = C.shoulderColor;
+    ctx.fillRect(roadLeft - C.roadMargin, 0, totalRoadWidth + 2 * C.roadMargin, h);
+    ctx.fillStyle = C.roadColor;
+    ctx.fillRect(roadLeft, 0, totalRoadWidth, h);
+
+    ctx.strokeStyle = C.lineColor;
+    ctx.lineWidth = 6;
+    ctx.setLineDash([C.dashLength, C.dashGap]);
+    const offset = (performance.now() / 1000) * (car.speed * 0.6);
+    ctx.lineDashOffset = -offset;
+    for (let i = 1; i < C.lanes; i++) {
+      const x = roadLeft + i * C.laneWidth;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "#d9d9d9";
+    ctx.beginPath(); ctx.moveTo(roadLeft, 0); ctx.lineTo(roadLeft, h); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(roadLeft + totalRoadWidth, 0); ctx.lineTo(roadLeft + totalRoadWidth, h); ctx.stroke();
+
+    drawCar(ctx, car.x, car.y, C);
+
+    ctx.fillStyle = C.obstacleColor;
+    obstaclesRef.current.forEach((obs) => {
+      ctx.fillRect(obs.x - C.obstacleWidth / 2, obs.y - C.obstacleHeight / 2, C.obstacleWidth, C.obstacleHeight);
+    });
+
+    if (showHUD) drawHUD(ctx, w, h, car, C);
+    if (gameOver) {
+      ctx.fillStyle = "rgba(0,0,0,0.6)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 48px sans-serif";
+      ctx.fillText("GAME OVER", w / 2 - 140, h / 2);
+    }
+
+    ctx.restore();
+  };
+
+  const drawCar = (ctx, cx, cy, C) => {
+    ctx.fillStyle = C.carColor;
+    ctx.fillRect(cx - 28, cy - 48, 56, 96);
+  };
+
+  const drawHUD = (ctx, w, h, car, C) => {
+    ctx.fillStyle = "white";
+    ctx.font = "16px sans-serif";
+    ctx.fillText(`Speed: ${Math.round(car.speed * 0.36)} km/h`, 20, 30);
+    ctx.fillText(`Score: ${score}`, 20, 50);
+  };
+
+  return (
+    <div className="relative w-full h-[80vh] bg-black">
+      <canvas ref={canvasRef} className="block w-full h-full" />
+      {gameOver && (
+        <button
+          onClick={() => {
+            setGameOver(false);
+            setScore(0);
+            setIsRunning(true);
+            obstaclesRef.current = [];
+            difficultyRef.current = 1;
+          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded"
+        >
+          Restart
+        </button>
+      )}
+    </div>
+  );
+}
