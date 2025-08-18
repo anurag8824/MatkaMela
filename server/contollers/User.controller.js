@@ -241,7 +241,7 @@ export const UserShop = async (req, res) => {
 export const GetAllGame = async (req, res) => {
   try {
     // Saare records fetch karna
-    const [rows] = await req.db.query('SELECT * FROM GAMES');
+    const [rows] = await req.db.query('SELECT * FROM games');
 
     res.status(200).json(rows);
   } catch (err) {
