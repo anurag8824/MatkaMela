@@ -1,12 +1,15 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../../Utils/axiosInstance';
+import { toast } from 'react-toastify';
 
 const Jodi = () => {
     const backUrl = process.env.REACT_APP_BACKEND_URL;
 
     const [bets, setBets] = useState(Array(99).fill("")); // 99 inputs ka array
+    const [totalPoints, setTotalPoints] = useState(0);
+  const [remainingPoints, setRemainingPoints] = useState(0);
 
     const gameId = useParams().id
     console.log(gameId,"pppp")
@@ -17,6 +20,15 @@ const Jodi = () => {
       updatedBets[index] = value;
       setBets(updatedBets);
     };
+
+    const maxPoints = 1000;
+
+    useEffect(() => {
+      const total = bets.reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+      setTotalPoints(total);
+      setRemainingPoints(maxPoints - total);
+    }, [bets]);
+  
 
     const handlePlaceBet = async () => {
         // Sirf filled inputs ka array banao
@@ -30,17 +42,29 @@ const Jodi = () => {
         console.log("Filled Bets:", filledBets); // Send se pehle console
     
         try {
-          const res = await axiosInstance.post(`${backUrl}/api/bet-game-jodi`, {filledBets,gameId}, );
+          const res = await axiosInstance.post(`${backUrl}/api/bet-game-jodi`, {filledBets,gameId,totalPoints}, );
           console.log("API Response:", res.data);
           alert("Bet Placed")
         } catch (err) {
           console.error("API Error:", err);
+          toast.error(err.response.data.message || "Error placing bet");
         }
       };
 
   return (
     <div>     
+    <div className="flex justify-between items-center bg-gray-100 p-2 rounded mb-4">
+        <div className="text-xs font-semibold">
+          Total Points: <span className="text-blue-600">{totalPoints}</span>
+        </div>
+        <div className="text-xs hidden font-semibold">
+          Points Remaining: <span className="text-red-600">{remainingPoints}</span>
+        </div>
+      </div>
     <div className="grid grid-cols-4 gap-2">
+
+    
+      
       {Array.from({ length: 99 }).map((_, i) => (
         <div
           key={i}

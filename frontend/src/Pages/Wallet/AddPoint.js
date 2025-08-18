@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import { FaUniversity } from 'react-icons/fa'
 import { IoClose } from 'react-icons/io5';
 import { toast } from 'react-toastify';
+import axiosInstance from '../../Utils/axiosInstance';
 
 
 const AddPoint = () => {
   const [amount, setAmount] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const backUrl = process.env.REACT_APP_BACKEND_URL;
+
 
   const handleAddPoints = async () => {
     if (!amount || amount <= 0) {
@@ -14,13 +17,11 @@ const AddPoint = () => {
       return;
     }
     try {
-      const res = await fetch("https://example.com/api/addpoints", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
+      const res = await axiosInstance.post(`${backUrl}/api/add-points`, {
+        amount,
       });
-      const data = await res.json();
-      console.log("API Response:", data);
+    
+      console.log("API Response:", res.data);
       alert("Points added successfully!");
     } catch (err) {
       console.error(err);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../Utils/axiosInstance";
+import { toast } from "react-toastify";
 
 const Haraf = () => {
 
@@ -59,7 +60,7 @@ const Haraf = () => {
       alert("Bet placed successfully!");
     } catch (err) {
       console.error("Error placing bet:", err);
-      alert("Failed to place bet");
+      toast.error(err.response.data.message || "Error placing bet");
     }
   };
 

@@ -66,6 +66,7 @@ const History = () => {
                   <th>Type</th>
                   <th>Number </th>
                   <th>Points </th>
+                  <th>Status </th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -86,6 +87,7 @@ const History = () => {
               <td>{bet.type}</td>
               <td>{bet.number}</td>
               <td>{bet.point}</td>
+              <td>{bet.status}</td>
               <td>
                 <button className="btn btn-sm btn-primary">View</button>
               </td>

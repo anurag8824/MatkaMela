@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../Utils/axiosInstance";
+import { toast } from "react-toastify";
 
 const Manual = () => {
 
@@ -57,6 +58,8 @@ const Manual = () => {
       alert("Bet Placed")
     } catch (err) {
       console.error("API Error:", err);
+      toast.error(err.response.data.message || "Error placing bet");
+      
     }
   };
 

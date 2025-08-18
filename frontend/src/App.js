@@ -26,6 +26,9 @@ import HelpPage from './Pages/Wallet/HelpPage';
 import PlayMenu from './Pages/PlayMenu';
 import History from './Pages/History';
 import Productpage from './Productpage';
+import Tnc from './Pages/Tnc';
+import AppDetails from './Pages/AppDetails';
+import Share from './Pages/Share';
 
 function App() {
   return (
@@ -39,6 +42,12 @@ function App() {
           <Route path="play" element={<PlayMenu />} />
           <Route path="history" element={<History />} />
           <Route path="login" element={<Login />} />
+          <Route path="Termsandcondition" element={<Tnc />} />
+          <Route path="Appdetails" element={<AppDetails />} />
+          <Route path="share" element={<Share />} />
+
+
+
           {/* <Route path="product" element={<Productpage />} />  */}
 
 

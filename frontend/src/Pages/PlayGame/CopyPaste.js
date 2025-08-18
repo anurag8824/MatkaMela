@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../Utils/axiosInstance";
+import { toast } from "react-toastify";
 
 const CopyPaste = () => {
     const backUrl = process.env.REACT_APP_BACKEND_URL;
@@ -94,7 +95,8 @@ const CopyPaste = () => {
       console.log(response.data);
     } catch (err) {
       console.error(err);
-      alert("Error placing bet");
+      toast.error(err.response.data.message || "Error placing bet");
+      
     }
   };
 

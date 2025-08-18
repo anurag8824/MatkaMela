@@ -251,8 +251,34 @@ export const GetAllGame = async (req, res) => {
 };
 
 
+// helpers/walletHelper.js
+export const deductWalletBalance = async (db, phone, totalPoints) => {
+  try {
+    // 1. User fetch karo
+    const [users] = await db.query("SELECT wallet FROM users WHERE mobile = ?", [phone]);
+    if (users.length === 0) {
+      throw new Error("User not found");
+    }
 
+    const walletBalance = users[0].wallet;
 
+    // 2. Check balance
+    if (walletBalance < totalPoints) {
+      throw new Error("Insufficient balance");
+    }
+
+    // 3. Update wallet
+    const newBalance = walletBalance - totalPoints;
+    await db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newBalance, phone]);
+
+    return { success: true, newBalance };
+  } catch (err) {
+    console.log("Error deducting wallet balance:", err);
+    throw err;
+  }
+};
+
+// helpers/gameHelper.js
 export const getGameNameById = async (db, gameId) => {
   const [rows] = await db.query(
     "SELECT name FROM games WHERE id = ?",
@@ -267,16 +293,24 @@ export const getGameNameById = async (db, gameId) => {
 };
 
 
+
+
 export const BetGameJodi = async (req, res) => {
   console.log(req.user, "autth se middle wale")
   const mobile = req.user.mobile
   console.log(mobile, "user ka number")
   try {
-    const { filledBets, gameId } = req.body;
+    const { filledBets, gameId , totalPoints } = req.body;
     console.log("Request body jodi:", req.body);
 
     if (!filledBets || filledBets.length === 0) {
       return res.status(400).json({ success: false, message: "No bets provided." });
+    }
+
+    try {
+      await deductWalletBalance(req.db, mobile, totalPoints);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
     }
 
 
@@ -318,6 +352,12 @@ export const BetGameManual = async (req, res) => {
     const mobile = req.user.mobile
 
     const gameName = await getGameNameById(req.db, gameID);
+
+    try {
+      await deductWalletBalance(req.db, mobile, req.body.totalPoints);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
 
     // Transform rows
     const result = [];
@@ -365,10 +405,16 @@ export const BetGameManual = async (req, res) => {
 export const BetGameHarraf = async (req, res) => {
   const mobile = req.user.mobile
   try {
-    const { andarHaraf, baharHaraf, gameId } = req.body;
+    const { andarHaraf, baharHaraf, gameId , totalPoints } = req.body;
     console.log("Request body harraf:", req.body);
 
     const gameName = await getGameNameById(req.db, gameId);
+
+    try {
+      await deductWalletBalance(req.db, mobile, totalPoints);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
 
     const result = [];
 
@@ -424,7 +470,7 @@ export const BetGameHarraf = async (req, res) => {
 export const BetGameCrossing = async (req, res) => {
   const mobile = req.user.mobile
   try {
-    const { bets, gameId } = req.body;
+    const { bets, gameId, totalPoints } = req.body;
     console.log("Request body crossing:", req.body);
 
     if (!bets || bets.length === 0) {
@@ -433,6 +479,11 @@ export const BetGameCrossing = async (req, res) => {
 
 
     const gameName = await getGameNameById(req.db, gameId);
+    try {
+      await deductWalletBalance(req.db, mobile, totalPoints);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
 
 
     // Transform data for bulk insert
@@ -464,7 +515,7 @@ export const BetGameCrossing = async (req, res) => {
 export const BetGameCopyPaste = async (req, res) => {
   const mobile = req.user.mobile
   try {
-    const { bets, gameId } = req.body;
+    const { bets, gameId , totalPoints } = req.body;
     console.log("Request body copy-paste:", req.body);
 
     if (!bets || bets.length === 0) {
@@ -472,6 +523,11 @@ export const BetGameCopyPaste = async (req, res) => {
     }
 
     const gameName = await getGameNameById(req.db, gameId);
+    try {
+      await deductWalletBalance(req.db, mobile, totalPoints);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
 
     // Transform data for bulk insert
     const result = bets.map(bet => [
@@ -515,12 +571,14 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       AND DATE(DATE_TIME) = DATE(?)
     `;
     const [bets] = await req.db.query(betsQuery, [GAME_ID, DATE]);
-    console.log(bets,"betss ki ")
+    console.log(bets,"betss ki non result ")
 
     if (!bets.length) {
       console.log("No bets found for this game and date.");
       return;
     }
+
+    let updatedBets = [];
 
     // Loop all bets & update status
     for (const bet of bets) {
@@ -530,30 +588,30 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       switch (bet.TYPE) {
         case "Jodi":
           expectedResult = Jodi;
-          status = bet.NUMBER === Jodi ? "Win" : "Loss";
+          status = bet.number === Jodi ? "Win" : "Loss";
           break;
 
         case "Manual":
           // manual winning numbers string "12,34" → split
           const manualNumbers = Manual.split(",");
           expectedResult = Manual;
-          status = manualNumbers.includes(bet.NUMBER) ? "Win" : "Loss";
+          status = manualNumbers.includes(bet.number) ? "Win" : "Loss";
           break;
 
         case "AndarHaraf":
           expectedResult = andarHaraf.toString();
-          status = bet.NUMBER === expectedResult ? "Win" : "Loss";
+          status = bet.number === expectedResult ? "Win" : "Loss";
           break;
 
         case "BaharHaraf":
           expectedResult = baharHaraf.toString();
-          status = bet.NUMBER === expectedResult ? "Win" : "Loss";
+          status = bet.number === expectedResult ? "Win" : "Loss";
           break;
 
         case "Crossing":
           const crossingNumbers = Crossing.split(",");
           expectedResult = Crossing;
-          status = crossingNumbers.includes(bet.NUMBER) ? "Win" : "Loss";
+          status = crossingNumbers.includes(bet.number) ? "Win" : "Loss";
           break;
 
         case "CopyPaste":
@@ -569,9 +627,23 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
         WHERE ID = ?
       `;
       await req.db.query(updateQuery, [expectedResult, status, bet.ID]);
+
+      if(status === "Win") {
+      updatedBets.push({
+        betId: bet.ID,
+        type: bet.TYPE,
+        number: bet.number,
+        point: bet.point,
+        user:bet.phone,
+        expectedResult,
+        status
+      });}
+    
     }
 
-    // console.log("Bets updated successfully for game:", GAME_ID);
+    console.log(updatedBets , "✅ Updated Bets:" );
+
+   
 
   } catch (err) {
     console.error("Error updating bets:", err);
@@ -648,7 +720,7 @@ export const CalculateGameResults = async (req, res) => {
 
     // ---- Insert into DB ----
     const insertQuery = `
-  INSERT INTO result 
+  INSERT INTO RESULT 
   (GAME_ID, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
@@ -672,7 +744,7 @@ export const CalculateGameResults = async (req, res) => {
 
     // Fetch inserted row (with DATE_TIME too)
     const [insertedRows] = await req.db.query(
-      "SELECT * FROM result WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
+      "SELECT * FROM RESULT WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
       [gameId]
     );
 
@@ -705,6 +777,24 @@ export const CalculateGameResults = async (req, res) => {
   }
 };
 
+export const getUserInfo = async (req, res) => {
+  try {
+    const [rows] = await req.db.query(
+      "SELECT mobile, wallet FROM users WHERE mobile = ? LIMIT 1",
+      [req.user.mobile]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error fetching user info:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 
 export const getUserBetHistory = async (req, res) => {
   try {
@@ -716,7 +806,7 @@ export const getUserBetHistory = async (req, res) => {
 
     // SQL query to get bets by user's mobile
     const [bets] = await req.db.query(
-      `SELECT id, number, point, type, game,game_id, date_time
+      `SELECT id, number, point, type, game,game_id, date_time,status
        FROM bets
        WHERE phone = ?
        ORDER BY id DESC`,
@@ -732,3 +822,49 @@ export const getUserBetHistory = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const AddMoney = async (req, res) => {
+  try {
+    let { amount } = req.body;
+    const mobile = req.user?.mobile;
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid amount" });
+    }
+
+    amount = parseFloat(amount); // ensure number
+
+    if (!mobile) {
+      return res.status(401).json({ success: false, message: "Unauthorized: Mobile not found" });
+    }
+
+    // Find user by mobile
+    const [users] = await req.db.query("SELECT * FROM users WHERE mobile = ?", [mobile]);
+    if (!users.length) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const user = users[0];
+
+    // Ensure wallet is a number
+    let wallet = parseFloat(user.wallet);
+    if (isNaN(wallet)) wallet = 0;
+
+    const newWalletBalance = wallet + amount;
+
+    // Update wallet
+    await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWalletBalance, mobile]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Money added successfully",
+      wallet: newWalletBalance
+    });
+
+  } catch (err) {
+    console.error("Error in AddMoney:", err);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
