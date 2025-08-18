@@ -104,25 +104,25 @@ export const SendOTP = async (req, res) => {
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-   // Check if user already exists
-   const [rows] = await req.db.query(
-    "SELECT id FROM users WHERE mobile = ?",
-    [phone]
-  );
+    // Check if user already exists
+    const [rows] = await req.db.query(
+      "SELECT id FROM users WHERE mobile = ?",
+      [phone]
+    );
 
-  if (rows.length > 0) {
-    // Update existing user's OTP
-    await req.db.query(
-      "UPDATE users SET otp = ? WHERE mobile = ?",
-      [otp, phone]
-    );
-  } else {
-    // Insert new user with mobile + OTP
-    await req.db.query(
-      "INSERT INTO users (mobile, otp) VALUES (?, ?)",
-      [phone, otp]
-    );
-  }
+    if (rows.length > 0) {
+      // Update existing user's OTP
+      await req.db.query(
+        "UPDATE users SET otp = ? WHERE mobile = ?",
+        [otp, phone]
+      );
+    } else {
+      // Insert new user with mobile + OTP
+      await req.db.query(
+        "INSERT INTO users (mobile, otp) VALUES (?, ?)",
+        [phone, otp]
+      );
+    }
 
     // Send OTP via NinzaSMS
     const response = await fetch("https://ninzasms.in.net/auth/send_sms", {
@@ -135,7 +135,7 @@ export const SendOTP = async (req, res) => {
         sender_id: "15539",
         variables_values: otp.toString(),
         numbers: phone,
-        rout: "waninza" // for WhatsApp OTP
+        // rout: "waninza" // for WhatsApp OTP
       })
     });
 
@@ -165,10 +165,10 @@ export const UserLogin = async (req, res) => {
       return res.status(401).json({ message: "Invalid OTP" });
     }
 
-  
+
 
     const user = rows[0];
-    console.log(user,"userrrr")
+    console.log(user, "userrrr")
 
     // Clear OTP after verification (optional but recommended)
     await req.db.query("UPDATE users SET otp = NULL WHERE mobile = ?", [emailOrPhone]);
@@ -268,9 +268,9 @@ export const getGameNameById = async (db, gameId) => {
 
 
 export const BetGameJodi = async (req, res) => {
-  console.log(req.user,"autth se middle wale")
+  console.log(req.user, "autth se middle wale")
   const mobile = req.user.mobile
-  console.log(mobile,"user ka number")
+  console.log(mobile, "user ka number")
   try {
     const { filledBets, gameId } = req.body;
     console.log("Request body jodi:", req.body);
@@ -289,7 +289,7 @@ export const BetGameJodi = async (req, res) => {
       Number(bet.value),    // point column
       gameId,               // game_id column
       "Jodi",
-      mobile ,
+      mobile,
       gameName               // type column
     ]);
 
@@ -310,7 +310,7 @@ export const BetGameJodi = async (req, res) => {
 
 
 export const BetGameManual = async (req, res) => {
-  
+
   try {
     const rows = req.body.dataToSend;
     const gameID = req.body.gameId
@@ -334,7 +334,7 @@ export const BetGameManual = async (req, res) => {
         //   });
         // }
         if (value) { // Only process non-empty values
-          result.push([value, Number(point), gameID, "Manual", mobile,gameName]); // Prepare as array for bulk insert
+          result.push([value, Number(point), gameID, "Manual", mobile, gameName]); // Prepare as array for bulk insert
         }
       });
     });
@@ -367,7 +367,7 @@ export const BetGameHarraf = async (req, res) => {
   try {
     const { andarHaraf, baharHaraf, gameId } = req.body;
     console.log("Request body harraf:", req.body);
-    
+
     const gameName = await getGameNameById(req.db, gameId);
 
     const result = [];
@@ -379,8 +379,8 @@ export const BetGameHarraf = async (req, res) => {
           bet.number,          // number column
           Number(bet.points),  // point column
           gameId,              // game_id column
-          "AndarHaraf"   ,
-          mobile  ,
+          "AndarHaraf",
+          mobile,
           gameName    // type column
         ]);
       });
@@ -394,7 +394,7 @@ export const BetGameHarraf = async (req, res) => {
           Number(bet.points),  // point column
           gameId,              // game_id column
           "BaharHaraf",
-          mobile  ,
+          mobile,
           gameName       // type column
         ]);
       });
@@ -433,7 +433,7 @@ export const BetGameCrossing = async (req, res) => {
 
 
     const gameName = await getGameNameById(req.db, gameId);
-    
+
 
     // Transform data for bulk insert
     const result = bets.map(bet => [
@@ -479,7 +479,7 @@ export const BetGameCopyPaste = async (req, res) => {
       Number(bet.points),   // point column
       // bet.paltiType,        // palti_type column
       gameId,               // game_id column
-      "CopyPaste" ,         // type column
+      "CopyPaste",         // type column
       mobile,
       gameName
     ]);
@@ -501,9 +501,88 @@ export const BetGameCopyPaste = async (req, res) => {
 
 
 
+
+export const UpdateBetsWithResults = async (req, resultRow) => {
+  try {
+    const { GAME_ID, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste, DATE } = resultRow;
+
+    console.log(resultRow, "resutl Row")
+
+    // Fetch bets of that gameId & same date
+    const betsQuery = `
+      SELECT * FROM bets 
+      WHERE GAME_ID = ? 
+      AND DATE(DATE_TIME) = DATE(?)
+    `;
+    const [bets] = await req.db.query(betsQuery, [GAME_ID, DATE]);
+    console.log(bets,"betss ki ")
+
+    if (!bets.length) {
+      console.log("No bets found for this game and date.");
+      return;
+    }
+
+    // Loop all bets & update status
+    for (const bet of bets) {
+      let expectedResult = null;
+      let status = "Loss";
+
+      switch (bet.TYPE) {
+        case "Jodi":
+          expectedResult = Jodi;
+          status = bet.NUMBER === Jodi ? "Win" : "Loss";
+          break;
+
+        case "Manual":
+          // manual winning numbers string "12,34" → split
+          const manualNumbers = Manual.split(",");
+          expectedResult = Manual;
+          status = manualNumbers.includes(bet.NUMBER) ? "Win" : "Loss";
+          break;
+
+        case "AndarHaraf":
+          expectedResult = andarHaraf.toString();
+          status = bet.NUMBER === expectedResult ? "Win" : "Loss";
+          break;
+
+        case "BaharHaraf":
+          expectedResult = baharHaraf.toString();
+          status = bet.NUMBER === expectedResult ? "Win" : "Loss";
+          break;
+
+        case "Crossing":
+          const crossingNumbers = Crossing.split(",");
+          expectedResult = Crossing;
+          status = crossingNumbers.includes(bet.NUMBER) ? "Win" : "Loss";
+          break;
+
+        case "CopyPaste":
+          expectedResult = CopyPaste;
+          status = CopyPaste; // Win/Loss direct
+          break;
+      }
+
+      // Update bet row
+      const updateQuery = `
+        UPDATE bets 
+        SET RESULT = ?, STATUS = ? 
+        WHERE ID = ?
+      `;
+      await req.db.query(updateQuery, [expectedResult, status, bet.ID]);
+    }
+
+    // console.log("Bets updated successfully for game:", GAME_ID);
+
+  } catch (err) {
+    console.error("Error updating bets:", err);
+  }
+};
+
+
+
 export const CalculateGameResults = async (req, res) => {
   try {
-    const { openResult, closeResult, gameId  } = req.body;
+    const { openResult, closeResult, gameId } = req.body;
     console.log(req.body, "reqbody")
 
     console.log("Declared Result:", openResult, closeResult);
@@ -589,6 +668,18 @@ export const CalculateGameResults = async (req, res) => {
     ];
 
     await req.db.query(insertQuery, values);
+
+
+    // Fetch inserted row (with DATE_TIME too)
+    const [insertedRows] = await req.db.query(
+      "SELECT * FROM result WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
+      [gameId]
+    );
+
+    if (insertedRows.length) {
+      await UpdateBetsWithResults(req, insertedRows[0]);
+    }
+
 
 
     const resultObj = {

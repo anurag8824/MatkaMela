@@ -57,9 +57,9 @@ export default function Login() {
       localStorage.setItem('mobile', user.mobile);
       localStorage.setItem('id', user.id);
 
-
+      
       alert('Login successful');
-      window.location.href("/")
+      window.location.href = "/";
     } catch (err) {
       alert('Login failed');
       console.error(err);
