@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios"
+import axiosInstance from "../Utils/axiosInstance";
 
 const EditResult = ({ initialId = "", apiBase }) => {
   const [games, setGames] = useState([]);
@@ -67,7 +68,7 @@ const handleSubmit = async (e) => {
   };
 
   try {
-    const { data } = await axios.post(`${backUrl}/api/bet-game-result`, payload, {
+    const { data } = await axiosInstance.post(`${backUrl}/api/bet-game-result`, payload, {
       headers: {
         "Content-Type": "application/json",
       },

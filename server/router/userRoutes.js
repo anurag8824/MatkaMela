@@ -51,7 +51,7 @@ router.get('/bet-game-history', authMiddleware, getUserBetHistory);
 
 
 
-router.post('/bet-game-result',  CalculateGameResults);
+router.post('/bet-game-result', authMiddleware ,  CalculateGameResults);
 
 
 

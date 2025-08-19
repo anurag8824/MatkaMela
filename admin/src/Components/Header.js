@@ -3,11 +3,86 @@ import { Link } from 'react-router-dom';
 import Profile from './Profile';
 
 import { FiMenu } from 'react-icons/fi';
+import { FaUser } from "react-icons/fa";
+import { FaTachometerAlt, FaUsers, FaCogs, FaGamepad } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa6";
+
+
 import { BsBellFill } from 'react-icons/bs';
+
+
+
+const menuItems = [
+  {
+    title: "Dashboard",
+    icon: <FaTachometerAlt />,
+    link: "https://admin.dsmatka.com/public/administrator/dashboard",
+  },
+  {
+    title: "Users",
+    icon: <FaUsers />,
+    children: [
+      {
+        title: "Active Users",
+        link: "https://admin.dsmatka.com/public/administrator/user/active-user-list",
+      },
+      {
+        title: "Inactive Users",
+        link: "https://admin.dsmatka.com/public/administrator/user/inactive-user-list",
+      },
+      {
+        title: "Today Users",
+        link: "https://admin.dsmatka.com/public/administrator/user/today-user-list",
+      },
+      {
+        title: "Today Online Users",
+        link: "https://admin.dsmatka.com/public/administrator/user/online-user-list",
+      },
+      {
+        title: "Users Game Report",
+        link: "https://admin.dsmatka.com/public/administrator/user-game-report-list",
+      },
+      {
+        title: "Users Reffer Report",
+        link: "https://admin.dsmatka.com/public/administrator/user/user-reffer-report",
+      },
+    ],
+  },
+  {
+    title: "Games",
+    icon: <FaGamepad />,
+    children: [
+      { title: "All Games", link: "#" },
+      { title: "Game Reports", link: "#" },
+    ],
+  },
+  {
+    title: "Settings",
+    icon: <FaCogs />,
+    children: [
+      { title: "General Settings", link: "#" },
+      { title: "Payment Settings", link: "#" },
+    ],
+  },
+];
+
 
 const Header = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+
+
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  const toggleDropdown = (menu) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
+
+
+
+
 
   return (
     <header className="w-full sticky top-0 z-50 bg-white shadow">
@@ -15,7 +90,7 @@ const Header = () => {
    
 
 
-      <div className="w-full bg-[#094c73] px-3 py-2 shadow-md">
+      <div className="w-full bg-[##094c73] px-3 py-2 shadow-md">
         <div className="flex justify-between items-center">
           {/* Left: Hamburger + Badge + Home */}
           <div className="flex items-center gap-2">
@@ -30,7 +105,7 @@ const Header = () => {
           {/* Center: Logo */}
           <div className="flex justify-center">
             <img
-              src="/images/whitelogo.png"
+              src="/images/blacklogo.png"
               alt="logo"
               className="h-10"
             />
@@ -38,19 +113,10 @@ const Header = () => {
 
           {/* Right: Points + Bell */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <img
-                src="https://khelomatka.com/static/media/points.8ca46c1daf68863799f4.gif"
-                alt="points"
-                className="h-4"
-              />
-              <span className="text-sm font-medium">0 /-</span>
-            </div>
-            <a href="/Notification" className="relative text-white">
-              <BsBellFill className="text-xl" />
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                6
-              </span>
+            
+            <a href="#" className="relative text-black">
+              <FaUser className="text-xl" />
+             
             </a>
           </div>
         </div>
@@ -59,10 +125,10 @@ const Header = () => {
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-blak bg-opacity-40 z-40" onClick={() => setIsSidebarOpen(false)}>
           <div
-            className="absolute top-0 left-0 w-64 h-full bg-[#094c73] z-50 shadow-md"
+            className="absolute top-0 left-0 w-64 h-full bg-white z-50 shadow-md"
             onClick={(e) => e.stopPropagation()} // prevent sidebar from closing when clicked inside
           >
-            <div className="profileimage relative bg-[#094c73] p-4 rounded shadow-md w-full max-w-xs">
+            <div className="profileimage relative bg-white p-4 rounded shadow-md w-full max-w-xs">
   {/* Close Button */}
   <button onClick={() => setIsSidebarOpen(false)} type="button" className="absolute top-2 right-2 text-lg text-white bg-blue-600 hover:bg-blue-700 rounded-full w-8 h-8 flex items-center justify-center">
     ×
@@ -71,10 +137,64 @@ const Header = () => {
   {/* Profile Top */}
   <div className="flex items-center justify-between mb-4">
     <div className="profilephoto">
-      <img   src="/images/whitelogo.png" alt="Profile" className=" h-6 rounded-full" />
+      <img   src="/images/blacklogo.png" alt="Profile" className=" h-6 rounded-full" />
     </div>
     {/* <a href="/Profile" className="text-blue-50 font-medium text-sm hover:underline">Edit Profile</a> */}
   </div>
+
+  <div className="w-64 hidden bg-gray-800 text-white h-screen fixed overflow-y-auto">
+      
+      <ul className="space-y-1 mt-2">
+        {menuItems.map((item, index) => (
+          <li key={index}>
+            {item.children ? (
+              <>
+                {/* Dropdown Parent */}
+                <button
+                  onClick={() => toggleDropdown(index)}
+                  className="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-700"
+                >
+                  <div className="flex items-center">
+                    <span className="mr-3">{item.icon}</span>
+                    {item.title}
+                  </div>
+                  <FaChevronDown
+                    className={`transition-transform ${
+                      openDropdown === index ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Items */}
+                {openDropdown === index && (
+                  <ul className="pl-10 space-y-1 bg-gray-700">
+                    {item.children.map((child, i) => (
+                      <li key={i}>
+                        <a
+                          href={child.link}
+                          className="block py-2 hover:bg-gray-600 px-2 rounded"
+                        >
+                          {child.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            ) : (
+              // Normal Link (without dropdown)
+              <a
+                href={item.link}
+                className="flex items-center px-4 py-2 hover:bg-gray-700"
+              >
+                <span className="mr-3">{item.icon}</span>
+                {item.title}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
 
   {/* Profile Details */}
 
@@ -101,7 +221,7 @@ const Header = () => {
     <li key={idx}>
       <Link
         to={item.href}
-        className={`flex items-center gap-3 px-3 py-2 rounded-md bg-gray-100 
+        className={`flex items-center gap-3  py-1 rounded-md bg-white
           ${item.logout ? 'text-red-600 font-semibold' : 'text-gray-700'}`}
       >
         <div className="w-6 h-6 flex items-center justify-center">
@@ -111,6 +231,10 @@ const Header = () => {
       </Link>
     </li>
   ))}
+
+
+
+
 
   {/* Social Media */}
   <li className="p-0 mt-4">

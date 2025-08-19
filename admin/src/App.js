@@ -17,6 +17,7 @@ import Settings from './Pages/Settings';
 import Refresh from './Pages/Refresh';
 import PasswordReset from './Pages/PasswordReset';
 import EditResult from './Pages/EditResult';
+import Login from './Pages/Account/Login';
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
           <Route path="users" element={<ManageUsers />} />
           <Route path="manage_result" element={<ManageResult />} />
           <Route path="edit-result/:id/:name" element={<EditResult />} />
+
+          <Route path="login" element={<Login />} />
 
           <Route path="manage_starline" element={<ManageStarlineResult />} />
           <Route path="manage_guess" element={<ManageGuess />} />

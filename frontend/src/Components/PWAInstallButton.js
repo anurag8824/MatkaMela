@@ -55,9 +55,12 @@ export default function PWAInstallButton() {
     //              shadow-[0_0_18px_rgba(120,180,255,0.6)]
     //              hover:shadow-[0_0_28px_rgba(140,200,255,0.9)]
     //              transition-all duration-300 hover:scale-105"
-    className="btn btn-primary px-1  py-1 rounded bg-[#094c73] text-xs text-white hover:bg-blue-700 transition duration-300"
+    className="btn border-white border-dotted border-2 btn-primary px-1 w-full mt-2  py-1 rounded bg-[#094c73] text-lg text-white hover:bg-blue-700 transition duration-300"
     >
-      Install App
+      Install Application 1
     </button>
+
+
+
   );
 }

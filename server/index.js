@@ -4,6 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './db/connection.js';
 import userRoutes from './router/userRoutes.js';
+import adminRoutes from './router/adminRoutes.js';
+
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api', userRoutes);
+app.use('/admin', adminRoutes);
+
 
 // Start server after testing DB connection
 const startServer = async () => {

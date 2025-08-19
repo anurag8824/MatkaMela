@@ -653,6 +653,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
 
 export const CalculateGameResults = async (req, res) => {
+  console.log(req.user,"chcck")
   try {
     const { openResult, closeResult, gameId } = req.body;
     console.log(req.body, "reqbody")
