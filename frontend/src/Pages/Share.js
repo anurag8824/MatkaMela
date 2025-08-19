@@ -16,7 +16,7 @@ const Share = () => {
   };
   return (
     <div>
-         <div className="flex flex-col items-center justify-center min-h-screen">
+         <div className="flex flex-col items-center justify-center min-h-screen bg-theme">
       
         <div className="fixed inset-0 bg-blue-900k bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-96 relative animate-fadeIn">

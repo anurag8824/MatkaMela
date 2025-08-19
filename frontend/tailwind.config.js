@@ -20,6 +20,9 @@ module.exports = {
       },
       backgroundImage: {
         'main': 'linear-gradient(to right, #F15A24, #F59018, #FEF903)',
+      },
+      backgroundColor : {
+        "theme" : "#094c73",
       }
     },
   },

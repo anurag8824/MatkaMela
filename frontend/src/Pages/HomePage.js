@@ -19,6 +19,34 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
 
+  const [dateTime, setDateTime] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+
+      // Format: DD-MM-YYYY Day HH:MM:SS AM/PM
+      const options = {
+        weekday: "short",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      };
+
+      const formatted = now.toLocaleString("en-GB", options)
+        .replace(",", ""); // remove comma between date & time
+
+      setDateTime(formatted);
+    }, 1000);
+
+    return () => clearInterval(interval); // cleanup
+  }, []);
+
+
   useEffect(() => {
     const fetchGames = async () => {
       try {
@@ -47,15 +75,19 @@ const HomePage = () => {
   }, [navigate]);
 
   return (
-    <div className="">
+    <div className="bg-[#343c44]">
       {/* <HighlightMarquee /> */}
 
-      <div className="flex w-full mt-2 justify-between text-nowrap">
+      <div className="flex w-full px-2 pt-2 justify-between text-nowrap">
         {/* Left Side Buttons - aligned to the left end */}
-        <div className="flex flex-col gap-4 items-start">
+        <div className="flex flex-col gap-2 items-start">
           <a
             href="/Depositchat"
-            className="w-44 flex items-center px-4 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-800"
+            className="w-44 flex items-center px-4 py-2 
+             bg-gradient-to-r from-blue-400 to-blue-600 
+             text-white rounded-full transition-all duration-500 
+             shadow-[0_0_20px_rgba(100,180,255,0.7)] 
+             hover:shadow-[0_0_35px_rgba(120,200,255,0.95)]"
           >
             <span className="mr-2 text-xl">
               <MdMarkUnreadChatAlt />
@@ -65,7 +97,11 @@ const HomePage = () => {
 
           <a
             href="/Withdrawalchat"
-            className="w-44 flex items-center px-4 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-800"
+            className="w-44 flex items-center px-4 py-2 
+             bg-gradient-to-r from-blue-400 to-blue-600 
+             text-white rounded-full transition-all duration-500 
+             shadow-[0_0_20px_rgba(100,180,255,0.7)] 
+             hover:shadow-[0_0_35px_rgba(120,200,255,0.95)]"
           >
             <span className="mr-2 text-xl">
               <MdOutlineChat />
@@ -75,11 +111,15 @@ const HomePage = () => {
         </div>
 
         {/* Right Side Buttons - aligned to the right end */}
-        <div className="flex flex-col gap-4 items-end">
+        <div className="flex flex-col gap-2 items-end">
           <a
             href="https://khelomatka.com/api/pages/other_games.php"
             target="_blank"
-            className="w-44 flex items-center px-4 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-800"
+            className="w-44 flex items-center px-4 py-2 
+             bg-gradient-to-r from-blue-400 to-blue-600 
+             text-white rounded-full transition-all duration-500 
+             shadow-[0_0_20px_rgba(100,180,255,0.7)] 
+             hover:shadow-[0_0_35px_rgba(120,200,255,0.95)]"
           >
             <span className="mr-2 text-xl">
               <IoGameController />
@@ -88,8 +128,12 @@ const HomePage = () => {
           </a>
 
           <a
-            href="/Home"
-            className="w-44 flex items-center px-4 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-800"
+            href="/"
+            className="w-44 flex items-center px-4 py-2 
+             bg-gradient-to-r from-blue-400 to-blue-600 
+             text-white rounded-full transition-all duration-500 
+             shadow-[0_0_20px_rgba(100,180,255,0.7)] 
+             hover:shadow-[0_0_35px_rgba(120,200,255,0.95)]"
           >
             <span className="mr-2 text-xl">
               <RiRefreshFill />
@@ -102,80 +146,83 @@ const HomePage = () => {
 
 
 
-      <div style={{ backgroundImage: "url(/images/home-back.jpeg)" }} class="w-full bg-yellow-100 border-4 border-[#4481eb] text-center py-2 px-2 mt-2 shadow-md">
-        <h6 class="text-lg sm:text-base font-semibold text-white">🔥 भरोसे का एक ही नाम 🔥</h6>
-        <h6 class="text-lg sm:text-base font-semibold text-white">🙏 matkamela.com 🙏</h6>
-        <h6 class="text-sm sm:text-xs mt-2 text-white">
-          <span id="date">07-08-2025 Thu 03:15:50 PM</span>
+      <div style={{ backgroundImage: "url(/images/home-back.jpeg)", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="w-full bg-yellow-100 border-4 border-[#4481eb] text-center py-2 px-2 mt-2 shadow-md">
+        <h6 className="text-lg sm:text-base font-semibold text-white">🔥 भरोसे का एक ही नाम 🔥</h6>
+        <h6 className="text-lg sm:text-base font-semibold text-white">🙏 matkamela.shop 🙏</h6>
+        <h6 className="text-sm sm:text-xs mt-2 text-white">
+          <span id="date">{dateTime}</span>
         </h6>
       </div>
-    
 
-      <div class="w-full hidden bg-[#ffd53c] hover:bg-[#ccc] border border-yellow-300 px-3 py-2 shadow-sm">
+
+      <div className="w-full hidden bg-[#ffd53c] hover:bg-[#ccc] border border-yellow-300 px-3 py-2 shadow-sm">
         {/* <!-- Market Name --> */}
-        <div class="text-center mb-1">
-          <h3 class="text-base font-semibold text-yellow-800 tracking-wide">
+        <div className="text-center">
+          <h3 className="text-base font-semibold text-yellow-800 tracking-wide">
             MORNING STAR
           </h3>
         </div>
 
         {/* <!-- Market Result Numbers --> */}
-        <div class="flex justify-center items-center gap-2 text-gray-800 text-base font-semibold">
+        <div className="flex justify-center items-center gap-2 text-gray-800 text-base font-semibold">
           <span>44</span>
           <span>-</span>
           <span>15</span>
         </div>
 
         {/* <!-- Market Timings --> */}
-        <ul class="flex justify-center items-center flex-wrap gap-3 text-xs text-gray-700 mt-1">
-          <li class="text-center">
-            <span class="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Open Time</span>
-            <span class="block">1:00 AM</span>
+        <ul className="flex justify-center items-center flex-wrap gap-3 text-xs text-gray-700 mt-1">
+          <li className="text-center">
+            <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Open Time</span>
+            <span className="block">1:00 AM</span>
           </li>
           <li>|</li>
-          <li class="text-center">
-            <span class="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Close Time</span>
-            <span class="block">11:00 AM</span>
+          <li className="text-center">
+            <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Close Time</span>
+            <span className="block">11:00 AM</span>
           </li>
           <li>|</li>
-          <li class="text-center">
-            <span class="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Result Time</span>
-            <span class="block">11:15 AM</span>
+          <li className="text-center">
+            <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Result Time</span>
+            <span className="block">11:15 AM</span>
           </li>
         </ul>
       </div>
 
 
       <div className="w-full bg-[#ffd53c]  border border-yellow-300 rounded-md shadow-sm mb-2 text-center relative overflow-hidden">
-  
-
-  {/* Result Text */}
-  <h5 className="text-base font-medium text-yellow-900 relative z-10">Result</h5>
-
-  {/* Market Name and Result Number */}
-  <div className="relative z-10 text-white font-bold text-base rounded-t-none p-4 rounded-[10px] overflow-hidden border-0 bg-gradient-to-br from-[#eecda3] via-[#ef629f] to-[#1d2671] bg-[length:400%_400%] animate-gradientresult">
-  <div className="absolute inset-0 pointer-events-none z-0">
-    {[...Array(12)].map((_, i) => (
-      <div
-        key={i}
-        className="w-2 h-2 bg-white rounded-full absolute animate-ping opacity-70"
-        style={{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-        }}
-      ></div>
-    ))}
-  </div>
-  <p className="text-white font-bold text-base mb-1">DEV DARSHAN</p>
-  <span className="font-bold text-lg text-white">53</span>
-</div>
-
-</div>
 
 
-      
+        {/* Result Text */}
+        <h5 className="text-lg border-white border-dashed border-1 font-medium bg-theme text-white relative z-10">Result</h5>
 
-<HomeMarket markets={games} />
+        {/* Market Name and Result Number */}
+        <div className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 bg-gradient-to-br from-[#d2ac79] via-[#ef629f] to-[#040f6b] bg-[length:400%_400%] animate-gradientresult">
+          <div className="absolute inset-0 pointer-events-none z-0">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="w-2 h-2 bg-white rounded-full absolute animate-ping opacity-70"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                }}
+              ></div>
+            ))}
+          </div>
+          <p className="text-white font-bold text-base">DEV DARSHAN</p>
+          <span className="font-bold text-xl text-white">53</span>
+        </div>
+
+
+
+      </div>
+
+      <h5 className="py-2 text-center rounded font-medium bg-theme text-white relative z-10">Live Result of {new Date().toLocaleDateString()}</h5>
+
+
+
+      <HomeMarket markets={games} />
 
 
 

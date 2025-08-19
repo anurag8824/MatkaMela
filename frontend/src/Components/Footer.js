@@ -97,45 +97,45 @@ const Footer = () => {
       </div>
     </div>
 
-    <div class="menufooter bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full">
-  <ul class="flex justify-around items-center">
+    <div className="menufooter bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full">
+  <ul className="flex justify-around items-center">
     
     {/* <!-- Home --> */}
-    <li class="menu">
-      <div class="inactive iconmenu">
-        <Link to="/" class="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
-          <i class="bi bi-house-door-fill text-xl"></i>
-          <span class="text-xs">Home</span>
+    <li className="menu">
+      <div className="inactive iconmenu">
+        <Link to="/" className="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
+          <i className="bi bi-house-door text-xl"></i>
+          <span className="text-xs">Home</span>
         </Link>
       </div>
     </li>
     
     {/* <!-- Play --> */}
-    <li class="menu">
-      <div class="inactive iconmenu">
-        <Link to="/Play" class="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
-          <i class="bi bi-controller text-xl"></i>
-          <span class="text-xs">Play</span>
+    <li className="menu">
+      <div className="inactive iconmenu">
+        <Link to="/Play" className="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
+          <i className="bi bi-controller text-xl"></i>
+          <span className="text-xs">Play</span>
         </Link>
       </div>
     </li>
     
     {/* <!-- Wallet --> */}
-    <li class="menu">
-      <div class="inactive iconmenu">
-        <Link to="/wallet" class="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
-          <i class="bi bi-wallet2 text-xl"></i>
-          <span class="text-xs">Wallet</span>
+    <li className="menu">
+      <div className="inactive iconmenu">
+        <Link to="/wallet" className="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
+          <i className="bi bi-wallet2 text-xl"></i>
+          <span className="text-xs">Wallet</span>
         </Link>
       </div>
     </li>
     
     {/* <!-- Help --> */}
-    <li class="menu">
-      <div class="iconmenu">
-        <Link to="/help" class="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
-          <i class="bi bi-info-square text-xl"></i>
-          <span class="text-xs">Help</span>
+    <li className="menu">
+      <div className="iconmenu">
+        <Link to="/help" className="flex flex-col items-center text-gray-600 hover:text-blue-600 py-2">
+          <i className="bi bi-info-square text-xl"></i>
+          <span className="text-xs">Help</span>
         </Link>
       </div>
     </li>

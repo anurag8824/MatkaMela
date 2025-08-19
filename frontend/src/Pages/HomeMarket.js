@@ -52,7 +52,7 @@ const HomeMarket = ({markets}) => {
   ];
 
   return (
-    <div>
+    <div className=''>
       {markets?.map((market) => (
         <Link to={`/play-game/${market.ID}`} key={market.ID}>
           <div className="w-full bg-[#ffd53c] hover:bg-[#ccc] border border-yellow-300 px-3 py-2 shadow-sm"
@@ -91,7 +91,7 @@ const HomeMarket = ({markets}) => {
                 <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">
                   Result Time
                 </span>
-                <span className="block">{market.result}</span>
+                <span className="block">{market.TIME2}</span>
               </li>
             </ul>
           </div>
