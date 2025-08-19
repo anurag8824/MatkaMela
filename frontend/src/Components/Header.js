@@ -75,7 +75,7 @@ const Header = () => {
           {/* Right: Points + Bell */}
           <div className="flex items-center gap-3">
 
-          <PWAInstallButton />
+          {/* <PWAInstallButton /> */}
             <div className="flex items-center gap-1">
               <img
                 src="https://khelomatka.com/static/media/points.8ca46c1daf68863799f4.gif"
