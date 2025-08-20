@@ -18,6 +18,9 @@ import Refresh from './Pages/Refresh';
 import PasswordReset from './Pages/PasswordReset';
 import EditResult from './Pages/EditResult';
 import Login from './Pages/Account/Login';
+import DepositHistory from './Pages/DepositHistory';
+import QrUploadForm from './Pages/QrUploadForm';
+import EditGame from './Pages/EditGame';
 
 function App() {
   return (
@@ -29,12 +32,19 @@ function App() {
           <Route path="manage_result" element={<ManageResult />} />
           <Route path="edit-result/:id/:name" element={<EditResult />} />
 
+
           <Route path="login" element={<Login />} />
 
           <Route path="manage_starline" element={<ManageStarlineResult />} />
           <Route path="manage_guess" element={<ManageGuess />} />
           <Route path="bets" element={<ManageBets />} />
           <Route path="manage_games" element={<ManageGames />} />
+
+          <Route path="edit-game/:id" element={<EditGame />} />
+
+
+
+
           <Route path="transactions" element={<Transactions />} />
           <Route path="manage_games" element={<ManageGames />} />
           <Route path="report" element={<ReportPage />} />
@@ -43,6 +53,12 @@ function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="refresh" element={<Refresh />} />
           <Route path="reset_password" element={<PasswordReset />} />
+
+
+          <Route path="deposit-list/:type" element={<DepositHistory />} />
+          <Route path="upload-qr" element={<QrUploadForm />} />
+
+
           
 
 

@@ -3,6 +3,7 @@ import { FaUniversity } from 'react-icons/fa'
 import { IoClose } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../Utils/axiosInstance';
+import { useNavigate } from 'react-router-dom';
 
 
 const AddPoint = () => {
@@ -10,23 +11,26 @@ const AddPoint = () => {
   const [showPopup, setShowPopup] = useState(false);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
 
-
+const navigate = useNavigate();
   const handleAddPoints = async () => {
     if (!amount || amount <= 0) {
       toast.error("Please enter amount");
       return;
     }
-    try {
-      const res = await axiosInstance.post(`${backUrl}/api/add-points`, {
-        amount,
-      });
+
+    navigate(`/deposit/${amount}`);
+
+    // try {
+    //   const res = await axiosInstance.post(`${backUrl}/api/add-points`, {
+    //     amount,
+    //   });
     
-      console.log("API Response:", res.data);
-      alert("Points added successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Error adding points");
-    }
+    //   console.log("API Response:", res.data);
+    //   alert("Points added successfully!");
+    // } catch (err) {
+    //   console.error(err);
+    //   alert("Error adding points");
+    // }
   };
 
   return (

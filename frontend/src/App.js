@@ -1,34 +1,17 @@
-import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import ContactPage from './Pages/ContactPage';
 import HomePage from './Pages/HomePage';
 import Layout from './Components/Layout';
-import ProductPage from './Pages/ProductPage';
-import NewsPage from './Pages/NewsPage';
-import GalleryPage from './Pages/GalleryPage';
-import AboutPage from './Pages/AboutPage';
-import Kendra from './Pages/Kendra';
-import Foundation from './Pages/Foundation';
-import Group from './Pages/Group';
-import Education from './Pages/Education';
-import WorkingTeam from './Pages/WorkingTeam';
-import WorkingTraining from './Pages/WorkingTraining';
-import WorkingScheme from './Pages/WorkingScheme';
-import WorkingBusiness from './Pages/WorkingBusiness';
-import MSME from './Pages/MSME';
-import ShopPage from './Pages/Ecom/ShopPage';
-import Register from './Pages/Account/Register';
 import Login from './Pages/Account/Login';
 import PlayPage from './Pages/PlayGame/PlayPage';
 import Wallet from './Pages/Wallet/Wallet';
 import HelpPage from './Pages/Wallet/HelpPage';
 import PlayMenu from './Pages/PlayMenu';
 import History from './Pages/History';
-import Productpage from './Productpage';
 import Tnc from './Pages/Tnc';
 import AppDetails from './Pages/AppDetails';
 import Share from './Pages/Share';
+import Deposit from './Pages/Wallet/Deposit';
 
 function App() {
   return (
@@ -45,6 +28,8 @@ function App() {
           <Route path="Termsandcondition" element={<Tnc />} />
           <Route path="Appdetails" element={<AppDetails />} />
           <Route path="share" element={<Share />} />
+          <Route path="deposit/:money" element={<Deposit />} />
+
 
 
 

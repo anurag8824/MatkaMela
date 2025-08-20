@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, GetAllGame, getUserBetHistory, getUserInfo, MSMEForm, SendOTP, UserLogin, UserRegister, UserShop } from '../contollers/User.controller.js';
+import { AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, GetAllGame, getDepositList, getUserBetHistory, getUserInfo, MSMEForm, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop } from '../contollers/User.controller.js';
 import upload from '../middlewares/upload.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -41,6 +41,13 @@ router.post('/bet-game-crossing',authMiddleware,  BetGameCrossing);
 router.post('/bet-game-copypaste', authMiddleware, BetGameCopyPaste);
 
 router.post('/add-points', authMiddleware, AddMoney);
+
+
+router.post('/user-deposit', authMiddleware, UserDeposit);
+
+router.get('/user-deposit-list', authMiddleware, getDepositList);
+
+
 
 
 

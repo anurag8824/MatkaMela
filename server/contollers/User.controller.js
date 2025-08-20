@@ -869,3 +869,59 @@ export const AddMoney = async (req, res) => {
   }
 };
 
+
+export const UserDeposit = async (req, res) => {
+  try {
+    const { amount, utr_number, type,status } = req.body;
+    const userId = req.user?.mobile; 
+    console.log(req.user)
+
+    if (!userId || !amount || !utr_number || !type) {
+      return res.status(400).json({ success: false, message: "Missing fields" });
+    }
+
+    const sql = `
+      INSERT INTO PAYMENT_QUEUE (USER_ID, AMOUNT, TXN_ID, MODE, STATUS)
+      VALUES (?, ?, ?, ?,?)
+    `;
+    await req.db.query(sql, [userId, amount, utr_number, type , status]);
+
+    return res.json({ success: true, message: "Deposit queued successfully ✅" });
+  } catch (err) {
+    console.error("Deposit API Error:", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+
+};
+
+
+export const getDepositList = async (req, res) => {
+  try {
+    let sql, params;
+
+    if (req.user?.role === "admin") {
+      // 🔹 Admin -> sabhi users ka data
+      sql = `SELECT * FROM PAYMENT_QUEUE ORDER BY id DESC`;
+      params = [];
+    } else {
+      // 🔹 Normal user -> sirf uska data
+      const userId = req.user?.mobile;
+      if (!userId) {
+        return res.status(400).json({ success: false, message: "User ID missing" });
+      }
+      sql = `SELECT * FROM PAYMENT_QUEUE WHERE USER_ID = ? ORDER BY id DESC`;
+      params = [userId];
+    }
+
+    const [rows] = await req.db.query(sql, params);
+
+    return res.json({
+      success: true,
+      message: "Deposit list fetched successfully ✅",
+      data: rows,
+    });
+  } catch (err) {
+    console.error("Get Deposit List API Error:", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};

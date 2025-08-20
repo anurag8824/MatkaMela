@@ -264,12 +264,35 @@ export default function HomePage() {
       </section>
 
 
+<div className="d-flex justify-content-end gap-2 mb-3">
+
+      <Link to={"upload-qr"}><button className="btn btn-success">Upload QR</button></Link>
+
+
+      <Link to={"deposit-list/pending"}><button className="btn btn-success">Deposit Pending </button></Link>
+      <Link to={"deposit-list/approved"}><button className="btn btn-success">Deposit Approved</button></Link>
+      <Link to={"deposit-list/cancelled"}><button className="btn btn-success">Deposit Cancelled</button></Link>
+
+      
+</div>
+     
+
+
+
 
       <div className="row">
 
 
       
+
+
+      
        <div className="col-md-12 mb-3">
+
+       
+
+
+
         <form method="get">
           <div className="d-flex align-items-center mb-5">
             <div>

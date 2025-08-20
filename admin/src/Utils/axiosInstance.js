@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const axiosInstance = axios.create();
+const backUrl = process.env.REACT_APP_BACKEND_URL;
+
+const axiosInstance = axios.create({
+  baseURL: backUrl, // <-- yahan set kar diya
+});
 
 // Automatically attach token to all requests
 axiosInstance.interceptors.request.use(

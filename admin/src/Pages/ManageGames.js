@@ -49,7 +49,7 @@ export default function ManageGames() {
     //   time2: game.time2Raw || "",
     //   days: game.days || "7",
     // });
-    navigate (`/edit-result/${game}`)
+    navigate (`/edit-game/${game}`)
   };
 
   const handleDelete = async (id) => {
