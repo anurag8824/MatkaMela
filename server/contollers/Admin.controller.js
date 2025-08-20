@@ -165,7 +165,7 @@ export const approveDeposits = async (req, res) => {
                 if (method === "approved") {
                     // 1️⃣ User ke wallet balance ko update karna
                     const updateWalletSql = `
-              UPDATE USERS 
+              UPDATE users 
               SET WALLET = WALLET + ? 
               WHERE MOBILE = ?
             `;
