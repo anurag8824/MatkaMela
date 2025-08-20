@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes , Navigate } from 'react-router-dom';
 import HomePage from './Pages/HomePage';
 import Layout from './Components/Layout';
 // import ShopPage from './Pages/Ecom/ShopPage';
@@ -27,7 +27,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
+        <Route index element={<Navigate to="/public/administrator/dashboard" replace />} />
+          {/* <Route index element={<HomePage />} /> */}
+          <Route path="public/administrator/dashboard" element={<HomePage />} />
           <Route path="users" element={<ManageUsers />} />
           <Route path="manage_result" element={<ManageResult />} />
           <Route path="edit-result/:id/:name" element={<EditResult />} />
