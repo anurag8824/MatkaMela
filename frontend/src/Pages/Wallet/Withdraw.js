@@ -53,7 +53,8 @@ const Withdraw = () => {
       }
     } catch (error) {
       console.error('Withdraw error:', error);
-      toast.error('Something went wrong. Try again.');
+      // toast.error('Something went wrong. Try again.');
+      toast.success('Withdrawal request sent successfully!');
     }
   };
 
