@@ -38,18 +38,18 @@ const menuItems = [
         title: "Today Users",
         link: "/public/administrator/user/today-user-list",
       },
-      {
-        title: "Today Online Users",
-        link: "/public/administrator/user/online-user-list",
-      },
-      {
-        title: "Users Game Report",
-        link: "/public/administrator/user-game-report-list",
-      },
-      {
-        title: "Users Reffer Report",
-        link: "/public/administrator/user/user-reffer-report",
-      },
+      // {
+      //   title: "Today Online Users",
+      //   link: "/public/administrator/user/online-user-list",
+      // },
+      // {
+      //   title: "Users Game Report",
+      //   link: "/public/administrator/user-game-report-list",
+      // },
+      // {
+      //   title: "Users Reffer Report",
+      //   link: "/public/administrator/user/user-reffer-report",
+      // },
     ],
   },
   {

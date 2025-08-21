@@ -61,7 +61,7 @@ export default function EditGame() {
       console.log(res,"ress")
       if (res.status === 200) {
         alert("✅ Game updated successfully!");
-        navigate("/manage_games"); // update ke baad redirect karna ho toh
+        navigate("/public/administrator/game-name-list"); // update ke baad redirect karna ho toh
       }
     } catch (err) {
       console.log("Error updating game:", err);
