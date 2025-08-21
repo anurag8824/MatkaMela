@@ -1,5 +1,5 @@
 import express from 'express';
-import { AdminLogin, approveDeposits, editGame, getAdminDetails, GetQr, UpdateQr } from '../contollers/Admin.controller.js';
+import { AdminLogin, approveDeposits, editGame, getAdminDetails, GetAllUsers, GetQr, toggleUserState, UpdateQr, updateWallet } from '../contollers/Admin.controller.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { qrMulter } from '../middlewares/qrMulter.js';
 
@@ -10,6 +10,13 @@ const router = express.Router();
 
 router.post('/login', AdminLogin);
 router.get('/admin-detail', authMiddleware , getAdminDetails)
+
+router.get('/get-users', authMiddleware , GetAllUsers)
+router.post('/admin-update-wallet', authMiddleware , updateWallet)
+router.post('/toggle-user-state', authMiddleware , toggleUserState )
+
+
+
 
 router.post('/edit-game', authMiddleware , editGame)
 

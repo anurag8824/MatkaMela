@@ -3,7 +3,7 @@ import { Link, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../Utils/axiosInstance";
 
-export default function ManageUsers() {
+export default function TodayUsers() {
   const { id } = useParams();
   const location = useLocation();
   const [users, setUsers] = useState([]);
@@ -31,8 +31,10 @@ export default function ManageUsers() {
         const res = await axiosInstance.get("/admin/get-users");
         const data = res.data;
         const userList = Array.isArray(data) ? data : [data];
-        setUsers(userList);
-        setFilteredUsers(userList);
+        const deactiveUsers = userList.filter((user) => user.state.toLowerCase() === "deactive");
+
+        setUsers(deactiveUsers);
+        setFilteredUsers(deactiveUsers);
       } catch (err) {
         console.error("Error fetching users:", err);
       }
@@ -143,7 +145,7 @@ export default function ManageUsers() {
                     <th>Refer By</th>
                     <th>State</th>
 
-                    <th>Action</th>
+                    {/* <th>Action</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -179,7 +181,7 @@ export default function ManageUsers() {
                           }
                         }} className="btn btn-sm btn-outline-danger">{user.state}</button></td>
 
-                        <td className="text-center  gap-1 md:flex">
+                        <td className="text-center hidden  gap-1 md:flekx">
                           <Link className="btn bg-amber-400" to={`/user_edit/${user.id}`}>
                             <i className="fa fa-pen "></i>
                           </Link>

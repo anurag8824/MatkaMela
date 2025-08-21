@@ -49,7 +49,7 @@ export default function ManageGames() {
     //   time2: game.time2Raw || "",
     //   days: game.days || "7",
     // });
-    navigate (`/edit-game/${game}`)
+    navigate (`/public/administrator/game/edit-game/${game}`)
   };
 
   const handleDelete = async (id) => {
@@ -189,18 +189,18 @@ export default function ManageGames() {
               <th>Game</th>
               <th>Result 1 Time</th>
               <th>Result 2 Time</th>
-              <th>Holiday</th>
+              {/* <th>Holiday</th> */}
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {games.map((game) => (
               <tr key={game.id}>
-                <td>{game.ID}</td>
-                <td>{game.NAME}</td>
-                <td>{game.time1}</td>
-                <td>{game.time2}</td>
-                <td className="text-center">
+                <td className="text-center">{game.ID}</td>
+                <td className="text-center">{game.NAME}</td>
+                <td className="text-center">{game.TIME1}</td>
+                <td className="text-center">{game.TIME2}</td>
+                <td className="text-center hidden">
                   <Form.Check
                     type="checkbox"
                     checked={holidays[game.id] || false}

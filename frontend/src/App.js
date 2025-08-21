@@ -12,6 +12,7 @@ import Tnc from './Pages/Tnc';
 import AppDetails from './Pages/AppDetails';
 import Share from './Pages/Share';
 import Deposit from './Pages/Wallet/Deposit';
+import AddBank from './Pages/Wallet/AddBank';
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="play-game/:id" element={<PlayPage />} />
           <Route path="wallet" element={<Wallet />} />
+          <Route path="add-bank" element={<AddBank />} />
+
           <Route path="help" element={<HelpPage />} />
           <Route path="play" element={<PlayMenu />} />
           <Route path="history" element={<History />} />

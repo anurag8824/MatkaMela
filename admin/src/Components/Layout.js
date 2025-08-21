@@ -30,7 +30,7 @@ function Layout() {
       } catch (err) {
         console.error("Admin check failed", err);
         setIsAdmin(false);
-        navigate("/login");
+        navigate("/public/administrator/login");
       }
     };
 

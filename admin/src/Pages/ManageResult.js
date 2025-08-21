@@ -86,7 +86,7 @@ export default function ManageResult() {
                   <td>{game.RESULT1 || ""}</td>
                   <td>{game.RESULT2 || ""}</td>
                   <td className="text-center">
-                    <Link to={`/edit-result/${game.ID}/${game.PAGE}`}>
+                    <Link to={`/public/administrator/edit-result/${game.ID}/${game.PAGE}`}>
                       <i className="fa fa-pen"></i>
                     </Link>
                   </td>

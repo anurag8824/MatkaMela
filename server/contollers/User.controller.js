@@ -870,6 +870,64 @@ export const AddMoney = async (req, res) => {
 };
 
 
+export const AddBankDetails = async (req, res) => {
+
+  const mobile = req.user.mobile; // get user mobile
+  const { bankname, holder, acnumber, ifsc, upi } = req.body;
+
+  try {
+    // Check if the user already has a bank entry
+    const [existing] = await req.db.query(
+      'SELECT * FROM BANK WHERE mobile = ?',
+      [mobile]
+    );
+
+    if (existing.length > 0) {
+      // Update existing entry
+      await req.db.query(
+        `UPDATE BANK 
+         SET bankname = ?, holder = ?, acnumber = ?, ifsc = ?, upi = ?
+         WHERE mobile = ?`,
+        [bankname, holder, acnumber, ifsc, upi, mobile]
+      );
+      return res.json({ message: 'Bank details updated successfully' });
+    } else {
+      // Insert new entry
+      await req.db.query(
+        `INSERT INTO BANK (mobile, bankname, holder, acnumber, ifsc, upi) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [mobile, bankname, holder, acnumber, ifsc, upi]
+      );
+      return res.json({ message: 'Bank details added successfully' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+
+}
+
+export const GetBankDetails = async (req, res) => {
+  const mobile = req.user.mobile; // get user mobile
+
+  try {
+    // Fetch bank details for the user
+    const [rows] = await req.db.query(
+      'SELECT * FROM BANK WHERE mobile = ?',
+      [mobile]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No bank details found' });
+    }
+
+    return res.json(rows[0]); // Return the first row
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 export const UserDeposit = async (req, res) => {
   try {
     const { amount, utr_number, type,status } = req.body;
