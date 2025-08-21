@@ -259,10 +259,10 @@ export const GetAllUsers = async (req, res) => {
       }
   
       const user = users[0];
-      let newWallet = parseFloat(user.WALLET); // current wallet
+      let newWallet = parseFloat(user.WALLET) || 0; // current wallet
       console.log("Current wallet:", newWallet);
-      const amt = parseFloat(amount);
-  
+      const amt = parseFloat(amount) || 0; 
+      
       if (type.toLowerCase() === "deposit") {
         newWallet += amt; // deposit -> add amount
       } else if (type.toLowerCase() === "withdraw") {
