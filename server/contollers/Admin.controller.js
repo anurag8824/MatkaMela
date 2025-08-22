@@ -50,6 +50,72 @@ export const getAdminDetails = (req, res) => {
 
 
 
+
+// ✅ Admin Dashboard Data API
+export const adminDashboardData = async (req, res) => {
+    try {
+      // 1️⃣ Active users ka total wallet balance
+      const [userBalanceRows] = await req.db.query(
+        `SELECT SUM(WALLET) as totalBalance 
+         FROM users 
+         WHERE STATE = 'active'`
+      );
+      const customerBalance = userBalanceRows[0]?.totalBalance || 0;
+  
+      // 2️⃣ Deposit status wise sum
+      const [depositRows] = await req.db.query(
+        `SELECT STATUS, SUM(AMOUNT) as total 
+         FROM PAYMENT_QUEUE 
+         GROUP BY STATUS`
+      );
+  
+      let depositSummary = {
+        approved: 0,
+        pending: 0,
+        cancelled: 0,
+      };
+      depositRows.forEach((row) => {
+        depositSummary[row.STATUS] = row.total || 0;
+      });
+  
+      // 3️⃣ Withdraw status wise sum
+      const [withdrawRows] = await req.db.query(
+        `SELECT STATUS, SUM(AMOUNT) as total 
+         FROM WITHDRAW 
+         GROUP BY STATUS`
+      );
+  
+      let withdrawSummary = {
+        approved: 0,
+        pending: 0,
+        cancelled: 0,
+      };
+      withdrawRows.forEach((row) => {
+        withdrawSummary[row.STATUS] = row.total || 0;
+      });
+  
+      return res.json({
+        success: true,
+        message: "Admin dashboard data fetched ✅",
+        data: {
+          customerBalance,
+          deposits: depositSummary,
+          withdraws: withdrawSummary,
+        },
+      });
+    } catch (err) {
+      console.error("Admin Dashboard Data Error:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error ❌",
+      });
+    }
+  };
+  
+  
+
+
+
 export const editGame = async (req, res) => {
     const {
         ID,
@@ -205,6 +271,69 @@ export const approveDeposits = async (req, res) => {
 };
 
 
+// ✅ Approve / Cancel Withdraw API
+export const approveWithdraws = async (req, res) => {
+    const { method } = req.body; // "approved" | "cancelled"
+    console.log(req.body, "req body in approve withdraws");
+  
+    try {
+      let withdraws = [];
+  
+      // Single object aaya hai
+      if (!Array.isArray(req.body.withdraws)) {
+        withdraws = [req.body];
+      } else {
+        withdraws = req.body.withdraws;
+      }
+  
+      try {
+        for (let wd of withdraws) {
+          const { ID, MOBILE, AMOUNT } = wd;
+  
+          if (method === "approved") {
+            // 1️⃣ Wallet balance se paisa minus karna
+            const updateWalletSql = `
+              UPDATE users 
+              SET WALLET = WALLET - ? 
+              WHERE MOBILE = ?
+            `;
+            await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
+          }
+  
+          // 2️⃣ Withdraw entry ka status update karna
+          const updateWithdrawSql = `
+            UPDATE WITHDRAW 
+            SET STATUS = ? 
+            WHERE ID = ?
+          `;
+          await req.db.query(updateWithdrawSql, [method, ID]);
+        }
+  
+        return res.json({
+          success: true,
+          message:
+            method === "approved"
+              ? "Withdraws approved and wallet updated ✅"
+              : "Withdraws cancelled successfully ❌",
+        });
+      } catch (err) {
+        console.error("Transaction Error:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to update withdraws ❌",
+        });
+      }
+    } catch (err) {
+      console.error("Approve Withdraw API Error:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error ❌",
+      });
+    }
+  };
+  
+
+
 
 const qrFolder = path.join(process.cwd(), "qrImage");
 
@@ -262,7 +391,7 @@ export const GetAllUsers = async (req, res) => {
       let newWallet = parseFloat(user.WALLET) || 0; // current wallet
       console.log("Current wallet:", newWallet);
       const amt = parseFloat(amount) || 0; 
-      
+
       if (type.toLowerCase() === "deposit") {
         newWallet += amt; // deposit -> add amount
       } else if (type.toLowerCase() === "withdraw") {

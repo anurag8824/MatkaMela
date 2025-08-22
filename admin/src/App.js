@@ -23,6 +23,7 @@ import QrUploadForm from './Pages/QrUploadForm';
 import EditGame from './Pages/EditGame';
 import InactiveUsers from './Pages/InactiveUsers';
 import TodayUsers from './Pages/TodayUsers';
+import WithdrawHistory from './Pages/WithdrawHistory';
 
 
 const basePath = "public/administrator"
@@ -57,6 +58,8 @@ function App() {
           <Route path="refresh" element={<Refresh />} />
           <Route path="reset_password" element={<PasswordReset />} />
           <Route path="deposit/:type" element={<DepositHistory />} />
+          <Route path="withdraw/:type" element={<WithdrawHistory />} />
+
           <Route path="upload-qr" element={<QrUploadForm />} />
         </Route>
       </Routes>

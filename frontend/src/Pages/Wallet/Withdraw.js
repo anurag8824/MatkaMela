@@ -15,6 +15,9 @@ const Withdraw = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const [active, setActive] = useState("upi");
+
+
   // Fetch existing bank details
   useEffect(() => {
     const fetchBankDetails = async () => {
@@ -34,8 +37,8 @@ const Withdraw = () => {
 
   const handleWithdraw = async () => {
     // Check if bank details exist
-    if (!bankData.acnumber) {
-      toast.error('Add bank detail first!');
+    if (!bankData.acnumber && !bankData.upi) {
+      toast.error('Add a/c detail first!');
       return;
     }
 
@@ -45,8 +48,8 @@ const Withdraw = () => {
     }
 
     try {
-      const payload = { amount, ...bankData };
-      const response = await axiosInstance.post('/api/withdraw', payload);
+      const payload = { amount, ...bankData, status: "pending" };
+      const response = await axiosInstance.post('/api/user-withdraw', payload);
       if (response.status === 200) {
         toast.success('Withdrawal request sent successfully!');
         setAmount('');
@@ -97,75 +100,103 @@ const Withdraw = () => {
         Withdraw Time :- सुबह 10 से रात 10 बजे तक
       </p>
 
-      <p className="text-center text-sm mt-1 text-[#094c73]">Win Amount :- 0</p>
+      {/* <p className="text-center text-sm mt-1 text-[#094c73]">Win Amount :- 0</p> */}
 
       {/* Bank Account Section */}
       <p className="text-center text-xs mt-1 mb-2">Bank Account Details</p>
+
+
+      <div className="mb-4 max-w-md mx-auto">
+
+        <div className="flex mb-4">
+          <button
+            onClick={() => setActive("bank")}
+            className={`flex-1 font-bold px-4 py-2 transition-colors rounded-l-xl 
+          ${active === "bank" ? "bg-theme text-white" : "bg-gray-100 text-gray-800"}
+        `}>Bank</button>
+
+          <button
+            onClick={() => setActive("upi")}
+            className={`flex-1 font-bold px-4 py-2 transition-colors rounded-r-xl 
+          ${active === "upi" ? "bg-theme text-white" : "bg-gray-100 text-gray-800"}
+        `}>UPI ID</button>
+        </div>
+
+
+        {active === "bank" && (
+          <div className='bank'>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bank Name
+            </label>
+            <input
+              type="text"
+              value={bankData.bankname || ''}
+              disabled
+              className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
+            />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Account Holder Name
+            </label>
+            <input
+              type="text"
+              value={bankData.holder || ''}
+              disabled
+              className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
+            />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Account Number
+            </label>
+            <input
+              type="text"
+              value={bankData.acnumber || ''}
+              disabled
+              className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
+            />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              IFSC Code
+            </label>
+            <input
+              type="text"
+              value={bankData.ifsc || ''}
+              disabled
+              className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
+            />
+
+          </div>)}
+
+        {active === "upi" && (
+          <div className='upi'>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              UPI ID
+            </label>
+            <input
+              type="text"
+              value={bankData.upi || ''}
+              disabled
+              className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
+            />
+          </div>)}
+
+      </div>
+
       <div className="flex justify-center mb-2">
         <Link to="/add-bank" className="btn btn-primary">
-          Add / Update Bank Account
+        Add/Update a/c details
         </Link>
       </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Bank Name
-        </label>
-        <input
-          type="text"
-          value={bankData.bankname || ''}
-          disabled
-          className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
-        />
-
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Account Holder Name
-        </label>
-        <input
-          type="text"
-          value={bankData.holder || ''}
-          disabled
-          className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
-        />
-
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Account Number
-        </label>
-        <input
-          type="text"
-          value={bankData.acnumber || ''}
-          disabled
-          className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
-        />
-
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          IFSC Code
-        </label>
-        <input
-          type="text"
-          value={bankData.ifsc || ''}
-          disabled
-          className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
-        />
-
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          UPI ID
-        </label>
-        <input
-          type="text"
-          value={bankData.upi || ''}
-          disabled
-          className="w-full border rounded px-3 py-2 mb-3 bg-gray-100"
-        />
-      </div>
-
       {/* Withdraw Button */}
+      <div className="flex justify-center mb-2">
       <button
         onClick={handleWithdraw}
-        className="w-full bg-[#094c73] text-white py-2 rounded hover:bg-[#1a3a4e]"
+        className="w-full bg-[#094c73] btn  text-white py-2 rounded hover:bg-[#1a3a4e]"
       >
         Withdraw
       </button>
+      </div>
     </div>
   );
 };

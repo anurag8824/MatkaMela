@@ -55,11 +55,11 @@ const HomeMarket = ({markets}) => {
     <div className=''>
       {markets?.map((market) => (
         <Link to={`/play-game/${market.ID}`} key={market.ID}>
-          <div className="w-full bg-[#ffd53c] hover:bg-[#ccc] border border-yellow-300 px-3 py-2 shadow-sm"
+          <div className="w-full bg-theme hover:bg-[#cccl] border border-yellow-300 px-3 py-2 shadow-sm"
           >
             {/* Market Name */}
             <div className="text-center mb-1">
-              <h3 className="text-base font-semibold text-yellow-900 tracking-wide">
+              <h3 className="text-base font-semibold text-yellow-500 tracking-wide">
                 {market.NAME}
               </h3>
             </div>
@@ -72,7 +72,7 @@ const HomeMarket = ({markets}) => {
             </div>
 
             {/* Market Timings */}
-            <ul className="flex justify-center items-center flex-wrap gap-3 text-xs text-gray-700 mt-1">
+            <ul className="flex justify-center items-center flex-wrap gap-3 text-xs text-gray-50 mt-1">
               <li className="text-center">
                 <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">
                   Open Time

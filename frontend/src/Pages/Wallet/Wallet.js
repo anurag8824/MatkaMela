@@ -3,6 +3,7 @@ import { FaUniversity } from "react-icons/fa";
 import AddPoint from "./AddPoint";
 import Withdraw from "./Withdraw";
 import DepositHistory from "./DepositHistory";
+import WithdrawHistory from "./WithdrawHistory";
 
 export default function Wallet() {
   const [activeTab, setActiveTab] = useState("add");
@@ -36,17 +37,19 @@ export default function Wallet() {
         {activeTab === "add" ? (
           <>
             <AddPoint />
+            <DepositHistory />
           </>
         ) : (
           <>
             <Withdraw />
+            <WithdrawHistory/>
 
           </>
         )}
       </div>
 
 
-      <DepositHistory />
+     
     </div>
   );
 }

@@ -78,7 +78,7 @@ const HomePage = () => {
     <div className="bg-[#343c44]">
       {/* <HighlightMarquee /> */}
 
-      <div className="flex w-full px-2 pt-2 justify-between text-nowrap">
+      <div className="flexx hidden w-full px-2 pt-2 justify-between text-nowrap">
         {/* Left Side Buttons - aligned to the left end */}
         <div className="flex flex-col gap-2 items-start">
           <a
@@ -190,15 +190,18 @@ const HomePage = () => {
       </div>
 
 
-      <div className="w-full bg-[#ffd53c]  border border-yellow-300 rounded-md shadow-sm mb-2 text-center relative overflow-hidden">
+      <div className="w-full bg-[#fff]  border border-yellow-300 rounded-md shadow-sm mb-2 text-center relative overflow-hidden">
 
 
         {/* Result Text */}
         <h5 className="text-lg border-white border-dashed border-1 font-medium bg-theme text-white relative z-10">Result</h5>
 
         {/* Market Name and Result Number */}
-        <div className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 bg-gradient-to-br from-[#d2ac79] via-[#ef629f] to-[#040f6b] bg-[length:400%_400%] animate-gradientresult">
-          <div className="absolute inset-0 pointer-events-none z-0">
+        <div style={{backgroundImage:"url(/images/congratulations.gif)" ,}} 
+        className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 animate-gradientlresult">
+
+        {/* className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 bg-gradient-to-br from-[#d2ac79] via-[#ef629f] to-[#040f6b] bg-[length:400%_400%] animate-gradientresult"> */}
+          <div className="absolute hidden inset-0 pointer-events-none z-0">
             {[...Array(12)].map((_, i) => (
               <div
                 key={i}
@@ -210,8 +213,8 @@ const HomePage = () => {
               ></div>
             ))}
           </div>
-          <p className="text-white font-bold text-base">DEV DARSHAN</p>
-          <span className="font-bold text-xl text-white">53</span>
+          <p className="text-blue-950 font-bold text-xl">DEV DARSHAN</p>
+          <span className="font-bold text-xl text-blue-950">53</span>
         </div>
 
 

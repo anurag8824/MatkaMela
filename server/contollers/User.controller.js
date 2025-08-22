@@ -983,3 +983,78 @@ export const getDepositList = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+export const UserWithdraw = async (req, res) => {
+  const { acnumber, amount, bankname, holder, ifsc, mobile, status, upi } = req.body;
+
+  if (!mobile || !amount || !holder || !bankname || !acnumber) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    const timeNow = new Date();
+
+    const query = `
+      INSERT INTO WITHDRAW 
+      (MOBILE, HOLDER, UPI, AMOUNT, TIME, STATUS, BANK, IFSC, ACCOUNT)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      mobile,
+      holder,
+      upi || null,
+      amount,
+      timeNow,
+      status || "pending",
+      bankname,
+      ifsc,
+      acnumber,
+    ];
+
+    await req.db.query(query, values);
+
+    res.status(200).json({ message: "Withdraw request stored successfully" });
+  } catch (error) {
+    console.error("Withdraw insert error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export const getWithdrawList = async (req, res) => {
+  try {
+    let sql, params;
+
+    if (req.user?.role === "admin") {
+      // 🔹 Admin -> sabhi users ke withdraws
+      sql = `SELECT * FROM WITHDRAW ORDER BY id DESC`;
+      params = [];
+    } else {
+      // 🔹 Normal user -> sirf apne withdraws
+      const userMobile = req.user?.mobile;
+      if (!userMobile) {
+        return res.status(400).json({
+          success: false,
+          message: "User mobile missing",
+        });
+      }
+
+      sql = `SELECT * FROM WITHDRAW WHERE MOBILE = ? ORDER BY id DESC`;
+      params = [userMobile];
+    }
+
+    const [rows] = await req.db.query(sql, params);
+
+    return res.json({
+      success: true,
+      message: "Withdraw list fetched successfully ✅",
+      data: rows,
+    });
+  } catch (err) {
+    console.error("Get Withdraw List API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}

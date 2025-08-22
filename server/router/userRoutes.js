@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddBankDetails, AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, GetAllGame, GetBankDetails, getDepositList, getUserBetHistory, getUserInfo, MSMEForm, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop } from '../contollers/User.controller.js';
+import { AddBankDetails, AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, GetAllGame, GetBankDetails, getDepositList, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
 import upload from '../middlewares/upload.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -49,8 +49,12 @@ router.get('/get-bank-detail', authMiddleware, GetBankDetails);
 
 
 router.post('/user-deposit', authMiddleware, UserDeposit);
+router.post('/user-withdraw', authMiddleware, UserWithdraw);
+
 
 router.get('/user-deposit-list', authMiddleware, getDepositList);
+router.get('/user-withdraw-list', authMiddleware, getWithdrawList);
+
 
 
 

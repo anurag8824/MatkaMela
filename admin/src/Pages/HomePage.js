@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {Link} from "react-router-dom"
+import axiosInstance from "../Utils/axiosInstance";
 
 export default function HomePage() {
   const [stats, setStats] = useState({
@@ -10,33 +11,62 @@ export default function HomePage() {
     with_count: 0,
   });
 
+  const [dashboardData, setDashboardData] = useState({});
+
+
   useEffect(() => {
-    fetch("/api/dashboard") // Backend se stats fetch karega
-      .then((res) => res.json())
-      .then((data) => setStats(data))
-      .catch((err) => console.error("Error fetching dashboard:", err));
+    const fetchDashboardData = async () => {
+      try {
+        const res = await axiosInstance.get("/admin/admin-dashboard-data");
+        if (res.data.success) {
+          setDashboardData(res.data.data);
+        } else {
+          alert(res.data.message);
+        }
+      } catch (err) {
+        console.error("Dashboard Data Fetch Error:", err);
+        alert("Failed to fetch dashboard data ❌");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
 
   const cards = [
-    { title: "Customer Balance", value: "33873.55", icon: "fa-users" },
-    { title: "Add Money", value: "2640", icon: "fa-coins" },
+    { title: "Customer Balance", value: dashboardData?.customerBalance, icon: "fa-users" },
+    { title: "Add Money", value: "", icon: "fa-coins" , extra: (
+        <>
+          <span className="weight-500 uppercase-font txt-light font-13">
+            PENDING RS: <span className="counter-anim">{dashboardData?.deposits?.pending}</span>
+          </span>
+          <br />
+          <span className="weight-500 uppercase-font txt-light font-13">
+            SUCCESS RS: <span className="counter-anim">{dashboardData?.deposits?.approved}</span>
+          </span>
+          <br />
+          <span className="weight-500 uppercase-font txt-light font-13">
+            CANCEL RS: <span className="counter-anim">{dashboardData?.deposits?.cancelled}</span>
+          </span>
+        </> ) },
     {
       title: "Withdraw Money",
       icon: "fa-users",
-      value: "2489.65",
+      value: dashboardData?.withdrawnMoney,
       extra: (
         <>
           <span className="weight-500 uppercase-font txt-light font-13">
-            PENDING RS: <span className="counter-anim">0</span>
+            PENDING RS: <span className="counter-anim">{dashboardData?.withdraws?.pending}</span>
           </span>
           <br />
           <span className="weight-500 uppercase-font txt-light font-13">
-            SUCCESS RS: <span className="counter-anim">4010</span>
+            SUCCESS RS: <span className="counter-anim">{dashboardData?.withdraws?.approved}</span>
           </span>
           <br />
           <span className="weight-500 uppercase-font txt-light font-13">
-            CANCEL RS: <span className="counter-anim">0</span>
+            CANCEL RS: <span className="counter-anim">{dashboardData?.withdraws?.cancelled}</span>
           </span>
         </>
       ),
@@ -265,88 +295,75 @@ export default function HomePage() {
 
 
 
-
-
-
-      <div className="row">
-
-
-      
-
-
-      
-       <div className="col-md-12 mb-3">
+      <div className="col-md-12 mb-3">
 
        
 
 
 
-        <form method="get">
-          <div className="d-flex align-items-center mb-5">
-            <div>
-              <input
-                type="date"
-                name="select_date"
-                defaultValue="2025-08-19"
-                className="form-control"
-                placeholder="Select Date"
-                id="cdate"
-                required
-              />
-            </div>
-            <div>
-              <button className="btn btn-success m-0 ms-2">Search</button>
-            </div>
-            <div>
-              <a
-                href="#"
-                className="btn btn-success m-0 ms-2"
-              >
-                Refresh Today
-              </a>
-            </div>
-          </div>
-        </form>
-      </div>
+<form method="get">
+  <div className="d-flex align-items-center mb-5">
+    <div>
+      <input
+        type="date"
+        name="select_date"
+        defaultValue="2025-08-19"
+        className="form-control"
+        placeholder="Select Date"
+        id="cdate"
+        required
+      />
+    </div>
+    <div>
+      <button className="btn btn-success m-0 ms-2">Search</button>
+    </div>
+    <div>
+      <a
+        href="#"
+        className="btn btn-success m-0 ms-2"
+      >
+        Refresh Today
+      </a>
+    </div>
+  </div>
+</form>
+</div>
 
 
+<div className="row">
+  {cards?.map((card, index) => (
+    <div key={index} className="col-lg-3 col-md-6 col-sm-12 col-xs-12 mb-3">
+      <div className="card bg-[#673e0e] text-white py-1 h-44 flex flex-col justify-between rounded-xl shadow-md">
+        <div className="card-body flex flex-col justify-between h-full">
+          <div className="flex items-center justify-between">
+            <Link className="flex-1" to="/">
+              <div>
+                <span className="block text-sm uppercase font-semibold opacity-80">
+                  {card?.title}
+                </span>
+                <span className="block text-2xl font-bold mt-1">
+                  {card?.value}
+                </span>
+              </div>
+            </Link>
 
-
-
-      {cards?.map((card, index) => (
-      
-  
-     
-      <div className="col-lg-3 col-md-6 col-sm-12 col-xs-12 mb-1 ">
-        <div className="card bg-[#673e0e] text-white py-3  ">
-          <div className="card-body">
-            <div className="d-flex items-center justify-content-between ">
-              <Link to="/">
-                <div className="pl-0 pr-0 data-wrap-left">
-                  <span className="weight-500 uppercase txt-light block font-16">
-                    {card?.title}
-                  </span>
-                  <span className="txt-light block counter">
-                    <span className="counter-anim">{card?.value}</span>
-                  </span>
-                </div>
-               
-              </Link>
-
-              <div className="pl-0 pr-0 data-wrap-right text-3xl">
-                  <i className={`fa ${card?.icon} txt-light  data-right-rep-icon`}></i>
-                </div>
+            <div className="text-3xl ml-3">
+              <i className={`fa ${card?.icon} text-white`}></i>
             </div>
           </div>
+
+          {/* 🔹 Extra content always aligned at bottom */}
+          {card?.extra && (
+            <div className=" text-xs opacity-90 leading-5">
+              {card.extra}
+            </div>
+          )}
         </div>
       </div>
-       
-    ) )}
-
-    
-
-      {/* Repeat same structure for other cards... */}
     </div>
+  ))}
+</div>
+
 
 
       
