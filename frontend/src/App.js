@@ -6,13 +6,13 @@ import Login from './Pages/Account/Login';
 import PlayPage from './Pages/PlayGame/PlayPage';
 import Wallet from './Pages/Wallet/Wallet';
 import HelpPage from './Pages/Wallet/HelpPage';
-import PlayMenu from './Pages/PlayMenu';
 import History from './Pages/History';
 import Tnc from './Pages/Tnc';
 import AppDetails from './Pages/AppDetails';
 import Share from './Pages/Share';
 import Deposit from './Pages/Wallet/Deposit';
 import AddBank from './Pages/Wallet/AddBank';
+import HomePlayMenu from './Pages/HomePlayMenu';
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
           <Route path="add-bank" element={<AddBank />} />
 
           <Route path="help" element={<HelpPage />} />
-          <Route path="play" element={<PlayMenu />} />
+          <Route path="play" element={<HomePlayMenu />} />
           <Route path="history" element={<History />} />
           <Route path="login" element={<Login />} />
           <Route path="Termsandcondition" element={<Tnc />} />

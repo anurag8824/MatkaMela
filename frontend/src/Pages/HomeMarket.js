@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 
 const HomeMarket = ({markets}) => {
-
+// console.log(markets)
   const marketsh = [
     {
       id: 1,
@@ -54,7 +54,7 @@ const HomeMarket = ({markets}) => {
   return (
     <div className=''>
       {markets?.map((market) => (
-        <Link to={`/play-game/${market.ID}`} key={market.ID}>
+        <Link to={`${market?.playStatus ? `/play-game/${market?.ID}` : ""}`} key={market.ID}>
           <div className="w-full bg-theme hover:bg-[#cccl] border border-yellow-300 px-3 py-2 shadow-sm"
           >
             {/* Market Name */}
@@ -66,9 +66,9 @@ const HomeMarket = ({markets}) => {
 
             {/* Market Result Numbers */}
             <div className="flex justify-center items-center gap-2 text-gray-800 text-base font-semibold">
-              <span>{market.openNumber}</span>
+              <span>{market.RESULT1}</span>
               <span>-</span>
-              <span>{market.closeNumber}</span>
+              <span>{market.RESULT2}</span>
             </div>
 
             {/* Market Timings */}

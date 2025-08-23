@@ -51,7 +51,15 @@ const HomePage = () => {
     const fetchGames = async () => {
       try {
         const res = await axios.get(`${backUrl}/api/get-games`);
-        setGames(res.data); // API se aayi list
+
+        // Response mein games honge with PLAY column
+        // Yahi PLAY directly state mein set ho jaayega
+        const gamesWithPlay = res?.data?.map((g) => ({
+          ...g,
+          playStatus: g.PLAY === "checked" ? true : false, // optional boolean mapping
+        }));
+
+        setGames(gamesWithPlay); // API se aayi list
       } catch (err) {
         console.error("Error fetching games:", err);
       } finally {

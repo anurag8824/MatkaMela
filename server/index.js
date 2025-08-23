@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import pool from './db/connection.js';
 import userRoutes from './router/userRoutes.js';
 import adminRoutes from './router/adminRoutes.js';
+import { setupGameCronJobs } from './contollers/cronController.js';
 
 
 dotenv.config();
@@ -35,6 +36,11 @@ const startServer = async () => {
     try {
         const [rows] = await pool.query('SELECT 1 + 1 AS result');
         console.log('✅ MySQL Connected:', rows[0].result);
+
+
+        // 👇 Yahan cronjobs initialize kar do
+        setupGameCronJobs(pool);
+
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
         });

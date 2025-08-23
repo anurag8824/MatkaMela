@@ -300,7 +300,7 @@ export const BetGameJodi = async (req, res) => {
   const mobile = req.user.mobile
   console.log(mobile, "user ka number")
   try {
-    const { filledBets, gameId , totalPoints } = req.body;
+    const { filledBets, gameId, totalPoints } = req.body;
     console.log("Request body jodi:", req.body);
 
     if (!filledBets || filledBets.length === 0) {
@@ -405,7 +405,7 @@ export const BetGameManual = async (req, res) => {
 export const BetGameHarraf = async (req, res) => {
   const mobile = req.user.mobile
   try {
-    const { andarHaraf, baharHaraf, gameId , totalPoints } = req.body;
+    const { andarHaraf, baharHaraf, gameId, totalPoints } = req.body;
     console.log("Request body harraf:", req.body);
 
     const gameName = await getGameNameById(req.db, gameId);
@@ -515,7 +515,7 @@ export const BetGameCrossing = async (req, res) => {
 export const BetGameCopyPaste = async (req, res) => {
   const mobile = req.user.mobile
   try {
-    const { bets, gameId , totalPoints } = req.body;
+    const { bets, gameId, totalPoints } = req.body;
     console.log("Request body copy-paste:", req.body);
 
     if (!bets || bets.length === 0) {
@@ -571,7 +571,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       AND DATE(DATE_TIME) = DATE(?)
     `;
     const [bets] = await req.db.query(betsQuery, [GAME_ID, DATE]);
-    console.log(bets,"betss ki non result ")
+    console.log(bets, "betss ki non result ")
 
     if (!bets.length) {
       console.log("No bets found for this game and date.");
@@ -598,15 +598,28 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
           status = manualNumbers.includes(bet.number) ? "Win" : "Loss";
           break;
 
-        case "AndarHaraf":
-          expectedResult = andarHaraf.toString();
-          status = bet.number === expectedResult ? "Win" : "Loss";
-          break;
+        case "AndarHaraf": {
+          // andarHaraf will be like "4,7"
+          const andarValues = andarHaraf.toString().split(",");   // ["4","7"]
 
-        case "BaharHaraf":
-          expectedResult = baharHaraf.toString();
-          status = bet.number === expectedResult ? "Win" : "Loss";
+          // bet.number = e.g. "777" → extract family digit
+          const betDigit = bet.number[0]; // take first digit, since 444 → "4", 777 → "7"
+
+          expectedResult = andarHaraf.toString(); // "4,7"
+          status = andarValues.includes(betDigit) ? "Win" : "Loss";
           break;
+        }
+
+        case "BaharHaraf": {
+          // baharHaraf will be like "7,1"
+          const baharValues = baharHaraf.toString().split(",");  // ["7","1"]
+
+          const betDigit = bet.number[0]; // triple bet digit family
+
+          expectedResult = baharHaraf.toString(); // "7,1"
+          status = baharValues.includes(betDigit) ? "Win" : "Loss";
+          break;
+        }
 
         case "Crossing":
           const crossingNumbers = Crossing.split(",");
@@ -628,22 +641,23 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       `;
       await req.db.query(updateQuery, [expectedResult, status, bet.ID]);
 
-      if(status === "Win") {
-      updatedBets.push({
-        betId: bet.ID,
-        type: bet.TYPE,
-        number: bet.number,
-        point: bet.point,
-        user:bet.phone,
-        expectedResult,
-        status
-      });}
-    
+      if (status === "Win") {
+        updatedBets.push({
+          betId: bet.ID,
+          type: bet.TYPE,
+          number: bet.number,
+          point: bet.point,
+          user: bet.phone,
+          expectedResult,
+          status
+        });
+      }
+
     }
 
-    console.log(updatedBets , "✅ Updated Bets:" );
+    console.log(updatedBets, "✅ Updated Bets:");
 
-   
+
 
   } catch (err) {
     console.error("Error updating bets:", err);
@@ -653,7 +667,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
 
 export const CalculateGameResults = async (req, res) => {
-  console.log(req.user,"chcck")
+  console.log(req.user, "chcck")
   try {
     const { openResult, closeResult, gameId } = req.body;
     console.log(req.body, "reqbody")
@@ -681,9 +695,17 @@ export const CalculateGameResults = async (req, res) => {
 
     // ---- HARRAF ----
     const harraf = {
-      andarHaraf: parseInt(openResult.toString()[0]),
-      baharHaraf: parseInt(closeResult.toString().slice(-1))
+      andarHaraf: [
+        parseInt(openResult.toString()[0]),
+        parseInt(closeResult.toString()[0])
+      ].join(","),
+
+      baharHaraf: [
+        parseInt(openResult.toString().slice(-1)),
+        parseInt(closeResult.toString().slice(-1))
+      ].join(",")
     };
+
 
     // ---- CROSSING ----
     const openLastDigit = openResult.toString().slice(-1);
@@ -743,6 +765,8 @@ export const CalculateGameResults = async (req, res) => {
     await req.db.query(insertQuery, values);
 
 
+
+
     // Fetch inserted row (with DATE_TIME too)
     const [insertedRows] = await req.db.query(
       "SELECT * FROM RESULT WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
@@ -752,6 +776,16 @@ export const CalculateGameResults = async (req, res) => {
     if (insertedRows.length) {
       await UpdateBetsWithResults(req, insertedRows[0]);
     }
+
+
+    // ---- Update games table ----
+    const updateGameQuery = `
+     UPDATE games 
+     SET RESULT1 = ?, RESULT2 = ? , PLAY = 'unchecked'
+     WHERE ID = ?
+   `;
+
+    await req.db.query(updateGameQuery, [openResult, closeResult, gameId]);
 
 
 
@@ -930,8 +964,8 @@ export const GetBankDetails = async (req, res) => {
 
 export const UserDeposit = async (req, res) => {
   try {
-    const { amount, utr_number, type,status } = req.body;
-    const userId = req.user?.mobile; 
+    const { amount, utr_number, type, status } = req.body;
+    const userId = req.user?.mobile;
     console.log(req.user)
 
     if (!userId || !amount || !utr_number || !type) {
@@ -942,7 +976,7 @@ export const UserDeposit = async (req, res) => {
       INSERT INTO PAYMENT_QUEUE (USER_ID, AMOUNT, TXN_ID, MODE, STATUS)
       VALUES (?, ?, ?, ?,?)
     `;
-    await req.db.query(sql, [userId, amount, utr_number, type , status]);
+    await req.db.query(sql, [userId, amount, utr_number, type, status]);
 
     return res.json({ success: true, message: "Deposit queued successfully ✅" });
   } catch (err) {

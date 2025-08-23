@@ -130,8 +130,14 @@ const handleSubmit = async (e) => {
     type="number"
     className="form-control"
     value={result1}
-    onChange={(e) => setResult1(e.target.value)}
+    onChange={(e) => {
+    const val = e.target.value;
+    if (val.length <= 2) {
+      setResult1(val);
+    }
+  }}
     placeholder="Enter Result 1"
+    maxLength={2}
     required
   />
 </div>
@@ -143,8 +149,14 @@ const handleSubmit = async (e) => {
     type="number"
     className="form-control"
     value={result2}
-    onChange={(e) => setResult2(e.target.value)}
+    onChange={(e) => {
+    const val = e.target.value;
+    if (val.length <= 2) {
+      setResult2(val);
+    }
+  }}
     placeholder="Enter Result 2"
+  
   />
 </div>
 
