@@ -81,7 +81,11 @@ export const scheduleCronForGame = (db, game) => {
     const exp = `${s} ${m} ${h} * * *`;
 
     time1Job = cron.schedule(exp, async () => {
-      await db.query("UPDATE games SET PLAY = 'checked' WHERE ID = ?", [ID]);
+    //   await db.query("UPDATE games SET PLAY = 'checked' WHERE ID = ?", [ID]);
+      await db.query(
+        "UPDATE games SET PLAY = 'checked', RESULT1 = '', RESULT2 = '' WHERE ID = ?",
+        [ID]
+      );
       console.log(`[${NAME}] PLAY -> checked at ${TIME1}`);
     });
   }
