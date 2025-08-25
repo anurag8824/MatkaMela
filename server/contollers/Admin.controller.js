@@ -530,7 +530,7 @@ export const declareResultList = async (req, res) => {
           Crossing,
           CopyPaste,
           DATE
-         FROM result
+         FROM RESULT
          ORDER BY ID DESC`
       );
   
