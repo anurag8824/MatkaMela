@@ -88,11 +88,11 @@ const menuItems = [
       },
     ],
   },
-  // {
-  //   title: "Game Load",
-  //   icon: <FaCreditCard />,
-  //   link: "/public/administrator/game/game-name-list",
-  // },
+  {
+    title: "Game Load",
+    icon: <FaCreditCard />,
+    link: "/public/administrator/admin-game_load_list",
+  },
   {
     title: "Manage Result",
     icon: <FaTrophy />,
@@ -138,11 +138,6 @@ const menuItems = [
         link: "/public/administrator/game/winning-report-list",
       },
     ],
-  },
-  {
-    title: "FAQ Manage",
-    icon: <FaQuestionCircle />,
-    link: "/public/administrator/faq-manage",
   },
   {
     title: "Payment Gateway",

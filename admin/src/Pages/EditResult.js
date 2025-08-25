@@ -29,27 +29,8 @@ useEffect(() => {
   
 
   // Fetch patti options
-  useEffect(() => {
-    fetch(`${apiBase}/patti-options`)
-      .then((res) => res.json())
-      .then((data) => setPattiOptions(data))
-      .catch(console.error);
-  }, [apiBase]);
-
-  // Fetch result details for selected game
-  useEffect(() => {
-    if (selectedGameId) {
-      fetch(`${apiBase}/result/${selectedGameId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setResult1(data.result1 || "");
-          setResult2(data.result2 || "");
-          setRemark(data.remark || "");
-          setRId(data.rId || "");
-        })
-        .catch(console.error);
-    }
-  }, [selectedGameId, apiBase]);
+ 
+ 
 
 
 const handleSubmit = async (e) => {
@@ -57,11 +38,13 @@ const handleSubmit = async (e) => {
 
   // Selected game ka name nikalna
   const selectedGame = games.find((game) => game.ID === selectedGameId);
+  console.log(selectedGame,"fff")
+ 
 
   const payload = {
     r_id: rId,
     gameId: selectedGameId,
-    game_name: selectedGame ? selectedGame.NAME : "",
+    game_name: selectedGame ? selectedGame.NAME : "" ,
     openResult: result1,
     closeResult: result2,
     remark, // agar remark bhi bhejna hai to
@@ -109,7 +92,7 @@ const handleSubmit = async (e) => {
           <select
             className="form-select"
             value={selectedGameId}
-            onChange={(e) => setSelectedGameId(e.target.value)}
+            onChange={(e) => setSelectedGameId(Number(e.target.value))}
             required
           >
             <option value="" disabld>

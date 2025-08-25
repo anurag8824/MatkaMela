@@ -21,7 +21,7 @@ export const AdminLogin = async (req, res) => {
         const token = jwt.sign(
             { username: ADMIN_USER.username, role: ADMIN_USER.role },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "8h" }
         );
 
         return res.json({
@@ -361,6 +361,47 @@ export const GetQr = (req, res) => {
 };
 
 
+export const UpdateUPI = async (req, res) => {
+    const { upiId, name } = req.body;
+
+  if (!upiId || !name) {
+    return res.status(400).json({ error: "UPI ID and name are required" });
+  }
+
+  try {
+    console.log(upiId, name, "in update upi");
+
+    const [result] = await req.db.query(
+      "UPDATE SETTINGS SET gateway = ?, username = ?",
+      [upiId, name]
+    );
+
+    console.log("DB result:", result);
+    return res.json({ message: "UPI ID updated successfully" });
+  } catch (err) {
+    console.error("DB error:", err);
+    return res.status(500).json({ error: "Database Error" });
+  }
+  };
+
+  export const GetUPI = async (req, res) => {
+    try {
+        const [rows] = await req.db.query(
+          "SELECT gateway AS upiId, username AS name FROM SETTINGS"
+        );
+    
+        if (rows.length === 0) {
+          return res.status(404).json({ error: "No UPI details found" });
+        }
+    
+        return res.json(rows[0]); // { upiId: "...", name: "..." }
+      } catch (err) {
+        console.error("DB error in GET /upi:", err);
+        return res.status(500).json({ error: "Database Error" });
+      }
+  }
+  
+
 
 export const GetAllUsers = async (req, res) => {
     try {
@@ -375,6 +416,27 @@ export const GetAllUsers = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch users' });
     }
 };
+
+
+export const getAllBetsGameLoad = async (req, res) => {
+    try {
+      // SQL query to get all bets (no phone filter)
+      const [bets] = await req.db.query(
+        `SELECT id, number, point, type, game, game_id, date_time, status, result, phone
+         FROM bets
+         WHERE type IN ('Jodi', 'AndarHaraf', 'BaharHaraf')
+         ORDER BY id DESC`
+      );
+  
+      return res.json({
+        message: "All bets fetched successfully",
+        bets
+      });
+    } catch (error) {
+      console.error("Error fetching all bets:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
 
 
 export const updateWallet = async (req, res) => {
@@ -450,3 +512,61 @@ export const toggleUserState = async (req, res) => {
         res.status(500).json({ error: "Failed to update state" });
     }
 };
+
+export const declareResultList = async (req, res) => {
+    try {
+      // ✅ sirf required columns select kiye
+      const [results] = await req.db.query(
+        `SELECT 
+          ID,
+          GAME_ID,
+          GAME_NAME,
+          RESULT1,
+          RESULT2,
+          Jodi,
+          Manual,
+          andarHaraf,
+          baharHaraf,
+          Crossing,
+          CopyPaste,
+          DATE
+         FROM result
+         ORDER BY ID DESC`
+      );
+  
+      return res.json({
+        message: "Results fetched successfully",
+        results
+      });
+    } catch (error) {
+      console.error("Error fetching results:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+
+
+
+export const winningReportList = async (req, res) => {
+    try {
+        const [rows] = await req.db.query(
+          `SELECT 
+             ID, 
+             GAME_ID,
+             DATE_TIME, 
+             PHONE, 
+             GAME, 
+             STATUS, 
+             RESULT, 
+             TYPE, 
+             WIN_AMOUNT 
+           FROM bets 
+           WHERE STATUS = 'Loss'
+           ORDER BY DATE_TIME DESC`
+        );
+    
+        res.json({ success: true, results: rows });
+      } catch (err) {
+        console.error("Error fetching winning bets:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+      }
+  };

@@ -24,6 +24,9 @@ import EditGame from './Pages/EditGame';
 import InactiveUsers from './Pages/InactiveUsers';
 import TodayUsers from './Pages/TodayUsers';
 import WithdrawHistory from './Pages/WithdrawHistory';
+import GameLoad from './Pages/GameLoad';
+import DeclareResultList from './Pages/DeclareResultList';
+import WinningReportList from './Pages/WinningReportList';
 
 
 const basePath = "public/administrator"
@@ -39,6 +42,16 @@ function App() {
           <Route path="user/active-user-list" element={<ManageUsers />} />
           <Route path="user/inactive-user-list" element={<InactiveUsers />} />
           <Route path="user/today-user-list" element={<TodayUsers />} />
+
+          <Route path="admin-game_load_list" element={<GameLoad />} />
+          <Route path="game/declare-result-list" element={<DeclareResultList />} />
+          <Route path="game/winning-report-list" element={<WinningReportList />} />
+
+
+
+          
+
+   
 
 
           

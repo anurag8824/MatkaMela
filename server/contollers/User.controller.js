@@ -562,7 +562,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
   try {
     const { GAME_ID, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste, DATE } = resultRow;
 
-    console.log(resultRow, "resutl Row")
+    // console.log(resultRow, "resutl Row")
 
     // Fetch bets of that gameId & same date
     const betsQuery = `
@@ -571,7 +571,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       AND DATE(DATE_TIME) = DATE(?)
     `;
     const [bets] = await req.db.query(betsQuery, [GAME_ID, DATE]);
-    console.log(bets, "betss ki non result ")
+    // console.log(bets, "betss ki non result ")
 
     if (!bets.length) {
       console.log("No bets found for this game and date.");
@@ -655,7 +655,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
     }
 
-    console.log(updatedBets, "✅ Updated Bets:");
+    // console.log(updatedBets, "✅ Updated Bets:");
 
 
 
@@ -667,12 +667,12 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
 
 export const CalculateGameResults = async (req, res) => {
-  console.log(req.user, "chcck")
+  console.log(req.body, "chcck")
   try {
-    const { openResult, closeResult, gameId } = req.body;
+    const { openResult, closeResult, gameId , game_name } = req.body;
     console.log(req.body, "reqbody")
 
-    console.log("Declared Result:", openResult, closeResult);
+    // console.log("Declared Result:", openResult, closeResult);
 
     const sumDigits = (num) => {
       return num
@@ -744,14 +744,15 @@ export const CalculateGameResults = async (req, res) => {
     // ---- Insert into DB ----
     const insertQuery = `
   INSERT INTO RESULT 
-  (GAME_ID, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  (GAME_ID, GAME_NAME, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste)
+  VALUES (?, ?,? , ?, ?, ?, ?, ?, ?, ?)
 `;
 
 
 
     const values = [
       gameId,
+      game_name,
       openResult,
       closeResult,
       jodiNumber,
@@ -797,7 +798,7 @@ export const CalculateGameResults = async (req, res) => {
       CopyPaste: copyPasteResult
     };
 
-    console.log("Calculated Game Results:", resultObj);
+    // console.log("Calculated Game Results:", resultObj);
 
     res.status(200).json({
       success: true,
@@ -841,7 +842,7 @@ export const getUserBetHistory = async (req, res) => {
 
     // SQL query to get bets by user's mobile
     const [bets] = await req.db.query(
-      `SELECT id, number, point, type, game,game_id, date_time,status
+      `SELECT id, number, point, type, game,game_id, date_time,status,result
        FROM bets
        WHERE phone = ?
        ORDER BY id DESC`,

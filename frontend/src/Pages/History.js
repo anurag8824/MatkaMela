@@ -70,6 +70,7 @@ const History = () => {
                 <th>Type</th>
                 <th>Number</th>
                 <th>Points</th>
+                <th className="grid"><span className="text-[10px]">(Bet type)</span>Result</th>
                 <th>Status</th>
                 {/* <th>Action</th> */}
               </tr>
@@ -93,6 +94,8 @@ const History = () => {
                     <td>{bet.type}</td>
                     <td>{bet.number}</td>
                     <td>{bet.point}</td>
+                    <td>{bet.result ? bet?.result : "-" }</td>
+
                     <td>
                       {bet.status ? (
                         <span className={`badge ${bet.ststus === "Win" ? "bg-success" : "bg-danger"}`}>{bet.status}</span>
