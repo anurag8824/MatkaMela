@@ -560,7 +560,7 @@ export const winningReportList = async (req, res) => {
              TYPE, 
              WIN_AMOUNT 
            FROM bets 
-           WHERE STATUS = 'Loss'
+           WHERE STATUS = 'Win'
            ORDER BY DATE_TIME DESC`
         );
     
