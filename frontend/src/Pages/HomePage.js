@@ -9,7 +9,7 @@ import { RiRefreshFill } from "react-icons/ri";
 import { IoGameController } from "react-icons/io5";
 import HomeMarket from "./HomeMarket";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 
@@ -205,10 +205,10 @@ const HomePage = () => {
         <h5 className="text-lg border-white border-dashed border-1 font-medium bg-theme text-white relative z-10">Result</h5>
 
         {/* Market Name and Result Number */}
-        <div style={{backgroundImage:"url(/images/congratulations.gif)" ,}} 
-        className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 animate-gradientlresult">
+        <div style={{ backgroundImage: "url(/images/congratulations.gif)", }}
+          className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 animate-gradientlresult">
 
-        {/* className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 bg-gradient-to-br from-[#d2ac79] via-[#ef629f] to-[#040f6b] bg-[length:400%_400%] animate-gradientresult"> */}
+          {/* className="relative z-10 text-white font-bold text-base rounded-t-none px-4 py-1 rounded-[10px] overflow-hidden border-0 bg-gradient-to-br from-[#d2ac79] via-[#ef629f] to-[#040f6b] bg-[length:400%_400%] animate-gradientresult"> */}
           <div className="absolute hidden inset-0 pointer-events-none z-0">
             {[...Array(12)].map((_, i) => (
               <div
@@ -221,13 +221,15 @@ const HomePage = () => {
               ></div>
             ))}
           </div>
-          <p className="text-blue-950 font-bold text-xl">DEV DARSHAN</p>
-          <span className="font-bold text-xl text-blue-950">53</span>
+          <p className="text-blue-950 font-bold text-xl">{games[7]?.NAME}</p>
+          <span className="font-bold text-xl text-blue-950">{games[7]?.RESULT1 ? games[7]?.RESULT1 : "-" }</span>
         </div>
 
 
 
       </div>
+
+      <div className="card text-center clickresult animated-box"><Link className="d-block btn_share border-0 btn btn-primary" to="/refercode">शेयर Share &amp; Earn</Link></div>
 
       <h5 className="py-2 text-center rounded font-medium bg-theme text-white relative z-10">Live Result of {new Date().toLocaleDateString()}</h5>
 

@@ -13,6 +13,7 @@ import Share from './Pages/Share';
 import Deposit from './Pages/Wallet/Deposit';
 import AddBank from './Pages/Wallet/AddBank';
 import HomePlayMenu from './Pages/HomePlayMenu';
+import ReferPage from './Pages/Account/ReferPage';
 
 function App() {
   return (
@@ -28,6 +29,10 @@ function App() {
           <Route path="play" element={<HomePlayMenu />} />
           <Route path="history" element={<History />} />
           <Route path="login" element={<Login />} />
+
+          <Route path="refercode" element={<ReferPage />} />
+
+
           <Route path="Termsandcondition" element={<Tnc />} />
           <Route path="Appdetails" element={<AppDetails />} />
           <Route path="share" element={<Share />} />

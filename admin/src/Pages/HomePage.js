@@ -75,126 +75,126 @@ export default function HomePage() {
     { title: "Commission", value: "200.35", icon: "fa-users" },
     { title: "Winning Amount", value: "2705", icon: "fa-users" },
     { title: "Profit", value: "2489.65", icon: "fa-money-bill" },
-    {
-      title: "Disawar",
-      icon: "fa-users",
-      value: "2489.65",
-      extra: (
-        <>
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Bidding Rs. 25
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Wining Rs. 0
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Total Bal . 25
-          </span>
-        </>
-      ),
-    },
-    {
-      title: "Delhi Bazar",
-      icon: "fa-users",
-      value: "489.65",
-      extra: (
-        <>
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Bidding Rs. 1867
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Wining Rs. 2420
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Total Bal . -553
-          </span>
-        </>
-      ),
-    },
-    {
-      title: "Shree Ganesh",
-      icon: "fa-users",
-      value: "29.65",
-      extra: (
-        <>
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Bidding Rs. 2155
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Wining Rs. 0
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Total Bal . 2155
-          </span>
-        </>
-      ),
-    },
-    {
-      title: "Faridabad",
-      icon: "fa-users",
-      value: "439.65",
-      extra: (
-        <>
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Bidding Rs. 400
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Wining Rs. 0
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Total Bal . 400
-          </span>
-        </>
-      ),
-    },
-    {
-      title: "Ghaziabad",
-      icon: "fa-users",
-      value: "19.65",
-      extra: (
-        <>
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Bidding Rs. 66
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Wining Rs. 0
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Total Bal . 66
-          </span>
-        </>
-      ),
-    },
-    {
-      title: "Gali",
-      icon: "fa-users",
-      value: "989.65",
-      extra: (
-        <>
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Bidding Rs. 35
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Wining Rs. 0
-          </span>
-          <br />
-          <span className="weight-500 uppercase-font txt-light font-13">
-            Total Bal . 35
-          </span>
-        </>
-      ),
-    },
+    // {
+    //   title: "Disawar",
+    //   icon: "fa-users",
+    //   value: "2489.65",
+    //   extra: (
+    //     <>
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Bidding Rs. 25
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Wining Rs. 0
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Total Bal . 25
+    //       </span>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   title: "Delhi Bazar",
+    //   icon: "fa-users",
+    //   value: "489.65",
+    //   extra: (
+    //     <>
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Bidding Rs. 1867
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Wining Rs. 2420
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Total Bal . -553
+    //       </span>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   title: "Shree Ganesh",
+    //   icon: "fa-users",
+    //   value: "29.65",
+    //   extra: (
+    //     <>
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Bidding Rs. 2155
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Wining Rs. 0
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Total Bal . 2155
+    //       </span>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   title: "Faridabad",
+    //   icon: "fa-users",
+    //   value: "439.65",
+    //   extra: (
+    //     <>
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Bidding Rs. 400
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Wining Rs. 0
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Total Bal . 400
+    //       </span>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   title: "Ghaziabad",
+    //   icon: "fa-users",
+    //   value: "19.65",
+    //   extra: (
+    //     <>
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Bidding Rs. 66
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Wining Rs. 0
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Total Bal . 66
+    //       </span>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   title: "Gali",
+    //   icon: "fa-users",
+    //   value: "989.65",
+    //   extra: (
+    //     <>
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Bidding Rs. 35
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Wining Rs. 0
+    //       </span>
+    //       <br />
+    //       <span className="weight-500 uppercase-font txt-light font-13">
+    //         Total Bal . 35
+    //       </span>
+    //     </>
+    //   ),
+    // },
   ];
 
   return (

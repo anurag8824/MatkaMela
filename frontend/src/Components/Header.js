@@ -117,7 +117,7 @@ const Header = () => {
               {/* Profile Details */}
               <div className="profiledetails mb-6">
                 <h3 className="text-lg font-semibold"></h3>
-                <h4 className="text-sm text-gray-50"><strong>ID:</strong> 9571788517</h4>
+                <h4 className="text-sm text-gray-50"><strong>ID:</strong> {userinfo?.mobile}</h4>
               </div>
 
               {/* Menu List */}
@@ -181,7 +181,7 @@ const Header = () => {
                 {/* Refer & Earn */}
                 <li>
                   <Link
-                    to="/"
+                    to="/refercode"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-yellow-300 text-black"
                   >
                     <div className="w-6 h-6">

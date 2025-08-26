@@ -101,22 +101,22 @@ const menuItems = [
         title: "Update Number",
         link: "/public/administrator/result/update-number",
       },
-      {
-        title: "Winning Number",
-        link: "/public/administrator/result/winning-number",
-      },
+      // {
+      //   title: "Winning Number",
+      //   link: "/public/administrator/result/winning-number",
+      // },
     ],
   },
-  {
-    title: "User Commission",
-    icon: <FaPercentage />,
-    children: [
-      {
-        title: "User Commission Pay List",
-        link: "/public/administrator/user/commission-pay-list",
-      },
-    ],
-  },
+  // {
+  //   title: "User Commission",
+  //   icon: <FaPercentage />,
+  //   children: [
+  //     {
+  //       title: "User Commission Pay List",
+  //       link: "/public/administrator/user/commission-pay-list",
+  //     },
+  //   ],
+  // },
   {
     title: "Game Management",
     icon: <FaGamepad />,
@@ -125,10 +125,10 @@ const menuItems = [
         title: "Game Name List",
         link: "/public/administrator/game/game-name-list",
       },
-      {
-        title: "Bid History List",
-        link: "/public/administrator/game/bid-history-list",
-      },
+      // {
+      //   title: "Bid History List",
+      //   link: "/public/administrator/game/bid-history-list",
+      // },
       {
         title: "Declare Result List",
         link: "/public/administrator/game/declare-result-list",
@@ -144,26 +144,26 @@ const menuItems = [
     icon: <FaCreditCard />,
     link: "/public/administrator/upload-qr",
   },
-  {
-    title: "User Reffer List",
-    icon: <FaUsers />,
-    link: "/public/administrator/user/user-reffer-list",
-  },
-  {
-    title: "User Wallet Data",
-    icon: <FaWallet />,
-    link: "/public/administrator/user-wallet-data",
-  },
-  {
-    title: "Web Setting Manage",
-    icon: <FaCogs />,
-    link: "/public/administrator/web-setting-manage",
-  },
-  {
-    title: "SubAdmin",
-    icon: <FaUserShield />,
-    link: "/public/administrator/subadmin",
-  },
+  // {
+  //   title: "User Reffer List",
+  //   icon: <FaUsers />,
+  //   link: "/public/administrator/user/user-reffer-list",
+  // },
+  // {
+  //   title: "User Wallet Data",
+  //   icon: <FaWallet />,
+  //   link: "/public/administrator/user-wallet-data",
+  // },
+  // {
+  //   title: "Web Setting Manage",
+  //   icon: <FaCogs />,
+  //   link: "/public/administrator/web-setting-manage",
+  // },
+  // {
+  //   title: "SubAdmin",
+  //   icon: <FaUserShield />,
+  //   link: "/public/administrator/subadmin",
+  // },
 
 
 ];

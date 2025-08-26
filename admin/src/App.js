@@ -27,6 +27,7 @@ import WithdrawHistory from './Pages/WithdrawHistory';
 import GameLoad from './Pages/GameLoad';
 import DeclareResultList from './Pages/DeclareResultList';
 import WinningReportList from './Pages/WinningReportList';
+import WinningNumber from './Pages/WinningNumber';
 
 
 const basePath = "public/administrator"
@@ -46,6 +47,11 @@ function App() {
           <Route path="admin-game_load_list" element={<GameLoad />} />
           <Route path="game/declare-result-list" element={<DeclareResultList />} />
           <Route path="game/winning-report-list" element={<WinningReportList />} />
+
+
+          
+          {/* <Route path="result/winning-number" element={<WinningNumber />} /> */}
+
 
 
 
@@ -72,6 +78,8 @@ function App() {
           <Route path="reset_password" element={<PasswordReset />} />
           <Route path="deposit/:type" element={<DepositHistory />} />
           <Route path="withdraw/:type" element={<WithdrawHistory />} />
+
+
 
           <Route path="upload-qr" element={<QrUploadForm />} />
         </Route>

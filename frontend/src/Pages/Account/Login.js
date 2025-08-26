@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FiPhone, FiUser } from 'react-icons/fi';
 import PWAInstallButton from '../../Components/PWAInstallButton';
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ emailOrPhone: '', otp: '' });
+  const [formData, setFormData] = useState({ emailOrPhone: '', otp: '' ,referby:'' });
   const backUrl = process.env.REACT_APP_BACKEND_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-
-
   };
 
 
@@ -37,11 +36,12 @@ export default function Login() {
     try {
       await axios.post(`${backUrl}/api/send-otp`, {
         phone: formData.emailOrPhone,
+        referby: formData.referby || "",
       });
       alert("OTP sent successfully!");
       setStep(2);
     } catch (err) {
-      alert("Failed to send OTP");
+      toast.error(err.response.data.message || "Failed to send OTP");
       console.error(err);
     }
   };
@@ -90,22 +90,55 @@ export default function Login() {
         <form onSubmit={step === 1 ? handleSendOtp : handleVerifyOtp} className="space-y-4">
 
 
-          {step === 1 && (<div className="flex items-center border rounded-lg overflow-hidden">
-            {/* Icon */}
-            <span className="px-3 text-gray-500">
-              <FiUser size={18} />
-            </span>
+          {step === 1 && (
+            <div>
 
-            {/* Input */}
-            <input
-              name="emailOrPhone"
-              type="text"
-              placeholder="Mobile Number"
-              onChange={handleChange}
-              required
-              className="w-full p-2 outline-none"
-            />
-          </div>)}
+              <div className="flex items-center border rounded-lg overflow-hidden">
+                {/* Icon */}
+                <span className="px-3 text-gray-500">
+                  <FiUser size={18} />
+                </span>
+
+                {/* Input */}
+                <input
+                  name="emailOrPhone"
+                  type="number"
+                  placeholder="Mobile Number"
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 outline-none"
+                />
+
+
+
+              </div>
+
+
+              <div className="flex items-center border rounded-lg mt-2 overflow-hidden">
+                {/* Icon */}
+                <span className="px-3 text-gray-500">
+                  <FiUser size={18} />
+                </span>
+
+                {/* Input */}
+         
+               
+         
+                <input
+                  name="referby"
+                  type="number"
+                  placeholder="Refer Number (optional)"
+                  onChange={handleChange}
+                  className="w-full p-2 outline-none"
+                />
+      
+
+
+              </div>
+            </div>
+
+
+          )}
 
 
           {step === 2 && (

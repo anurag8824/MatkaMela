@@ -97,10 +97,30 @@ export const UserRegister = async (req, res) => {
 
 
 export const SendOTP = async (req, res) => {
-  const { phone } = req.body;
+  const { phone, referby } = req.body;
   if (!phone) return res.status(400).json({ message: "Phone number required" });
 
   try {
+
+    // Validation: referby should not equal phone
+    if (referby && referby === phone) {
+      return res.status(400).json({ message: "You cannot refer yourself" });
+    }
+
+    // If referby provided → check if exists
+    if (referby) {
+      const [refUser] = await req.db.query(
+        "SELECT id FROM users WHERE mobile = ?",
+        [referby]
+      );
+      if (!refUser.length) {
+        return res.status(400).json({ message: "Refer number not existed" });
+      }
+    }
+
+
+
+
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
@@ -119,8 +139,8 @@ export const SendOTP = async (req, res) => {
     } else {
       // Insert new user with mobile + OTP
       await req.db.query(
-        "INSERT INTO users (mobile, otp) VALUES (?, ?)",
-        [phone, otp]
+        "INSERT INTO users (mobile, otp , refer_by) VALUES (?, ?, ?)",
+        [phone, otp, referby]
       );
     }
 
@@ -556,6 +576,111 @@ export const BetGameCopyPaste = async (req, res) => {
 };
 
 
+//update win_amount in bets and user of WIN bets 
+
+export const ProcessWinningBets = async (req, updatedBets) => {
+  try {
+    if (!updatedBets.length) {
+      console.log("⚠️ No winning bets to process");
+      return;
+    }
+
+    // Group wins by user
+    let userWins = {};
+
+    for (const bet of updatedBets) {
+      // 1. Fetch game rate
+      const [gameRows] = await req.db.query("SELECT RATE FROM games WHERE ID = ?", [bet.gameId]);
+      if (!gameRows.length) continue;
+
+      const rate = parseFloat(gameRows[0].RATE) || 1.5;
+      const winAmount = bet.point * rate;
+
+      // 2. Update bet with WIN_AMOUNT
+      await req.db.query(
+        "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
+        [winAmount, bet.betId]
+      );
+
+      // 3. Collect user’s total win
+      if (!userWins[bet.user]) {
+        userWins[bet.user] = 0;
+      }
+      userWins[bet.user] += winAmount;
+    }
+
+    // 4. Update each user wallet
+    for (const mobile in userWins) {
+      const winTotal = userWins[mobile];
+
+      // fetch wallet
+      const [users] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [mobile]);
+      if (!users.length) continue;
+
+      let wallet = parseFloat(users[0].wallet);
+      if (isNaN(wallet)) wallet = 0;
+
+      const newWallet = wallet + winTotal;
+
+      await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, mobile]);
+
+      console.log(`✅ Wallet updated: ${mobile} +${winTotal} → ${newWallet}`);
+    }
+
+  } catch (err) {
+    console.error("Error processing winning bets:", err);
+  }
+};
+
+
+
+export const ProcessLossBets = async (req, LossBets) => {
+  try {
+    if (!LossBets.length) {
+      console.log("⚠️ No loss bets to process");
+      return;
+    }
+
+    for (const bet of LossBets) {
+      // 1. Update bet WIN_AMOUNT = 0
+      await req.db.query(
+        "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
+        [0, bet.betId]
+      );
+
+      // 2. Get user info
+      const [users] = await req.db.query("SELECT REFER_BY FROM users WHERE mobile = ?", [bet.user]);
+      if (!users.length) continue;
+
+      const referBy = users[0].REFER_BY;
+      if (!referBy) {
+        console.log(`ℹ️ Bet ${bet.betId} user ${bet.user} has no refer_by`);
+        continue;
+      }
+
+      // 3. Calculate 5% commission
+      const commission = (parseFloat(bet.point) * 5) / 100;
+
+      // 4. Update referBy user wallet
+      const [refUsers] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [referBy]);
+      if (!refUsers.length) {
+        console.log(`⚠️ ReferBy user ${referBy} not found`);
+        continue;
+      }
+
+      let refWallet = parseFloat(refUsers[0].wallet);
+      if (isNaN(refWallet)) refWallet = 0;
+
+      const newWallet = refWallet + commission;
+
+      await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, referBy]);
+
+      console.log(`✅ ReferBy user ${referBy} got +${commission} from bet ${bet.betId}`);
+    }
+  } catch (err) {
+    console.error("Error processing loss bets:", err);
+  }
+};
 
 
 export const UpdateBetsWithResults = async (req, resultRow) => {
@@ -579,6 +704,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
     }
 
     let updatedBets = [];
+    let LossBets = [];
 
     // Loop all bets & update status
     for (const bet of bets) {
@@ -643,6 +769,20 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
       if (status === "Win") {
         updatedBets.push({
+          gameId: GAME_ID,
+          betId: bet.ID,
+          type: bet.TYPE,
+          number: bet.number,
+          point: bet.point,
+          user: bet.phone,
+          expectedResult,
+          status
+        });
+      }
+
+      if (status === "Loss") {
+        LossBets.push({
+          gameId: GAME_ID,
           betId: bet.ID,
           type: bet.TYPE,
           number: bet.number,
@@ -655,7 +795,15 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
     }
 
-    // console.log(updatedBets, "✅ Updated Bets:");
+    console.log(updatedBets, "✅ Updated Bets:");
+    console.log(LossBets, "✅ Updated Loss Bets:");
+
+
+    // Process only win bets for wallet update
+    await ProcessWinningBets(req, updatedBets);
+
+    await ProcessLossBets(req, LossBets);
+
 
 
 
@@ -669,7 +817,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 export const CalculateGameResults = async (req, res) => {
   console.log(req.body, "chcck")
   try {
-    const { openResult, closeResult, gameId , game_name } = req.body;
+    const { openResult, closeResult, gameId, game_name } = req.body;
     console.log(req.body, "reqbody")
 
     // console.log("Declared Result:", openResult, closeResult);
