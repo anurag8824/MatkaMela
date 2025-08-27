@@ -11,7 +11,7 @@ export const AdminLogin = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const [rows] = await req.db.query("SELECT mobile, otp FROM settings LIMIT 1");
+    const [rows] = await req.db.query("SELECT mobile, otp FROM SETTINGS LIMIT 1");
 
     if (!rows || rows.length === 0) {
       return res.status(404).json({ success: false, message: "Admin not found" });
@@ -47,7 +47,7 @@ export const ChangePasswordAdmin = async (req, res) => {
   
     try {
       // Pehle current password le aao
-      const [rows] = await req.db.query("SELECT otp FROM settings LIMIT 1");
+      const [rows] = await req.db.query("SELECT otp FROM SETTINGS LIMIT 1");
   
       if (!rows || rows.length === 0) {
         return res.status(404).json({ success: false, message: "Admin not found" });
@@ -60,7 +60,7 @@ export const ChangePasswordAdmin = async (req, res) => {
       }
   
       // Update new password
-      await req.db.query("UPDATE settings SET otp = ? LIMIT 1", [newPassword]);
+      await req.db.query("UPDATE SETTINGS SET otp = ? LIMIT 1", [newPassword]);
   
       res.json({ success: true, message: "Password changed successfully" });
     } catch (err) {
