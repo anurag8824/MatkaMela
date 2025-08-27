@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Profile from './Profile';
 
 import { FiMenu } from 'react-icons/fi';
@@ -13,6 +13,7 @@ import { FaPercentage } from "react-icons/fa";
 import { FaQuestionCircle } from "react-icons/fa";
 import { FaCreditCard, FaUserShield } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
+import { use } from 'react';
 
 
 
@@ -172,6 +173,7 @@ const Header = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [open, setOpen] = useState(false);
 
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -179,8 +181,17 @@ const Header = () => {
   const toggleDropdown = (menu) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
   };
+  const navigate = useNavigate();
 
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("mobile");
+    localStorage.removeItem("id");
+
+    navigate("/public/administrator/login");
+    window.location.reload();
+  };
 
 
 
@@ -213,12 +224,35 @@ const Header = () => {
           </div>
 
           {/* Right: Points + Bell */}
-          <div className="flex items-center gap-3">
+          <div className="flex relative items-center gap-3">
 
-            <a href="#" className="relative text-black">
-              <FaUser className="text-xl" />
+          <button
+        onClick={() => setOpen(!open)}
+        className="flex  items-center justify-center text-black focus:outline-none"
+      >
+        <FaUser className="text-xl" />
+      </button>
 
-            </a>
+      {open && (
+        <div className="absolute top-5 right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 z-50">
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/public/administrator/change-password"); // 👈 apni change password route
+            }}
+            className="w-full text-nowrap text-left px-3 py-2 rounded hover:bg-gray-100 bg-gray-300 text-sm"
+          >
+            Change Password
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-3 py-2 rounded hover:bg-gray-100  text-sm text-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
           </div>
         </div>
       </div>

@@ -5,14 +5,14 @@ import axiosInstance from "../../Utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const CopyPaste = () => {
-    const backUrl = process.env.REACT_APP_BACKEND_URL;
-
-    const gameId = useParams().id
+  const backUrl = process.env.REACT_APP_BACKEND_URL;
+  const gameId = useParams().id
   const [numberInput, setNumberInput] = useState("");
   const [pointsInput, setPointsInput] = useState("");
   const [paltiType, setPaltiType] = useState("with"); // with/without
   const [bets, setBets] = useState([]);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [loading, setLoading] = useState(false); // ✅ loading state
 
   // Generate separate combination objects for each row
   const generateCombinations = (num, type) => {
@@ -74,29 +74,38 @@ const CopyPaste = () => {
   };
 
   const handlePlaceBet = async () => {
+    setLoading(true);
     try {
       const payload = {
         bets: bets.map((b) => ({
-        //   inputnumber: b.number,
+          //   inputnumber: b.number,
           number: b.combination,
           points: b.points,
           paltiType: b.paltiType,
         })),
         totalPoints,
-        gameId,     
+        gameId,
       };
       const response = await axiosInstance.post(
         `${backUrl}/api/bet-game-copypaste`,
         payload
       );
-      alert("Bet placed successfully!");
+      toast.success("Bet placed successfully!"); // ✅ success toast
+
+      // ✅ reset after success
       setBets([]);
       setTotalPoints(0);
+      setNumberInput("");
+      setPointsInput("");
+      setPaltiType("with");
+
       console.log(response.data);
     } catch (err) {
       console.error(err);
       toast.error(err.response.data.message || "Error placing bet");
-      
+
+    } finally {
+      setLoading(false); // ✅ stop loading
     }
   };
 
@@ -197,8 +206,9 @@ const CopyPaste = () => {
           <button
             className="btn btn-success w-100 mt-3"
             onClick={handlePlaceBet}
+            disabled={loading} // ✅ disable while loading
           >
-            Place Bet
+            {loading ? "Placing Bet..." : "Place Bet"}
           </button>
         )}
       </div>

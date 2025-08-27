@@ -1,5 +1,5 @@
 import express from 'express';
-import { adminDashboardData, AdminLogin, approveDeposits, approveWithdraws, declareResultList, editGame, getAdminDetails, getAllBetsGameLoad, GetAllUsers, GetQr, GetUPI, toggleUserState, UpdateQr, UpdateUPI, updateWallet, winningReportList } from '../contollers/Admin.controller.js';
+import { AdminAddUser, adminDashboardData, AdminLogin, approveDeposits, approveWithdraws, ChangePasswordAdmin, declareResultList, editGame, getAdminDetails, getAllBetsGameLoad, GetAllUsers, GetQr, GetUPI, toggleUserState, UpdateQr, UpdateUPI, updateWallet, winningReportList } from '../contollers/Admin.controller.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { qrMulter } from '../middlewares/qrMulter.js';
 
@@ -10,11 +10,17 @@ const router = express.Router();
 
 router.post('/login', AdminLogin);
 router.get('/admin-detail', authMiddleware , getAdminDetails)
+router.post('/change-password', authMiddleware , ChangePasswordAdmin )
+
 
 router.get('/admin-dashboard-data', authMiddleware , adminDashboardData )
 
 
+
 router.get('/get-users', authMiddleware , GetAllUsers)
+
+router.post('/admin-add-user', authMiddleware , AdminAddUser)
+
 router.post('/admin-update-wallet', authMiddleware , updateWallet)
 router.post('/toggle-user-state', authMiddleware , toggleUserState )
 

@@ -17,6 +17,11 @@ const navigate = useNavigate();
       toast.error("Please enter amount");
       return;
     }
+  
+    if (amount < 100) {
+      toast.error("Minimum deposit amount of 100");
+      return;
+    }
 
     navigate(`/deposit/${amount}`);
 
@@ -70,7 +75,7 @@ const navigate = useNavigate();
         <button onClick={handleAddPoints} className="w-full bg-[#094c73] text-white py-2 rounded ">
           Add Points
         </button>
-        <button onClick={() => setShowPopup(true)} className="w-full bg-[#094c73] text-white py-2 rounded">
+        <button onClick={() => setShowPopup(true)} className="w-full hidden bg-[#094c73] text-white py-2 rounded">
           Transfer Points
         </button>
       </div>

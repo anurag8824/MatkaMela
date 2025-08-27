@@ -97,7 +97,7 @@ export const UserRegister = async (req, res) => {
 
 
 export const SendOTP = async (req, res) => {
-  const { phone, referby } = req.body;
+  const {name, phone, referby } = req.body;
   if (!phone) return res.status(400).json({ message: "Phone number required" });
 
   try {
@@ -139,8 +139,8 @@ export const SendOTP = async (req, res) => {
     } else {
       // Insert new user with mobile + OTP
       await req.db.query(
-        "INSERT INTO users (mobile, otp , refer_by) VALUES (?, ?, ?)",
-        [phone, otp, referby]
+        "INSERT INTO users (mobile, otp , refer_by , name) VALUES (?, ?, ? ,?)",
+        [phone, otp, referby , name]
       );
     }
 
@@ -171,14 +171,14 @@ export const SendOTP = async (req, res) => {
 
 
 export const UserLogin = async (req, res) => {
-  const { emailOrPhone, otp } = req.body;
-  if (!emailOrPhone || !otp) return res.status(400).json({ message: "Phone & OTP required" });
+  const { phone, otp } = req.body;
+  if (!phone || !otp) return res.status(400).json({ message: "Phone & OTP required" });
 
   try {
     // Check OTP in DB
     const [rows] = await req.db.query(
       "SELECT * FROM users WHERE mobile = ? AND otp = ?",
-      [emailOrPhone, otp]
+      [phone, otp]
     );
 
     if (rows.length === 0) {
@@ -191,7 +191,7 @@ export const UserLogin = async (req, res) => {
     console.log(user, "userrrr")
 
     // Clear OTP after verification (optional but recommended)
-    await req.db.query("UPDATE users SET otp = NULL WHERE mobile = ?", [emailOrPhone]);
+    await req.db.query("UPDATE users SET otp = NULL WHERE mobile = ?", [phone]);
 
     // Generate JWT
     const token = jwt.sign(
@@ -964,7 +964,7 @@ export const CalculateGameResults = async (req, res) => {
 export const getUserInfo = async (req, res) => {
   try {
     const [rows] = await req.db.query(
-      "SELECT mobile, wallet FROM users WHERE mobile = ? LIMIT 1",
+      "SELECT mobile, wallet , name , refer_by FROM users WHERE mobile = ? LIMIT 1",
       [req.user.mobile]
     );
 
@@ -990,7 +990,7 @@ export const getUserBetHistory = async (req, res) => {
 
     // SQL query to get bets by user's mobile
     const [bets] = await req.db.query(
-      `SELECT id, number, point, type, game,game_id, date_time,status,result
+      `SELECT id, number, point, type, game,game_id, date_time,status,result,win_amount
        FROM bets
        WHERE phone = ?
        ORDER BY id DESC`,

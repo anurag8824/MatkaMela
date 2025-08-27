@@ -12,22 +12,38 @@ function Layout() {
 
   const backUrl = process.env.REACT_APP_BACKEND_URL;
   const [user, setUserinfo] = useState(null);
+  const [loading, setLoading] = useState(true); // 👈 loader state
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token"); // 👈 check if token exists
+    if (!token) {
+      // navigate("/register");
+      return;
+    }
+
     axiosInstance
-      .get(`${backUrl}/api/getUserInfo`)
+      .get(`/api/getUserInfo`)
       .then((res) => {
-        console.log("User Info:", res?.data);
-        const usi = res.data;
-        setUserinfo(usi);
-        // res.data = { mobile: "...", wallet: ... }
+        if (res?.data) {
+          setUserinfo(res.data);
+        } else {
+          navigate("/login");
+        }
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Auth Error:", err);
         navigate("/login");
+      })
+      .finally(() => {
+        setLoading(false); // 👈 loading false after response
       });
-  }, []);
+  }, [backUrl, navigate]);
+
+
+ 
+
+  
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">

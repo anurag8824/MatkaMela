@@ -14,6 +14,7 @@ import Deposit from './Pages/Wallet/Deposit';
 import AddBank from './Pages/Wallet/AddBank';
 import HomePlayMenu from './Pages/HomePlayMenu';
 import ReferPage from './Pages/Account/ReferPage';
+import Register from './Pages/Account/Register';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="play" element={<HomePlayMenu />} />
           <Route path="history" element={<History />} />
           <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
 
           <Route path="refercode" element={<ReferPage />} />
 

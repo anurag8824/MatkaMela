@@ -7,7 +7,8 @@ import { toast } from 'react-toastify';
 
 export default function Login() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ emailOrPhone: '', otp: '' ,referby:'' });
+  const [formData, setFormData] = useState({ phone: '', otp: '', referby: '' });
+  const [loading, setLoading] = useState(false);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
 
   const handleChange = (e) => {
@@ -33,22 +34,26 @@ export default function Login() {
   // Send OTP API
   const handleSendOtp = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await axios.post(`${backUrl}/api/send-otp`, {
-        phone: formData.emailOrPhone,
+        phone: formData.phone,
         referby: formData.referby || "",
       });
-      alert("OTP sent successfully!");
+      toast.success("OTP sent successfully!");
       setStep(2);
     } catch (err) {
       toast.error(err.response.data.message || "Failed to send OTP");
       console.error(err);
+    } finally {
+      setLoading(false); // 👈 stop loading
     }
   };
 
   // Verify OTP (Login)
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await axios.post(`${backUrl}/api/login`, formData);
       const { token, user } = res.data;
@@ -59,11 +64,13 @@ export default function Login() {
       localStorage.setItem('id', user.id);
 
 
-      alert('Login successful');
+      toast.success('Login successful');
       window.location.href = "/";
     } catch (err) {
       alert('Login failed');
       console.error(err);
+    } finally {
+      setLoading(false); // 👈 stop loading
     }
   };
 
@@ -73,7 +80,9 @@ export default function Login() {
 
   return (
     <div className='bg-[#094c73]  h-screen pt-20'>
-      <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-lg text-red-500 bg-white font-medium px-1 rounded-md"><h2>फरीदाबाद , गाजियाबाद , गली और दिसावर गेम खेलने के वाले नीचे से एप्लीकेशन डाउनलोड करे । यहां मिलता है आपको सबसे ज्यादा रेट 10 के 980 और सबसे फास्ट एंड सैफ पेमेंट ।</h2></div>
+      <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-lg text-red-500 bg-white font-medium px-1 rounded-md">
+        <h2>फरीदाबाद , गाजियाबाद , गली और दिसावर गेम खेलने के वाले नीचे से एप्लीकेशन डाउनलोड करे । यहां मिलता है आपको सबसे ज्यादा रेट 10 के 980 और सबसे फास्ट एंड सैफ पेमेंट ।</h2>
+      </div>
       <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
         <div className="flex justify-center mb-4 ">
           <img
@@ -101,7 +110,7 @@ export default function Login() {
 
                 {/* Input */}
                 <input
-                  name="emailOrPhone"
+                  name="phone"
                   type="number"
                   placeholder="Mobile Number"
                   onChange={handleChange}
@@ -114,27 +123,7 @@ export default function Login() {
               </div>
 
 
-              <div className="flex items-center border rounded-lg mt-2 overflow-hidden">
-                {/* Icon */}
-                <span className="px-3 text-gray-500">
-                  <FiUser size={18} />
-                </span>
 
-                {/* Input */}
-         
-               
-         
-                <input
-                  name="referby"
-                  type="number"
-                  placeholder="Refer Number (optional)"
-                  onChange={handleChange}
-                  className="w-full p-2 outline-none"
-                />
-      
-
-
-              </div>
             </div>
 
 
@@ -154,9 +143,13 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
+            className={`w-full py-2 rounded-lg transition ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+
           >
-            {step === 1 ? "Send OTP" : "Verify & Login"}
+            {loading ? "Please wait..." : step === 1 ? "Send OTP" : "Verify & Login"}
+
           </button>
 
         </form>

@@ -13,6 +13,7 @@ const Haraf = () => {
 
   const [andarHaraf, setAndarHaraf] = useState(Array(10).fill(""));
   const [baharHaraf, setBaharHaraf] = useState(Array(10).fill(""));
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (type, index, value) => {
     if (type === "andar") {
@@ -55,12 +56,20 @@ const Haraf = () => {
     console.log("Sending to API:", payload);
 
     try {
+      setLoading(true);
       const res = await axiosInstance.post(`${backUrl}/api/bet-game-harraf`, payload);
       console.log("Bet placed:", res.data);
-      alert("Bet placed successfully!");
+      toast.success("Bet placed successfully ✅");
+
+      // ✅ Reset inputs after success
+      setAndarHaraf(Array(10).fill(""));
+      setBaharHaraf(Array(10).fill(""));
     } catch (err) {
       console.error("Error placing bet:", err);
       toast.error(err.response.data.message || "Error placing bet");
+    }
+    finally {
+      setLoading(false); // ✅ Stop loading
     }
   };
 
@@ -106,11 +115,15 @@ const Haraf = () => {
       {renderGrid("bahar", baharHaraf)}
 
       {/* Place Bet Button */}
-      <button
+       {/* Place Bet Button */}
+       <button
         onClick={placeBet}
-        className="w-full mt-6 bg-green-600 text-white py-2 rounded hover:bg-green-700"
+        disabled={loading} // ✅ Disabled while loading
+        className={`w-full mt-6 text-white py-2 rounded 
+          ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}
+        `}
       >
-        Place Bet
+        {loading ? "Placing Bet..." : "Place Bet"}
       </button>
     </div>
   );

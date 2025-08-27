@@ -3,41 +3,72 @@ import path from "path";
 import fs from "fs";
 import { scheduleCronForGame } from "./cronController.js";
 
-const ADMIN_USER = {
-    username: "admin",
-    password: "12345",
-    role: "admin",
 
 
-};
 
 
 export const AdminLogin = async (req, res) => {
-    const { username, password } = req.body;
-    console.log(req.body);
+  const { username, password } = req.body;
 
-    if (username === ADMIN_USER.username && password === ADMIN_USER.password) {
-        // token generate
-        const token = jwt.sign(
-            { username: ADMIN_USER.username, role: ADMIN_USER.role },
-            process.env.JWT_SECRET,
-            { expiresIn: "8h" }
-        );
+  try {
+    const [rows] = await req.db.query("SELECT mobile, otp FROM settings LIMIT 1");
 
-        return res.json({
-            success: true,
-            message: "Admin login successful",
-            role: ADMIN_USER.role,
-            username: ADMIN_USER.username,
-            token,
-        });
-    } else {
-        return res.status(401).json({
-            success: false,
-            message: "Invalid username or password",
-        });
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Admin not found" });
     }
+
+    const admin = rows[0];
+
+    if (username === admin.mobile && password === admin.otp) {
+      const token = jwt.sign(
+        { username: admin.mobile, role: "admin" },
+        process.env.JWT_SECRET,
+        { expiresIn: "8h" }
+      );
+
+      return res.json({
+        success: true,
+        message: "Admin login successful",
+        role: "admin",
+        username: admin.mobile,
+        token,
+      });
+    } else {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+  } catch (err) {
+    console.error("AdminLogin error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
+
+export const ChangePasswordAdmin = async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+  
+    try {
+      // Pehle current password le aao
+      const [rows] = await req.db.query("SELECT otp FROM settings LIMIT 1");
+  
+      if (!rows || rows.length === 0) {
+        return res.status(404).json({ success: false, message: "Admin not found" });
+      }
+  
+      const currentPass = rows[0].otp;
+  
+      if (oldPassword !== currentPass) {
+        return res.status(400).json({ success: false, message: "Old password incorrect" });
+      }
+  
+      // Update new password
+      await req.db.query("UPDATE settings SET otp = ? LIMIT 1", [newPassword]);
+  
+      res.json({ success: true, message: "Password changed successfully" });
+    } catch (err) {
+      console.error("ChangePassword error:", err);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  };
+  
 
 export const getAdminDetails = (req, res) => {
     const { username, role } = req.user;
@@ -418,6 +449,60 @@ export const GetAllUsers = async (req, res) => {
         console.error('Error fetching users:', err);
         res.status(500).json({ error: 'Failed to fetch users' });
     }
+};
+
+
+export const AdminAddUser = async (req, res) => {
+    try {
+        const { name, phone, referby, dob } = req.body;
+    
+        if (!name || !phone || !dob) {
+          return res.status(400).json({ message: "Required fields missing" });
+        }
+    
+        // 1. Check if phone already exists
+        const [existingUser] = await req.db.query(
+          "SELECT * FROM users WHERE MOBILE = ?",
+          [phone]
+        );
+        if (existingUser.length > 0) {
+          return res.status(400).json({ message: "User is already registered" });
+        }
+    
+        // 2. Check referby validity (if provided)
+        if (referby) {
+          if (referby === phone) {
+            return res
+              .status(400)
+              .json({ message: "ReferBy number cannot be same as user's phone" });
+          }
+    
+          const [refUser] = await req.db.query(
+            "SELECT * FROM users WHERE MOBILE = ?",
+            [referby]
+          );
+    
+          if (refUser.length === 0) {
+            return res
+              .status(400)
+              .json({ message: "Invalid ReferBy number. User does not exist." });
+          }
+        }
+    
+        // 3. Insert into users table
+        const query = `
+          INSERT INTO users (NAME, MOBILE, REFER_BY ) 
+          VALUES (?, ?, ?)
+        `;
+        const values = [name, phone, referby || null, dob];
+    
+        await req.db.query(query, values);
+    
+        return res.status(200).json({ message: "User added successfully" });
+      } catch (err) {
+        console.error("Error inserting user:", err);
+        return res.status(500).json({ message: "Server error" });
+      }
 };
 
 

@@ -13,7 +13,7 @@ const Withdraw = () => {
     ifsc: '',
     upi: ''
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [active, setActive] = useState("upi");
 
@@ -21,6 +21,7 @@ const Withdraw = () => {
   // Fetch existing bank details
   useEffect(() => {
     const fetchBankDetails = async () => {
+      setLoading(true);
       try {
         const response = await axiosInstance.get('/api/get-bank-detail');
         if (response.status === 200 && response.data) {
@@ -46,8 +47,17 @@ const Withdraw = () => {
       toast.error('Enter a valid amount');
       return;
     }
+    if (Number(amount) < 100) {
+      toast.error('Minimum withdraw amount is 100');
+      return;
+    }
+    if (Number(amount) > 50000) {
+      toast.error('Maximum withdraw amount is 50000');
+      return;
+    }
 
     try {
+      setLoading(true); 
       const payload = { amount, ...bankData, status: "pending" };
       const response = await axiosInstance.post('/api/user-withdraw', payload);
       if (response.status === 200) {
@@ -56,8 +66,9 @@ const Withdraw = () => {
       }
     } catch (error) {
       console.error('Withdraw error:', error);
-      // toast.error('Something went wrong. Try again.');
-      toast.success('Withdrawal request sent successfully!');
+      toast.error('Something went wrong. Try again.');
+    } finally {
+      setLoading(false); // 👈 stop loading
     }
   };
 
@@ -192,9 +203,10 @@ const Withdraw = () => {
       <div className="flex justify-center mb-2">
       <button
         onClick={handleWithdraw}
+        disabled={loading}
         className="w-full bg-[#094c73] btn  text-white py-2 rounded hover:bg-[#1a3a4e]"
       >
-        Withdraw
+         {loading ? "Processing..." : "Withdraw"}
       </button>
       </div>
     </div>

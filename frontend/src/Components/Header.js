@@ -56,7 +56,7 @@ const Header = () => {
               className="text-2xl text-white cursor-pointer"
               onClick={() => setIsSidebarOpen(true)}
             />
-            <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">4</span>
+            {/* <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">4</span> */}
             <Link to={"/"} className="text-sm text-white font-semibold">Home</Link>
           </div>
 
@@ -84,7 +84,7 @@ const Header = () => {
               />
               <span className="text-sm text-white font-medium">{userinfo?.wallet} /-</span>
             </div>
-            <a href="/Notification" className="relative text-white">
+            <a href="/Notification" className="relative hidden text-white">
               <BsBellFill className="text-xl" />
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 6
@@ -123,7 +123,7 @@ const Header = () => {
               {/* Menu List */}
               <ul className="space-y-3 text-sm text-black  font-medium">
                 {/* App Details */}
-                <li>
+                {/* <li>
                   <Link
                     to="/Appdetails"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
@@ -137,7 +137,7 @@ const Header = () => {
                     </div>
                     <div className="flex-1">App Details</div>
                   </Link>
-                </li>
+                </li> */}
 
                 {/* My Play History */}
                 <li>
@@ -157,7 +157,7 @@ const Header = () => {
                 </li>
 
                 {/* Game Posting with badge */}
-                <li>
+                {/* <li>
                   <Link
                     to="/"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
@@ -176,7 +176,7 @@ const Header = () => {
                       </span>
                     </div>
                   </Link>
-                </li>
+                </li> */}
 
                 {/* Refer & Earn */}
                 <li>
@@ -196,7 +196,7 @@ const Header = () => {
                 </li>
 
                 {/* Result History */}
-                <li>
+                {/* <li>
                   <Link
                     to="/"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
@@ -210,7 +210,7 @@ const Header = () => {
                     </div>
                     <div className="flex-1">Result History</div>
                   </Link>
-                </li>
+                </li> */}
 
                 {/* Terms and Condition */}
                 <li>
@@ -247,7 +247,7 @@ const Header = () => {
                 </li>
 
                 {/* Rate Our App */}
-                <li>
+                {/* <li>
                   <Link
                     to="/"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
@@ -261,7 +261,7 @@ const Header = () => {
                     </div>
                     <div className="flex-1">Rate Our App</div>
                   </Link>
-                </li>
+                </li> */}
 
                 {/* Logout with function */}
                 <li>

@@ -28,6 +28,8 @@ import GameLoad from './Pages/GameLoad';
 import DeclareResultList from './Pages/DeclareResultList';
 import WinningReportList from './Pages/WinningReportList';
 import WinningNumber from './Pages/WinningNumber';
+import ChangePassword from './Components/ChangePassword';
+import AddUser from './Pages/AddUser';
 
 
 const basePath = "public/administrator"
@@ -44,10 +46,15 @@ function App() {
           <Route path="user/inactive-user-list" element={<InactiveUsers />} />
           <Route path="user/today-user-list" element={<TodayUsers />} />
 
+          <Route path="user/add-user" element={<AddUser />} />
+
+
           <Route path="admin-game_load_list" element={<GameLoad />} />
           <Route path="game/declare-result-list" element={<DeclareResultList />} />
           <Route path="game/winning-report-list" element={<WinningReportList />} />
 
+
+          <Route path="change-password" element={<ChangePassword />} />
 
           
           {/* <Route path="result/winning-number" element={<WinningNumber />} /> */}
@@ -75,7 +82,7 @@ function App() {
           <Route path="payment" element={<ManagePayments />} />
           <Route path="settings" element={<Settings />} />
           <Route path="refresh" element={<Refresh />} />
-          <Route path="reset_password" element={<PasswordReset />} />
+          {/* <Route path="reset_password" element={<PasswordReset />} /> */}
           <Route path="deposit/:type" element={<DepositHistory />} />
           <Route path="withdraw/:type" element={<WithdrawHistory />} />
 

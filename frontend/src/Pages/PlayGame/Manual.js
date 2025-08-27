@@ -8,6 +8,7 @@ const Manual = () => {
 
     const gameId = useParams().id
     const backUrl = process.env.REACT_APP_BACKEND_URL;
+    
 
    
   // 10 rows banate hain, har row ke liye initial state
@@ -18,6 +19,10 @@ const Manual = () => {
       points: ""
     }))
   );
+
+
+  const [loading, setLoading] = useState(false); // ✅ loading state
+
 
   // Jodi value change
   const handleJodiChange = (rowIndex, inputIndex, value) => {
@@ -53,13 +58,24 @@ const Manual = () => {
     console.log("Data to send:", dataToSend); // Send se pehle check
 
     try {
+      setLoading(true); 
       const res = await axiosInstance.post(`${backUrl}/api/bet-game-manual`, {dataToSend,totalPoints,gameId});
       console.log("API Response:", res.data);
-      alert("Bet Placed")
+      toast.success("Bet Placed Successfully ✅");
+      // ✅ Reset rows after bet
+      setRows(
+        Array.from({ length: 10 }, (_, i) => ({
+          id: i + 1,
+          jodiInputs: Array(5).fill(""),
+          points: ""
+        }))
+      );
     } catch (err) {
       console.error("API Error:", err);
       toast.error(err.response.data.message || "Error placing bet");
-      
+    }
+    finally {
+      setLoading(false); // ✅ Stop loading
     }
   };
 
@@ -135,9 +151,12 @@ const Manual = () => {
       {/* Place Bet Button */}
       <button
         onClick={handlePlaceBet}
-        className="mt-4 w-full bg-green-600 text-white py-2 text-lg rounded hover:bg-green-700"
+        disabled={loading} // ✅ Disable while loading
+        className={`mt-4 w-full text-white py-2 text-lg rounded 
+          ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}
+        `}
       >
-        Place Bet
+        {loading ? "Placing Bet..." : "Place Bet"}
       </button>
     </div>
   );

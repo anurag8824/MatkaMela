@@ -11,6 +11,7 @@ const Crossing = () => {
   const [num2, setNum2] = useState("");
   const [points, setPoints] = useState("");
   const [bets, setBets] = useState([]);
+  const [loading, setLoading] = useState(false); // ✅
 
   const gameId = useParams().id
 
@@ -65,13 +66,20 @@ const pointsRemaining = 1000 - totalPoints;
     console.log("Sending to API:", payload);
 
     try {
+      setLoading(true); 
       const res = await axiosInstance.post(`${backUrl}/api/bet-game-crossing`, payload);
       console.log("Bet placed:", res.data);
-      alert("Bet placed successfully!");
+      toast.success("Bet placed successfully ✅");
+       // ✅ Reset bets + inputs after success
+       setBets([]);
+       setNum1("");
+       setNum2("");
+       setPoints("");
     } catch (err) {
       console.error("Error placing bet:", err);
       toast.error(err.response.data.message || "Error placing bet");
-      
+    }finally {
+      setLoading(false); // ✅ stop loading
     }
   };
 
@@ -164,9 +172,12 @@ const pointsRemaining = 1000 - totalPoints;
       {bets.length > 0 && (
         <button
           onClick={placeBet}
-          className="w-full mt-6 bg-green-600 text-white py-2 rounded hover:bg-green-700"
+          disabled={loading} // ✅ disable while loading
+          className={`w-full mt-6 text-white py-2 rounded 
+            ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}
+          `}
         >
-          Place Bet
+          {loading ? "Placing Bet..." : "Place Bet"}
         </button>
       )}
     </div>

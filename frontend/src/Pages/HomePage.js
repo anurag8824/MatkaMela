@@ -10,6 +10,8 @@ import { IoGameController } from "react-icons/io5";
 import HomeMarket from "./HomeMarket";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "../Utils/axiosInstance";
+import { Share2, Gift, Coins } from 'lucide-react';
 
 
 
@@ -82,9 +84,32 @@ const HomePage = () => {
     }
   }, [navigate]);
 
+  const [userinfo, setUserinfo] = useState({});
+
+  useEffect(() => {
+    axiosInstance
+      .get(`${backUrl}/api/getUserInfo`)
+      .then((res) => {
+        console.log("User Info:", res?.data);
+        const usi = res.data;
+        setUserinfo(usi);
+        // res.data = { mobile: "...", wallet: ... }
+      })
+      .catch((err) => {
+        console.error(err);
+        // alert("Error fetching user info");
+      });
+  }, []);
+
   return (
     <div className="bg-[#343c44]">
       {/* <HighlightMarquee /> */}
+
+
+      <div style={{ backgroundImage: "url(/images/name.jpg)", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="w-full bg-yellow-100 border-4 border-[#4481eb] text-center py-2 px-2 mt-2 shadow-md">
+        <p className="text-xl sm:text-lg font-semibold text-white">NAME: {userinfo?.name}</p>
+        <p className="text-xl sm:text-lg font-semibold text-white">REFER_ID: {userinfo?.mobile}</p>
+      </div>
 
       <div className="flexx hidden w-full px-2 pt-2 justify-between text-nowrap">
         {/* Left Side Buttons - aligned to the left end */}
@@ -154,6 +179,7 @@ const HomePage = () => {
 
 
 
+
       <div style={{ backgroundImage: "url(/images/home-back.jpeg)", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="w-full bg-yellow-100 border-4 border-[#4481eb] text-center py-2 px-2 mt-2 shadow-md">
         <h6 className="text-lg sm:text-base font-semibold text-white">🔥 भरोसे का एक ही नाम 🔥</h6>
         <h6 className="text-lg sm:text-base font-semibold text-white">🙏 matkamela.shop 🙏</h6>
@@ -162,40 +188,6 @@ const HomePage = () => {
         </h6>
       </div>
 
-
-      <div className="w-full hidden bg-[#ffd53c] hover:bg-[#ccc] border border-yellow-300 px-3 py-2 shadow-sm">
-        {/* <!-- Market Name --> */}
-        <div className="text-center">
-          <h3 className="text-base font-semibold text-yellow-800 tracking-wide">
-            MORNING STAR
-          </h3>
-        </div>
-
-        {/* <!-- Market Result Numbers --> */}
-        <div className="flex justify-center items-center gap-2 text-gray-800 text-base font-semibold">
-          <span>44</span>
-          <span>-</span>
-          <span>15</span>
-        </div>
-
-        {/* <!-- Market Timings --> */}
-        <ul className="flex justify-center items-center flex-wrap gap-3 text-xs text-gray-700 mt-1">
-          <li className="text-center">
-            <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Open Time</span>
-            <span className="block">1:00 AM</span>
-          </li>
-          <li>|</li>
-          <li className="text-center">
-            <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Close Time</span>
-            <span className="block">11:00 AM</span>
-          </li>
-          <li>|</li>
-          <li className="text-center">
-            <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">Result Time</span>
-            <span className="block">11:15 AM</span>
-          </li>
-        </ul>
-      </div>
 
 
       <div className="w-full bg-[#fff]  border border-yellow-300 rounded-md shadow-sm mb-2 text-center relative overflow-hidden">
@@ -222,15 +214,70 @@ const HomePage = () => {
             ))}
           </div>
           <p className="text-blue-950 font-bold text-xl">{games[7]?.NAME}</p>
-          <span className="font-bold text-xl text-blue-950">{games[7]?.RESULT1 ? games[7]?.RESULT1 : "-" }</span>
+          <span className="font-bold text-xl text-blue-950">{games[7]?.RESULT1 ? games[7]?.RESULT1 : "-"}</span>
         </div>
 
 
 
       </div>
 
-      <div className="card text-center clickresult animated-box"><Link className="d-block btn_share border-0 btn btn-primary" to="/refercode">शेयर Share &amp; Earn</Link></div>
+      <div className="relative group  ">
+        {/* Main Banner Container */}
+        <div className="relative bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 p-0.5 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02]">
 
+          {/* Inner Content */}
+          <div style={{background: "linear-gradient(15deg, rgb(113 9 238), rgb(241 15 15))"}} className=" backdrop-blur-sm rounded-xl p-1 relative overflow-hidden">
+
+            {/* Animated Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-indigo-50/50 opacity-50"></div>
+
+            {/* Floating Icons */}
+            <div className="absolute top-2 right-2 text-yellow-400 animate-bounce">
+              <Coins className="w-5 h-5" />
+            </div>
+            <div className="absolute bottom-2 left-2 text-green-400 animate-pulse">
+              <Gift className="w-4 h-4" />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 text-center">
+
+              {/* Icon Container */}
+            
+
+              {/* Main Text */}
+              <h2 className="text-xl text-white font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                शेयर Share & Earn
+              </h2>
+
+              {/* Subtitle */}
+              <p className="text-gray-50 text-sm font-medium">
+                Refer friends and earn amazing rewards!
+              </p>
+
+              {/* CTA Button */}
+              <button className="group relative inline-flex items-center justify-center px-8 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-full shadow-xl hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 overflow-hidden">
+
+                {/* Button Shine Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                {/* Button Content */}
+                <Link to={"refercode"} className="relative flex items-center gap-2">
+                  <Share2 className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+                  Start Earning
+                </Link>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+
+      </div>
       <h5 className="py-2 text-center rounded font-medium bg-theme text-white relative z-10">Live Result of {new Date().toLocaleDateString()}</h5>
 
 

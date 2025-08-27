@@ -108,6 +108,8 @@ export default function ManageUsers() {
         </div>
       </div>
 
+      <div className="text-right"><Link to={"/public/administrator/user/add-user"} className="btn btn-primary">Add User</Link></div>
+
       <div className="mb-3">
         <label htmlFor="mobileSearch" className="form-label">
           Search Mobile No.
