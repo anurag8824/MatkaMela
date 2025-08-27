@@ -70,6 +70,7 @@ const Manual = () => {
           points: ""
         }))
       );
+      window.location.reload();
     } catch (err) {
       console.error("API Error:", err);
       toast.error(err.response.data.message || "Error placing bet");

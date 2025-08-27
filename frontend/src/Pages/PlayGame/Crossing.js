@@ -75,6 +75,7 @@ const pointsRemaining = 1000 - totalPoints;
        setNum1("");
        setNum2("");
        setPoints("");
+       window.location.reload();
     } catch (err) {
       console.error("Error placing bet:", err);
       toast.error(err.response.data.message || "Error placing bet");

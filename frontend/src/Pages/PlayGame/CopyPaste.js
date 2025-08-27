@@ -98,6 +98,7 @@ const CopyPaste = () => {
       setNumberInput("");
       setPointsInput("");
       setPaltiType("with");
+      window.location.reload();
 
       console.log(response.data);
     } catch (err) {

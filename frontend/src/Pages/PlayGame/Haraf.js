@@ -64,6 +64,7 @@ const Haraf = () => {
       // ✅ Reset inputs after success
       setAndarHaraf(Array(10).fill(""));
       setBaharHaraf(Array(10).fill(""));
+      window.location.reload();
     } catch (err) {
       console.error("Error placing bet:", err);
       toast.error(err.response.data.message || "Error placing bet");
