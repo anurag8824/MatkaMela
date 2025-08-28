@@ -1241,3 +1241,149 @@ export const getWithdrawList = async (req, res) => {
     });
   }
 }
+
+
+export const GetReferredUsers = async (req, res) => {
+  try {
+    const mobile = req.user.mobile;
+
+    if (!mobile) {
+      return res.status(400).json({ success: false, message: "Mobile number required" });
+    }
+
+    // 1. Fetch users referred by this mobile
+    const [users] = await req.db.query(
+      "SELECT id, mobile, refer_by, wallet FROM users WHERE refer_by = ?",
+      [mobile]
+    );
+
+    if (!users.length) {
+      return res.status(200).json({
+        success: true,
+        message: "No referred users found",
+        data: []
+      });
+    }
+
+    let finalResult = [];
+
+    // 2. Loop users to fetch their Loss bets
+    for (const user of users) {
+      const [bets] = await req.db.query(
+        `SELECT 
+           ID, DATE_TIME, phone, STATUS, GAME, GAME_ID, POINT, TYPE 
+         FROM bets 
+         WHERE phone = ? AND STATUS = 'Loss'`,
+        [user.mobile]
+      );
+
+      // 3. Add earning field (5% of point)
+      const lossBets = bets.map(bet => ({
+        ...bet,
+        earning: parseFloat((bet.POINT * 0.05).toFixed(2)) // keep numeric with 2 decimals
+      }));
+
+       // 4. Calculate total earning of this user
+       const totalEarn = lossBets.reduce((sum, bet) => sum + bet.earning, 0);
+
+
+      finalResult.push({
+        mobile: user.mobile,
+        wallet: user.wallet,
+        totalEarn: parseFloat(totalEarn.toFixed(2)),
+        lossBets
+      });
+    }
+
+    // console.log("Referred Users with Loss Bets:", finalResult);
+
+    return res.status(200).json({
+      success: true,
+      message: "Referred users with loss bets fetched successfully",
+      data: finalResult
+    });
+
+  } catch (err) {
+    console.error("Error fetching referred users with bets:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+export const GetAllReferredUsersAdmin = async (req, res) => {
+  try {
+    // 1. Fetch all users who have been referred (refer_by not null/empty)
+    const [users] = await req.db.query(
+      "SELECT id, mobile, refer_by, wallet FROM users WHERE refer_by IS NOT NULL AND refer_by <> ''"
+    );
+    
+
+    if (!users.length) {
+      return res.status(200).json({
+        success: true,
+        message: "No referred users found",
+        data: []
+      });
+    }
+
+    // Group by refer_by
+    let groupedResult = {};
+
+    for (const user of users) {
+      const [bets] = await req.db.query(
+        `SELECT 
+           ID, DATE_TIME, phone, STATUS, GAME, GAME_ID, POINT, TYPE 
+         FROM bets 
+         WHERE phone = ? AND STATUS = 'Loss'`,
+        [user.mobile]
+      );
+
+      // Add earning field (5% of point)
+      const lossBets = bets.map(bet => ({
+        ...bet,
+        earning: parseFloat((bet.POINT * 0.05).toFixed(2))
+      }));
+
+      // Total earning of this user
+      const totalEarn = lossBets.reduce((sum, bet) => sum + bet.earning, 0);
+
+      // Prepare user object
+      const userObj = {
+        mobile: user.mobile,
+        wallet: user.wallet,
+        totalEarn: parseFloat(totalEarn.toFixed(2)),
+        lossBets
+      };
+
+      // Group into refer_by
+      if (!groupedResult[user.refer_by]) {
+        groupedResult[user.refer_by] = {
+          referBy: user.refer_by,
+          users: [],
+          totalEarn: 0
+        };
+      }
+
+      groupedResult[user.refer_by].users.push(userObj);
+      groupedResult[user.refer_by].totalEarn += totalEarn;
+    }
+
+    // Convert object to array
+    const finalResult = Object.values(groupedResult).map(group => ({
+      ...group,
+      totalEarn: parseFloat(group.totalEarn.toFixed(2))
+    }));
+
+    // console.log("Admin Referral Data:", finalResult);
+
+    return res.status(200).json({
+      success: true,
+      message: "All referred users with loss bets fetched successfully",
+      data: finalResult
+    });
+
+  } catch (err) {
+    console.error("Error fetching admin referral data:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};

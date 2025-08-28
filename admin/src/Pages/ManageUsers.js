@@ -80,6 +80,7 @@ export default function ManageUsers() {
       const res = await axiosInstance.post("/admin/admin-update-wallet", payload);
 
       alert(res.data.message || "Transaction success!");
+      window.location.reload();
       setShowModal(false);
     } catch (err) {
       console.error("Transaction error:", err);
@@ -157,9 +158,7 @@ export default function ManageUsers() {
                         <td>{user.wallet}</td>
                         <td>{"0"}</td>
                         <td>{user.wallet}</td>
-
-
-                        <td>{user.referby}</td>
+                        <td>{user.refer_by}</td>
                         <td><button onClick={async () => {
                           try {
                             const res = await axiosInstance.post("/admin/toggle-user-state", { mobile: user.mobile });
@@ -182,9 +181,7 @@ export default function ManageUsers() {
                         }} className="btn btn-sm btn-outline-danger">{user.state}</button></td>
 
                         <td className="text-center  gap-1 md:flex">
-                          <Link className="btn bg-amber-400" to={`/user_edit/${user.id}`}>
-                            <i className="fa fa-pen "></i>
-                          </Link>
+                          
 
                           <button
                             className="btn text-white bg-success"

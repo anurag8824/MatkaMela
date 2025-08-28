@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import { toast } from "react-toastify";
+import PWAInstallButton from "../../Components/PWAInstallButton";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ export default function Register() {
       setStep(2); // Move to OTP step
     } catch (err) {
       console.error("Error sending OTP:", err);
-        toast.error(err.response.data.message || "Failed to send OTP");
+      toast.error(err.response.data.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -70,122 +71,137 @@ export default function Register() {
   };
 
   return (
+<div
+  className="min-h-screen bg-cover bg-center flex items-center justify-center px-4"
+  style={{ backgroundImage: "url('images/register.jpg')" }} // 👈 apna background image path yahan dalen
+>
+  
+  {/* Dark Overlay */}
+  <div   style={{ backgroundColor: "rgba(0,0,0,0.5)" }} className="absolute inset-0 "></div>
 
-    <div className='bg-[#094c73]  h-screen pt-20'>
-       <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-lg text-red-500 bg-white font-medium px-1 rounded-md">
+  
+
+  {/* Main Content */}
+  <div className="relative w-full max-w-md p-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl">
+  <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-base text-red-500 bg-white font-medium px-1 rounded-md">
         <h2>फरीदाबाद , गाजियाबाद , गली और दिसावर गेम खेलने के वाले नीचे से एप्लीकेशन डाउनलोड करे । यहां मिलता है आपको सबसे ज्यादा रेट 10 के 980 और सबसे फास्ट एंड सैफ पेमेंट ।</h2>
       </div>
-   
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg">
+    <div className="flex justify-center mb-6">
+      <img
+        src="/images/blacklogo.png"
+        alt="Logo"
+        className="h-20 w-auto rounded-full border-48 border-white8 shadow-lg"
+      />
+    </div>
 
-    <div className="flex justify-center mb-4 ">
-          <img
-            src="/images/blacklogo.png"
-            alt="Logo"
-            className=" h-20 rounded-full border-4 border-gray-200 shadow-md"
+    <h2 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+      Register
+    </h2>
+
+    {/* Step 1 */}
+    {step === 1 && (
+      <form onSubmit={handleSendOtp} className="space-y-5">
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+          <input
+            name="name"
+            type="text"
+            placeholder="Enter your name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
           />
         </div>
-    
-      <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
 
-      {/* Step 1: Name, Phone, ReferBy */}
-      {step === 1 && (
-        <form onSubmit={handleSendOtp} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
+        {/* Phone */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number</label>
+          <input
+            name="phone"
+            type="text"
+            placeholder="Enter mobile number"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          />
+        </div>
+
+        {/* Refer Code */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Refer Number (optional)</label>
+          <div className="flex items-center border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+            <span className="px-3 text-gray-500">
+              <FiUser size={18} />
+            </span>
             <input
-              name="name"
-              type="text"
-              placeholder="Enter your name"
-              value={formData.name}
+              name="referby"
+              type="number"
+              placeholder="Refer code"
+              value={formData.referby}
               onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-lg"
+              className="w-full px-3 py-2 outline-none"
             />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Mobile Number</label>
-            <input
-              name="phone"
-              type="text"
-              placeholder="Enter mobile number"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-lg"
-            />
-          </div>
+        {/* Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-3 rounded-lg font-semibold transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+          }`}
+        >
+          {loading ? "Please wait..." : "Send OTP"}
+        </button>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Refer Number (optional)</label>
-            <div className="flex items-center border rounded-lg overflow-hidden">
-              <span className="px-3 text-gray-500">
-                <FiUser size={18} />
-              </span>
-              <input
-                name="referby"
-                type="number"
-                placeholder="Refer code"
-                value={formData.referby}
-                onChange={handleChange}
-                className="w-full p-2 outline-none"
-              />
-            </div>
-          </div>
+        <PWAInstallButton />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 rounded-lg transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
-          >
-            {loading ? "Please wait..." : "Send OTP"}
-          </button>
+        <p className="text-center text-sm mt-4 text-gray-700">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-600 font-medium hover:underline">
+            Login
+          </Link>
+        </p>
+      </form>
+    )}
 
-          <p className="text-center text-sm mt-4">
-            Already have an account?{" "}
-            <Link to="/login" className="text-blue-600 underline hover:text-blue-800">
-              Login
-            </Link>
-          </p>
-        </form>
-      )}
+    {/* Step 2 */}
+    {step === 2 && (
+      <form onSubmit={handleRegister} className="space-y-5">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Enter OTP</label>
+          <input
+            name="otp"
+            type="text"
+            placeholder="Enter OTP"
+            value={formData.otp}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-center tracking-widest focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          />
+        </div>
 
-      {/* Step 2: OTP + Register */}
-      {step === 2 && (
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Enter OTP</label>
-            <input
-              name="otp"
-              type="text"
-              placeholder="Enter OTP"
-              value={formData.otp}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-lg text-center tracking-widest"
-            />
-          </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-3 rounded-lg font-semibold transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700 text-white shadow-md"
+          }`}
+        >
+          {loading ? "Please wait..." : "Verify & Register"}
+        </button>
+      </form>
+    )}
+  </div>
+</div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 rounded-lg transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700 text-white"
-            }`}
-          >
-            {loading ? "Please wait..." : "Verify & Register"}
-          </button>
-        </form>
-      )}
-    </div>
-
-    </div>
   );
 }

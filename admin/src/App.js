@@ -30,6 +30,8 @@ import WinningReportList from './Pages/WinningReportList';
 import WinningNumber from './Pages/WinningNumber';
 import ChangePassword from './Components/ChangePassword';
 import AddUser from './Pages/AddUser';
+import CommissionList from './Pages/CommsionList';
+import UserRefferList from './Pages/UserRefferList';
 
 
 const basePath = "public/administrator"
@@ -86,6 +88,8 @@ function App() {
           <Route path="deposit/:type" element={<DepositHistory />} />
           <Route path="withdraw/:type" element={<WithdrawHistory />} />
 
+          <Route path='user/commission-list' element= {<CommissionList />} />
+          <Route path='user/user-reffer-list' element= {<UserRefferList />} />
 
 
           <Route path="upload-qr" element={<QrUploadForm />} />

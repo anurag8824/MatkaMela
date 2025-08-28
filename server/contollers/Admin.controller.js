@@ -441,7 +441,7 @@ export const GetAllUsers = async (req, res) => {
     try {
         // Users table se specific fields fetch karna
         const [rows] = await req.db.query(
-            'SELECT id, mobile, wallet, refer_by, state FROM users'
+            'SELECT id, mobile, wallet, refer_by, state, refer_by FROM users'
         );
 
         res.status(200).json(rows);

@@ -108,16 +108,16 @@ const menuItems = [
       // },
     ],
   },
-  // {
-  //   title: "User Commission",
-  //   icon: <FaPercentage />,
-  //   children: [
-  //     {
-  //       title: "User Commission Pay List",
-  //       link: "/public/administrator/user/commission-pay-list",
-  //     },
-  //   ],
-  // },
+  {
+    title: "User Commission",
+    icon: <FaPercentage />,
+    children: [
+      {
+        title: "User Commission ",
+        link: "/public/administrator/user/commission-list",
+      },
+    ],
+  },
   {
     title: "Game Management",
     icon: <FaGamepad />,
@@ -145,11 +145,11 @@ const menuItems = [
     icon: <FaCreditCard />,
     link: "/public/administrator/upload-qr",
   },
-  // {
-  //   title: "User Reffer List",
-  //   icon: <FaUsers />,
-  //   link: "/public/administrator/user/user-reffer-list",
-  // },
+  {
+    title: "User Reffer List",
+    icon: <FaUsers />,
+    link: "/public/administrator/user/user-reffer-list",
+  },
   // {
   //   title: "User Wallet Data",
   //   icon: <FaWallet />,

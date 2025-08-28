@@ -196,9 +196,9 @@ const Header = () => {
                 </li>
 
                 {/* Result History */}
-                {/* <li>
+                <li>
                   <Link
-                    to="/"
+                    to="/refer-list"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
                   >
                     <div className="w-6 h-6">
@@ -208,9 +208,9 @@ const Header = () => {
                         className="w-full h-full object-contain"
                       />
                     </div>
-                    <div className="flex-1">Result History</div>
+                    <div className="flex-1">Refer List</div>
                   </Link>
-                </li> */}
+                </li>
 
                 {/* Terms and Condition */}
                 <li>
