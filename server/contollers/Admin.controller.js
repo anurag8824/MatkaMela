@@ -130,7 +130,7 @@ export const adminDashboardData = async (req, res) => {
         // 4️⃣ Total betting (STATUS = NULL)
         const [totalBettingRows] = await req.db.query(
             `SELECT SUM(POINT) as totalBetting
-             FROM BETS
+             FROM bets
              WHERE STATUS IS NULL`
         );
         const totalBetting = totalBettingRows[0]?.totalBetting || 0;
@@ -138,14 +138,14 @@ export const adminDashboardData = async (req, res) => {
         // 5️⃣ Total Win Amount (SUM of WIN_AMOUNT)
         const [totalWinRows] = await req.db.query(
             `SELECT SUM(WIN_AMOUNT) as totalWinAmount
-             FROM BETS`
+             FROM bets`
         );
         const totalWinAmount = totalWinRows[0]?.totalWinAmount || 0;
 
         // 6️⃣ Total Commission (5% of POINT where STATUS = 'Loss')
         const [commissionRows] = await req.db.query(
             `SELECT SUM(POINT * 0.05) as totalCommission
-             FROM BETS
+             FROM bets
              WHERE STATUS = 'Loss'`
         );
         const totalCommission = commissionRows[0]?.totalCommission || 0;
@@ -153,7 +153,7 @@ export const adminDashboardData = async (req, res) => {
         // 7️⃣ Total Profit (sum of POINT where STATUS = 'Loss')
         const [profitRows] = await req.db.query(
             `SELECT SUM(POINT) as totalProfit
-             FROM BETS
+             FROM bets
              WHERE STATUS = 'Loss'`
         );
         const totalProfit = profitRows[0]?.totalProfit || 0;
