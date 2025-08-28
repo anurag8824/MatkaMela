@@ -37,7 +37,7 @@ export default function Register() {
         referby: formData.referby,
       });
 
-      alert(response.data.message || "OTP sent successfully");
+      toast.success(response.data.message || "OTP sent successfully");
       setStep(2); // Move to OTP step
     } catch (err) {
       console.error("Error sending OTP:", err);
@@ -60,7 +60,7 @@ export default function Register() {
         otp: formData.otp,
       });
 
-      alert("Registered successfully");
+      toast.success("Registered successfully");
       navigate("/login"); // Redirect to home or dashboard
     } catch (err) {
       console.error("Error registering:", err);

@@ -79,11 +79,14 @@ export default function Login() {
 
 
   return (
-    <div className='bg-[#094c73]  h-screen pt-20'>
-      <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-lg text-red-500 bg-white font-medium px-1 rounded-md">
+    <div style={{ backgroundImage: "url('images/register.jpg')" }}  className='  h-screen pt-20'>
+      <div   style={{ backgroundColor: "rgba(0,0,0,0.5)" }} className="absolute inset-0 "></div>
+
+      
+      <div className="max-w-xl relative mx-auto p-6 bg-white rounded-2xl shadow-lg">
+      <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-4 mx-3 ring-4 ring-[#094c73] text-base text-red-500 bg-white font-medium px-1 rounded-md">
         <h2>फरीदाबाद , गाजियाबाद , गली और दिसावर गेम खेलने के वाले नीचे से एप्लीकेशन डाउनलोड करे । यहां मिलता है आपको सबसे ज्यादा रेट 10 के 980 और सबसे फास्ट एंड सैफ पेमेंट ।</h2>
       </div>
-      <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
         <div className="flex justify-center mb-4 ">
           <img
             src="/images/blacklogo.png"

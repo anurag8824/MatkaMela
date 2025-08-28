@@ -71,10 +71,10 @@ export default function HomePage() {
         </>
       ),
     },
-    { title: "Total Bidding", value: "5395", icon: "fa-users" },
-    { title: "Commission", value: "200.35", icon: "fa-users" },
-    { title: "Winning Amount", value: "2705", icon: "fa-users" },
-    { title: "Profit", value: "2489.65", icon: "fa-money-bill" },
+    { title: "Total Bidding", value: dashboardData?.totalBetting, icon: "fa-users" },
+    { title: "Commission", value: dashboardData?.totalCommission, icon: "fa-users" },
+    { title: "User Winning Amount", value: dashboardData?.totalWinAmount, icon: "fa-users" },
+    { title: "Panel Profit", value: dashboardData?.totalProfit, icon: "fa-money-bill" },
     // {
     //   title: "Disawar",
     //   icon: "fa-users",
