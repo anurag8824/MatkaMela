@@ -156,22 +156,7 @@ export default function ManageGames() {
                   />
                 </Form.Group>
               </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Days</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={editGame.days}
-                    onChange={(e) => setEditGame({ ...editGame, days: e.target.value })}
-                  >
-                    <option value="7">Monday to Sunday</option>
-                    <option value="6">Monday to Saturday</option>
-                    <option value="5">Monday to Friday</option>
-                    <option value="4">Monday to Thursday</option>
-                    <option value="3">Monday to Wednesday</option>
-                  </Form.Control>
-                </Form.Group>
-              </Col>
+              
             </Row>
             <Button type="submit" variant="primary">
               {editGame.id ? "Update" : "Add"}
@@ -187,8 +172,8 @@ export default function ManageGames() {
             <tr>
               <th>ID</th>
               <th>Game</th>
-              <th>Result 1 Time</th>
-              <th>Result 2 Time</th>
+              <th>Open Time</th>
+              <th>Close Time</th>
               {/* <th>Holiday</th> */}
               <th>Action</th>
             </tr>
@@ -223,11 +208,11 @@ export default function ManageGames() {
             ))}
             <tr>
               <td colSpan="4"></td>
-              <td>
+              {/* <td>
                 <Button type="submit" variant="primary">
                   Update
                 </Button>
-              </td>
+              </td> */}
               <td></td>
             </tr>
           </tbody>

@@ -66,9 +66,7 @@ const HomeMarket = ({markets}) => {
 
             {/* Market Result Numbers */}
             <div className="flex justify-center items-center gap-2 text-white text-lg font-bold">
-              <span>{market.RESULT1}</span>
-              <span>-</span>
-              <span>{market.RESULT2}</span>
+              <span>{market?.RESULT1 ? market?.RESULT1 : "-" }</span>
             </div>
 
             {/* Market Timings */}

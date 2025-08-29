@@ -13,9 +13,9 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
   console.log(selectedGameId);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
-  
- // Fetch games list
-useEffect(() => {
+
+  // Fetch games list
+  useEffect(() => {
     axios
       .get(`${backUrl}/api/get-games`)
       .then((res) => {
@@ -26,44 +26,44 @@ useEffect(() => {
         console.error("Error fetching games:", err);
       });
   }, []);
-  
+
 
   // Fetch patti options
- 
- 
 
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  // Selected game ka name nikalna
-  const selectedGame = games.find((game) => game.ID === selectedGameId);
-  console.log(selectedGame,"fff")
- 
 
-  const payload = {
-    r_id: rId,
-    gameId: selectedGameId,
-    game_name: selectedGame ? selectedGame.NAME : "" ,
-    openResult: result1,
-    closeResult: result2,
-    remark, // agar remark bhi bhejna hai to
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Selected game ka name nikalna
+    const selectedGame = games.find((game) => game.ID === selectedGameId);
+    console.log(selectedGame, "fff")
+
+
+    const payload = {
+      r_id: rId,
+      gameId: selectedGameId,
+      game_name: selectedGame ? selectedGame.NAME : "",
+      openResult: result1,
+      closeResult: result2,
+      remark, // agar remark bhi bhejna hai to
+    };
+
+    try {
+      const { data } = await axiosInstance.post(`${backUrl}/api/bet-game-result`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      alert("Result updated successfully!");
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("Error updating result:", error);
+      alert("Something went wrong while updating the result!");
+    }
   };
-
-  try {
-    const { data } = await axiosInstance.post(`${backUrl}/api/bet-game-result`, payload, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    alert("Result updated successfully!");
-    console.log("Response:", data);
-  } catch (error) {
-    console.error("Error updating result:", error);
-    alert("Something went wrong while updating the result!");
-  }
-};
 
 
   return (
@@ -106,27 +106,27 @@ const handleSubmit = async (e) => {
           </select>
         </div>
 
-       {/* Result 1 Input */}
-<div className="col-lg-2">
-  <label className="form-label fw-bold">Result 1</label>
-  <input
-    type="number"
-    className="form-control"
-    value={result1}
-    onChange={(e) => {
-    const val = e.target.value;
-    if (val.length <= 2) {
-      setResult1(val);
-    }
-  }}
-    placeholder="Enter Result 1"
-    maxLength={2}
-    required
-  />
-</div>
+        {/* Result 1 Input */}
+        <div className="col-lg-2">
+          <label className="form-label fw-bold">Result </label>
+          <input
+            type="number"
+            className="form-control"
+            value={result1}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val.length <= 2) {
+                setResult1(val);
+              }
+            }}
+            placeholder="Enter Result "
+            maxLength={2}
+            required
+          />
+        </div>
 
-{/* Result 2 Input */}
-<div className="col-lg-2">
+        {/* Result 2 Input */}
+        {/* <div className="col-lg-2">
   <label className="form-label fw-bold">Result 2</label>
   <input
     type="number"
@@ -141,7 +141,7 @@ const handleSubmit = async (e) => {
     placeholder="Enter Result 2"
   
   />
-</div>
+</div> */}
 
 
         {/* Update Button */}

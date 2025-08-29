@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 const Share = () => {
     const [isOpen, setIsOpen] = useState(true);
   const [showToast, setShowToast] = useState(false);
-  const shareLink = "https://example.com";
+  const shareLink = "https://matkamela.shop/";
 
   const copyLink = async () => {
     try {

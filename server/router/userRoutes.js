@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddBankDetails, AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
+import { AddBankDetails, AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, resultHistory, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
 import upload from '../middlewares/upload.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -62,6 +62,8 @@ router.get('/user-withdraw-list', authMiddleware, getWithdrawList);
 
 
 router.get('/getUserInfo', authMiddleware, getUserInfo);
+router.post('/edit-profile', authMiddleware, editProfileUser);
+
 
 router.get('/bet-game-history', authMiddleware, getUserBetHistory);
 
@@ -74,6 +76,7 @@ router.get('/commission-list', authMiddleware ,  GetAllReferredUsersAdmin);
 
 
 
+router.get('/game-result-history', authMiddleware, resultHistory);
 
 
 

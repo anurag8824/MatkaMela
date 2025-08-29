@@ -210,7 +210,7 @@ const Header = () => {
               className="text-2xl cursor-pointer"
               onClick={() => setIsSidebarOpen(true)}
             />
-            <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">4</span>
+            {/* <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">4</span> */}
             <Link to={"/"} className="text-sm font-semibold">Home</Link>
           </div>
 

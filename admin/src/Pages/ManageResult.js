@@ -60,11 +60,11 @@ export default function ManageResult() {
       )}
 
       {/* Add Result Button */}
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <Link to="/edit_result" className="btn btn-primary">
           Add Result
         </Link>
-      </div>
+      </div> */}
 
       {/* Results Table */}
       <div className="table-responsive">
@@ -72,10 +72,10 @@ export default function ManageResult() {
           <thead className="bg-primary text-white text-center">
             <tr>
               <th>Game</th>
-              <th>Result 1</th>
-              <th>Result 2</th>
+              <th>Result</th>
+              {/* <th>Result 2</th> */}
               <th>Today's<br />Result</th>
-              <th>Old<br />Result</th>
+              {/* <th>Old<br />Result</th> */}
             </tr>
           </thead>
           <tbody>
@@ -84,17 +84,17 @@ export default function ManageResult() {
                 <tr key={game.ID}>
                   <td>{game.NAME}</td>
                   <td>{game.RESULT1 || ""}</td>
-                  <td>{game.RESULT2 || ""}</td>
+                  {/* <td>{game.RESULT2 || ""}</td> */}
                   <td className="text-center">
                     <Link to={`/public/administrator/edit-result/${game.ID}/${game.PAGE}`}>
                       <i className="fa fa-pen"></i>
                     </Link>
                   </td>
-                  <td className="text-center">
+                  {/* <td className="text-center">
                     <Link to={`/update_result/${game.ID}`}>
                       <i className="fa fa-pen"></i>
                     </Link>
-                  </td>
+                  </td> */}
                 </tr>
               ))
             ) : (

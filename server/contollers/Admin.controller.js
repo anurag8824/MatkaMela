@@ -86,6 +86,17 @@ export const getAdminDetails = (req, res) => {
 // ✅ Admin Dashboard Data API
 export const adminDashboardData = async (req, res) => {
     try {
+
+      const { date } = req.query; // query se date pick karlo
+      let dateCondition = "";
+      let dateValues = [];
+  
+      if (date) {
+        dateCondition = " AND DATE(TIME) = ? ";
+        dateValues.push(date);
+      }
+
+
         // 1️⃣ Active users ka total wallet balance
         const [userBalanceRows] = await req.db.query(
             `SELECT SUM(WALLET) as totalBalance 
@@ -98,7 +109,8 @@ export const adminDashboardData = async (req, res) => {
         const [depositRows] = await req.db.query(
             `SELECT STATUS, SUM(AMOUNT) as total 
          FROM PAYMENT_QUEUE 
-         GROUP BY STATUS`
+         WHERE 1=1 ${date ? "AND DATE(TIME) = ?" : ""}
+         GROUP BY STATUS`,date ? [date] : []
         );
 
         let depositSummary = {
@@ -114,7 +126,8 @@ export const adminDashboardData = async (req, res) => {
         const [withdrawRows] = await req.db.query(
             `SELECT STATUS, SUM(AMOUNT) as total 
          FROM WITHDRAW 
-         GROUP BY STATUS`
+          WHERE 1=1 ${date ? "AND DATE(TIME) = ?" : ""}
+         GROUP BY STATUS`,date ? [date] : []
         );
 
         let withdrawSummary = {
@@ -131,14 +144,14 @@ export const adminDashboardData = async (req, res) => {
         const [totalBettingRows] = await req.db.query(
             `SELECT SUM(POINT) as totalBetting
              FROM bets
-             WHERE STATUS IS NULL`
+             WHERE STATUS IS NULL ${date ? "AND DATE(DATE_TIME) = ?" : ""}`, date ? [date] : []
         );
         const totalBetting = totalBettingRows[0]?.totalBetting || 0;
 
         // 5️⃣ Total Win Amount (SUM of WIN_AMOUNT)
         const [totalWinRows] = await req.db.query(
             `SELECT SUM(WIN_AMOUNT) as totalWinAmount
-             FROM bets`
+             FROM bets WHERE 1=1 ${date ? "AND DATE(DATE_TIME) = ?" : ""}`,date ? [date] : []
         );
         const totalWinAmount = totalWinRows[0]?.totalWinAmount || 0;
 
@@ -146,7 +159,7 @@ export const adminDashboardData = async (req, res) => {
         const [commissionRows] = await req.db.query(
             `SELECT SUM(POINT * 0.05) as totalCommission
              FROM bets
-             WHERE STATUS = 'Loss'`
+             WHERE STATUS = 'Loss' ${date ? "AND DATE(DATE_TIME) = ?" : ""}`,date ? [date] : []
         );
         const totalCommission = commissionRows[0]?.totalCommission || 0;
 
@@ -154,7 +167,8 @@ export const adminDashboardData = async (req, res) => {
         const [profitRows] = await req.db.query(
             `SELECT SUM(POINT) as totalProfit
              FROM bets
-             WHERE STATUS = 'Loss'`
+             WHERE STATUS = 'Loss' ${date ? "AND DATE(DATE_TIME) = ?" : ""}`,
+             date ? [date] : []
         );
         const totalProfit = profitRows[0]?.totalProfit || 0;
 

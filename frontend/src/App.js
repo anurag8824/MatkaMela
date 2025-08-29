@@ -16,6 +16,8 @@ import HomePlayMenu from './Pages/HomePlayMenu';
 import ReferPage from './Pages/Account/ReferPage';
 import Register from './Pages/Account/Register';
 import ReferList from './Pages/ReferList';
+import ResultHistory from './Pages/ResultHistory';
+import EditProfile from './Pages/Account/EditProfile';
 
 function App() {
   return (
@@ -32,9 +34,11 @@ function App() {
           <Route path="history" element={<History />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-
+<Route path="Profile" element={<EditProfile />} />
           <Route path="refercode" element={<ReferPage />} />
           <Route path="refer-list" element={<ReferList />} />
+          <Route path="result-history" element={<ResultHistory />} />
+
 
 
 
@@ -54,7 +58,7 @@ function App() {
           {/* <Route path="contact" element={<ContactPage />} />
 
           <Route path="register" element={<Register />} />
-          <Route path="login" element={<Login />} />
+          
 
 
           

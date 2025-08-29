@@ -1,0 +1,490 @@
+
+//update win_amount in bets and user of WIN bets 
+export const ProcessWinningBets = async (req, updatedBets) => {
+  try {
+    if (!updatedBets.length) {
+      console.log("⚠️ No winning bets to process");
+      return;
+    }
+
+    // Group wins by user
+    let userWins = {};
+
+    for (const bet of updatedBets) {
+      // 1. Fetch game rate
+      const [gameRows] = await req.db.query("SELECT RATE FROM games WHERE ID = ?", [bet.gameId]);
+      if (!gameRows.length) continue;
+
+      const rate = parseFloat(gameRows[0].RATE) || 1.5;
+      const winAmount = bet.point * rate;
+
+      // 2. Update bet with WIN_AMOUNT
+      await req.db.query(
+        "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
+        [winAmount, bet.betId]
+      );
+
+      // 3. Collect user’s total win
+      if (!userWins[bet.user]) {
+        userWins[bet.user] = 0;
+      }
+      userWins[bet.user] += winAmount;
+    }
+
+    // 4. Update each user wallet
+    for (const mobile in userWins) {
+      const winTotal = userWins[mobile];
+
+      // fetch wallet
+      const [users] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [mobile]);
+      if (!users.length) continue;
+
+      let wallet = parseFloat(users[0].wallet);
+      if (isNaN(wallet)) wallet = 0;
+
+      const newWallet = wallet + winTotal;
+
+      await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, mobile]);
+
+      console.log(`✅ Wallet updated: ${mobile} +${winTotal} → ${newWallet}`);
+    }
+
+  } catch (err) {
+    console.error("Error processing winning bets:", err);
+  }
+};
+
+
+
+export const ProcessLossBets = async (req, LossBets) => {
+  try {
+    if (!LossBets.length) {
+      console.log("⚠️ No loss bets to process");
+      return;
+    }
+
+    for (const bet of LossBets) {
+      // 1. Update bet WIN_AMOUNT = 0
+      await req.db.query(
+        "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
+        [0, bet.betId]
+      );
+
+      // 2. Get user info
+      const [users] = await req.db.query("SELECT REFER_BY FROM users WHERE mobile = ?", [bet.user]);
+      if (!users.length) continue;
+
+      const referBy = users[0].REFER_BY;
+      if (!referBy) {
+        console.log(`ℹ️ Bet ${bet.betId} user ${bet.user} has no refer_by`);
+        continue;
+      }
+
+      // 3. Calculate 5% commission
+      const commission = (parseFloat(bet.point) * 5) / 100;
+
+      // 4. Update referBy user wallet
+      const [refUsers] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [referBy]);
+      if (!refUsers.length) {
+        console.log(`⚠️ ReferBy user ${referBy} not found`);
+        continue;
+      }
+
+      let refWallet = parseFloat(refUsers[0].wallet);
+      if (isNaN(refWallet)) refWallet = 0;
+
+      const newWallet = refWallet + commission;
+
+      await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, referBy]);
+
+      console.log(`✅ ReferBy user ${referBy} got +${commission} from bet ${bet.betId}`);
+    }
+  } catch (err) {
+    console.error("Error processing loss bets:", err);
+  }
+};
+
+
+export const UpdateBetsWithResults = async (req, resultRow) => {
+  try {
+    const { GAME_ID, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste, DATE } = resultRow;
+
+    // console.log(resultRow, "resutl Row")
+
+    // Fetch bets of that gameId & same date
+    const betsQuery = `
+      SELECT * FROM bets 
+      WHERE GAME_ID = ? 
+      AND DATE(DATE_TIME) = DATE(?)
+    `;
+    const [bets] = await req.db.query(betsQuery, [GAME_ID, DATE]);
+    // console.log(bets, "betss ki non result ")
+
+    if (!bets.length) {
+      console.log("No bets found for this game and date.");
+      return;
+    }
+
+    let updatedBets = [];
+    let LossBets = [];
+
+    // Loop all bets & update status
+    for (const bet of bets) {
+      let expectedResult = null;
+      let status = "Loss";
+
+      switch (bet.TYPE) {
+        case "Jodi":
+          expectedResult = Jodi;
+          status = bet.number === Jodi ? "Win" : "Loss";
+          break;
+
+        case "Manual":
+          // manual winning numbers string "12,34" → split
+          const manualNumbers = Manual.split(",");
+          expectedResult = Manual;
+          status = manualNumbers.includes(bet.number) ? "Win" : "Loss";
+          break;
+
+        case "AndarHaraf": {
+          // andarHaraf will be like "4,7"
+          const andarValues = andarHaraf.toString().split(",");   // ["4","7"]
+
+          // bet.number = e.g. "777" → extract family digit
+          const betDigit = bet.number[0]; // take first digit, since 444 → "4", 777 → "7"
+
+          expectedResult = andarHaraf.toString(); // "4,7"
+          status = andarValues.includes(betDigit) ? "Win" : "Loss";
+          break;
+        }
+
+        case "BaharHaraf": {
+          // baharHaraf will be like "7,1"
+          const baharValues = baharHaraf.toString().split(",");  // ["7","1"]
+
+          const betDigit = bet.number[0]; // triple bet digit family
+
+          expectedResult = baharHaraf.toString(); // "7,1"
+          status = baharValues.includes(betDigit) ? "Win" : "Loss";
+          break;
+        }
+
+        case "Crossing":
+          const crossingNumbers = Crossing.split(",");
+          expectedResult = Crossing;
+          status = crossingNumbers.includes(bet.number) ? "Win" : "Loss";
+          break;
+
+        case "CopyPaste":
+          expectedResult = CopyPaste;
+          status = CopyPaste; // Win/Loss direct
+          break;
+      }
+
+      // Update bet row
+      const updateQuery = `
+        UPDATE bets 
+        SET RESULT = ?, STATUS = ? 
+        WHERE ID = ?
+      `;
+      await req.db.query(updateQuery, [expectedResult, status, bet.ID]);
+
+      if (status === "Win") {
+        updatedBets.push({
+          gameId: GAME_ID,
+          betId: bet.ID,
+          type: bet.TYPE,
+          number: bet.number,
+          point: bet.point,
+          user: bet.phone,
+          expectedResult,
+          status
+        });
+      }
+
+      if (status === "Loss") {
+        LossBets.push({
+          gameId: GAME_ID,
+          betId: bet.ID,
+          type: bet.TYPE,
+          number: bet.number,
+          point: bet.point,
+          user: bet.phone,
+          expectedResult,
+          status
+        });
+      }
+
+    }
+
+    console.log(updatedBets, "✅ Updated Bets:");
+    console.log(LossBets, "✅ Updated Loss Bets:");
+
+
+    // Process only win bets for wallet update
+    await ProcessWinningBets(req, updatedBets);
+
+    await ProcessLossBets(req, LossBets);
+
+
+
+
+  } catch (err) {
+    console.error("Error updating bets:", err);
+  }
+};
+
+
+
+export const CalculateGameResults = async (req, res) => {
+  console.log(req.body, "chcck")
+  try {
+    const { openResult, closeResult, gameId, game_name } = req.body;
+    console.log(req.body, "reqbody")
+
+    // console.log("Declared Result:", openResult, closeResult);
+
+    const sumDigits = (num) => {
+      return num
+        .toString()
+        .split('')
+        .reduce((sum, digit) => sum + parseInt(digit), 0);
+    };
+
+    // ---- JODI ----
+    const jodiFirst = sumDigits(openResult) % 10;
+    const jodiSecond = sumDigits(closeResult) % 10;
+    const jodiNumber = `${jodiFirst}${jodiSecond}`;
+
+    // ---- MANUAL ----
+    const openManual = openResult.toString().slice(-2);  // last 2 digits of opening
+    const closeManual = closeResult.toString().slice(-2); // last 2 digits of closing
+
+    // Array of winning manual numbers
+    const manualWinningNumbers = [openManual, closeManual].join(",");
+
+    // ---- HARRAF ----
+    const harraf = {
+      andarHaraf: [
+        parseInt(openResult.toString()[0]),
+        parseInt(closeResult.toString()[0])
+      ].join(","),
+
+      baharHaraf: [
+        parseInt(openResult.toString().slice(-1)),
+        parseInt(closeResult.toString().slice(-1))
+      ].join(",")
+    };
+
+
+    // ---- CROSSING ----
+    const openLastDigit = openResult.toString().slice(-1);
+    const closeLastDigit = closeResult.toString().slice(-1);
+
+    const crossingNumbers = [
+      `${openLastDigit}${closeLastDigit}`,
+      `${closeLastDigit}${openLastDigit}`
+    ].join(",");
+
+    // ---- COPY-PASTE ----
+    // let copyPasteResult = [];
+    // if (copyPasteBets && Array.isArray(copyPasteBets)) {
+    //   copyPasteResult = copyPasteBets.map(bet => ({
+    //     ...bet,
+    //     status: bet.number === crossingNumber ? "Win" : "Loss"
+    //   }));
+    // }
+
+    let copyPasteResult = "Loss"; // default
+
+    // Calculate sum of digits ka last digit
+    const sumLastDigit = num => {
+      const sum = num.toString().split("").reduce((acc, d) => acc + parseInt(d), 0);
+      return sum.toString().slice(-1);
+    };
+
+    const openSumLast = sumLastDigit(openResult);
+    const closeSumLast = sumLastDigit(closeResult);
+
+    // Check conditions && ko dono true honi chahiye 
+    if (openLastDigit === closeLastDigit && openSumLast === closeSumLast) {
+      copyPasteResult = "Win";
+    }
+
+    // ---- Insert into DB ----
+    const insertQuery = `
+  INSERT INTO RESULT 
+  (GAME_ID, GAME_NAME, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste)
+  VALUES (?, ?,? , ?, ?, ?, ?, ?, ?, ?)
+`;
+
+
+
+    const values = [
+      gameId,
+      game_name,
+      openResult,
+      closeResult,
+      jodiNumber,
+      manualWinningNumbers,
+      harraf.andarHaraf,
+      harraf.baharHaraf,
+      crossingNumbers,
+      copyPasteResult
+    ];
+
+    await req.db.query(insertQuery, values);
+
+
+
+
+    // Fetch inserted row (with DATE_TIME too)
+    const [insertedRows] = await req.db.query(
+      "SELECT * FROM RESULT WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
+      [gameId]
+    );
+
+    if (insertedRows.length) {
+      await UpdateBetsWithResults(req, insertedRows[0]);
+    }
+
+
+    // ---- Update games table ----
+    const updateGameQuery = `
+     UPDATE games 
+     SET RESULT1 = ?, RESULT2 = ? , PLAY = 'unchecked'
+     WHERE ID = ?
+   `;
+
+    await req.db.query(updateGameQuery, [openResult, closeResult, gameId]);
+
+
+
+    const resultObj = {
+      Jodi: jodiNumber,
+      Manual: manualWinningNumbers,
+      Harraf: harraf,
+      Crossing: crossingNumbers,
+      CopyPaste: copyPasteResult
+    };
+
+    // console.log("Calculated Game Results:", resultObj);
+
+    res.status(200).json({
+      success: true,
+      message: "Results calculated and saved successfully",
+      results: resultObj
+    });
+
+
+  } catch (err) {
+    console.error('Error calculating results:', err);
+    res.status(500).json({ error: 'Failed to calculate results' });
+  }
+};
+
+
+
+
+
+ye iske liya hai ki same game ke result ki multple enrty bnti jaaye 
+export const CalculateGameResults = async (req, res) => {
+  console.log(req.body, "chcck")
+  try {
+    const { openResult, closeResult, gameId, game_name } = req.body;
+    console.log(req.body, "reqbody")
+
+    // ✅ Ek hi result declare hota hai
+    const result = openResult.toString();
+
+    // ---- JODI ----
+    const jodiNumber = result;  // same as result
+
+    // ---- MANUAL ----
+    const manualWinningNumbers = result; // same as result
+
+    // ---- HARRAF ----
+    const harraf = {
+      andarHaraf: result[0],  // first digit
+      baharHaraf: result.slice(-1) // last digit
+    };
+
+    // ---- CROSSING ----
+    const crossingNumbers = result; // same as result
+
+    // ---- COPY-PASTE ----
+    const copyPasteResult = result; // same as result
+
+
+
+    // ---- Insert into DB ----
+    const insertQuery = `
+  INSERT INTO RESULT 
+  (GAME_ID, GAME_NAME, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste)
+  VALUES (?, ?,? , ?, ?, ?, ?, ?, ?, ?)
+`;
+
+
+
+    const values = [
+      gameId,
+      game_name,
+      result,
+      result,
+      jodiNumber,
+      manualWinningNumbers,
+      harraf.andarHaraf,
+      harraf.baharHaraf,
+      crossingNumbers,
+      copyPasteResult
+    ];
+
+    await req.db.query(insertQuery, values);
+
+
+
+
+    // Fetch inserted row (with DATE_TIME too)
+    const [insertedRows] = await req.db.query(
+      "SELECT * FROM RESULT WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
+      [gameId]
+    );
+
+    if (insertedRows.length) {
+      await UpdateBetsWithResults(req, insertedRows[0]);
+    }
+
+
+    // ---- Update games table ----
+    const updateGameQuery = `
+     UPDATE games 
+     SET RESULT1 = ?, RESULT2 = ? , PLAY = 'unchecked'
+     WHERE ID = ?
+   `;
+
+    await req.db.query(updateGameQuery, [openResult, openResult, gameId]);
+
+
+
+    const resultObj = {
+      Jodi: jodiNumber,
+      Manual: manualWinningNumbers,
+      Harraf: harraf,
+      Crossing: crossingNumbers,
+      CopyPaste: copyPasteResult
+    };
+
+    // console.log("Calculated Game Results:", resultObj);
+
+    res.status(200).json({
+      success: true,
+      message: "Results calculated and saved successfully",
+      results: resultObj
+    });
+
+
+  } catch (err) {
+    console.error('Error calculating results:', err);
+    res.status(500).json({ error: 'Failed to calculate results' });
+  }
+};

@@ -36,8 +36,6 @@ const Header = () => {
     localStorage.removeItem("id"); // example
     localStorage.removeItem("mobile"); // example
     window.location.reload(); // reload the page to reflect changes
-
-
   };
 
 
@@ -111,7 +109,7 @@ const Header = () => {
                 <div className="profilephoto">
                   <img src="/images/whitelogo.png" alt="Profile" className=" h-12 rounded-full" />
                 </div>
-                <a href="/Profile" className="rounded font-medium text-xs text-blue-50 hover:underline">Edit Profile</a>
+                <Link to="/Profile" className="rounded font-medium text-xs text-blue-50 hover:underline">Edit Profile</Link>
               </div>
 
               {/* Profile Details */}
@@ -156,6 +154,22 @@ const Header = () => {
                   </Link>
                 </li>
 
+                <li>
+                  <Link
+                    to="/result-history"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
+                  >
+                    <div className="w-6 h-6">
+                      <img
+                        src="https://khelomatka.com/static/media/resulthistory.9f8464e933b04b603f3d.png"
+                        alt="Refer List"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1">Result History</div>
+                  </Link>
+                </li>
+
                 {/* Game Posting with badge */}
                 {/* <li>
                   <Link
@@ -195,7 +209,7 @@ const Header = () => {
                   </Link>
                 </li>
 
-                {/* Result History */}
+                {/* Refer List */}
                 <li>
                   <Link
                     to="/refer-list"
@@ -204,7 +218,7 @@ const Header = () => {
                     <div className="w-6 h-6">
                       <img
                         src="https://khelomatka.com/static/media/resulthistory.9f8464e933b04b603f3d.png"
-                        alt="Result History"
+                        alt="Refer List"
                         className="w-full h-full object-contain"
                       />
                     </div>
@@ -232,7 +246,7 @@ const Header = () => {
                 {/* Share */}
                 <li>
                   <Link
-                    to="/Share"
+                    to="/refercode"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
                   >
                     <div className="w-6 h-6">
@@ -281,17 +295,17 @@ const Header = () => {
                 </li>
 
                 {/* Social Media */}
-                <li className="p-0 mt-4">
+                <li className="p-0 mt-4 ">
                   <div className="w-full flex justify-center gap-4">
                     <div className="text-blue-600 text-xl">
-                      <a href="/Home/null">
+                      <Link to="#">
                         <i className="bi bi-facebook" />
-                      </a>
+                      </Link>
                     </div>
                     <div className="text-pink-600 text-xl">
-                      <a href="/Home/null">
+                      <Link to="#">
                         <i className="bi bi-instagram" />
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </li>

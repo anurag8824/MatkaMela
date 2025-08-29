@@ -97,7 +97,7 @@ export const UserRegister = async (req, res) => {
 
 
 export const SendOTP = async (req, res) => {
-  const {name, phone, referby } = req.body;
+  const { name, phone, referby } = req.body;
   if (!phone) return res.status(400).json({ message: "Phone number required" });
 
   try {
@@ -140,7 +140,7 @@ export const SendOTP = async (req, res) => {
       // Insert new user with mobile + OTP
       await req.db.query(
         "INSERT INTO users (mobile, otp , refer_by , name) VALUES (?, ?, ? ,?)",
-        [phone, otp, referby , name]
+        [phone, otp, referby, name]
       );
     }
 
@@ -577,7 +577,6 @@ export const BetGameCopyPaste = async (req, res) => {
 
 
 //update win_amount in bets and user of WIN bets 
-
 export const ProcessWinningBets = async (req, updatedBets) => {
   try {
     if (!updatedBets.length) {
@@ -718,44 +717,41 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
           break;
 
         case "Manual":
-          // manual winning numbers string "12,34" → split
-          const manualNumbers = Manual.split(",");
-          expectedResult = Manual;
-          status = manualNumbers.includes(bet.number) ? "Win" : "Loss";
+          expectedResult = Manual; // ex: "56"
+          status = bet.number === Manual ? "Win" : "Loss";
           break;
 
         case "AndarHaraf": {
-          // andarHaraf will be like "4,7"
-          const andarValues = andarHaraf.toString().split(",");   // ["4","7"]
+          // andar = pehla digit (e.g. "5")
+          const andarValue = andarHaraf.toString(); // "5"
 
-          // bet.number = e.g. "777" → extract family digit
-          const betDigit = bet.number[0]; // take first digit, since 444 → "4", 777 → "7"
+          // bet.number = e.g. "444" → take first digit
+          const betDigit = bet.number[0];
 
-          expectedResult = andarHaraf.toString(); // "4,7"
-          status = andarValues.includes(betDigit) ? "Win" : "Loss";
+          expectedResult = andarValue; // "5"
+          status = betDigit === andarValue ? "Win" : "Loss";
           break;
         }
 
         case "BaharHaraf": {
-          // baharHaraf will be like "7,1"
-          const baharValues = baharHaraf.toString().split(",");  // ["7","1"]
+          // bahar = last digit (e.g. "6")
+          const baharValue = baharHaraf.toString(); // "6"
 
-          const betDigit = bet.number[0]; // triple bet digit family
+          const betDigit = bet.number[0]; // e.g. "777" → "7"
 
-          expectedResult = baharHaraf.toString(); // "7,1"
-          status = baharValues.includes(betDigit) ? "Win" : "Loss";
+          expectedResult = baharValue; // "6"
+          status = betDigit === baharValue ? "Win" : "Loss";
           break;
         }
 
         case "Crossing":
-          const crossingNumbers = Crossing.split(",");
-          expectedResult = Crossing;
-          status = crossingNumbers.includes(bet.number) ? "Win" : "Loss";
+          expectedResult = Crossing; // ex: "56"
+          status = bet.number === Crossing ? "Win" : "Loss";
           break;
 
         case "CopyPaste":
-          expectedResult = CopyPaste;
-          status = CopyPaste; // Win/Loss direct
+          expectedResult = CopyPaste; // ex: "56"
+          status = bet.number === CopyPaste ? "Win" : "Loss";
           break;
       }
 
@@ -820,105 +816,85 @@ export const CalculateGameResults = async (req, res) => {
     const { openResult, closeResult, gameId, game_name } = req.body;
     console.log(req.body, "reqbody")
 
-    // console.log("Declared Result:", openResult, closeResult);
-
-    const sumDigits = (num) => {
-      return num
-        .toString()
-        .split('')
-        .reduce((sum, digit) => sum + parseInt(digit), 0);
-    };
+    // ✅ Ek hi result declare hota hai
+    const result = openResult.toString();
 
     // ---- JODI ----
-    const jodiFirst = sumDigits(openResult) % 10;
-    const jodiSecond = sumDigits(closeResult) % 10;
-    const jodiNumber = `${jodiFirst}${jodiSecond}`;
+    const jodiNumber = result;  // same as result
 
     // ---- MANUAL ----
-    const openManual = openResult.toString().slice(-2);  // last 2 digits of opening
-    const closeManual = closeResult.toString().slice(-2); // last 2 digits of closing
-
-    // Array of winning manual numbers
-    const manualWinningNumbers = [openManual, closeManual].join(",");
+    const manualWinningNumbers = result; // same as result
 
     // ---- HARRAF ----
     const harraf = {
-      andarHaraf: [
-        parseInt(openResult.toString()[0]),
-        parseInt(closeResult.toString()[0])
-      ].join(","),
-
-      baharHaraf: [
-        parseInt(openResult.toString().slice(-1)),
-        parseInt(closeResult.toString().slice(-1))
-      ].join(",")
+      andarHaraf: result[0],  // first digit
+      baharHaraf: result.slice(-1) // last digit
     };
-
 
     // ---- CROSSING ----
-    const openLastDigit = openResult.toString().slice(-1);
-    const closeLastDigit = closeResult.toString().slice(-1);
-
-    const crossingNumbers = [
-      `${openLastDigit}${closeLastDigit}`,
-      `${closeLastDigit}${openLastDigit}`
-    ].join(",");
+    const crossingNumbers = result; // same as result
 
     // ---- COPY-PASTE ----
-    // let copyPasteResult = [];
-    // if (copyPasteBets && Array.isArray(copyPasteBets)) {
-    //   copyPasteResult = copyPasteBets.map(bet => ({
-    //     ...bet,
-    //     status: bet.number === crossingNumber ? "Win" : "Loss"
-    //   }));
-    // }
+    const copyPasteResult = result; // same as result
 
-    let copyPasteResult = "Loss"; // default
 
-    // Calculate sum of digits ka last digit
-    const sumLastDigit = num => {
-      const sum = num.toString().split("").reduce((acc, d) => acc + parseInt(d), 0);
-      return sum.toString().slice(-1);
-    };
+     // ✅ Pehle check karo same GAME_ID + DATE entry exist karti hai ya nahi
+     const [existingRows] = await req.db.query(
+      `SELECT * FROM RESULT 
+       WHERE GAME_ID = ? AND DATE(DATE) = CURDATE()`,
+      [gameId]
+    );
 
-    const openSumLast = sumLastDigit(openResult);
-    const closeSumLast = sumLastDigit(closeResult);
 
-    // Check conditions && ko dono true honi chahiye 
-    if (openLastDigit === closeLastDigit && openSumLast === closeSumLast) {
-      copyPasteResult = "Win";
+
+    if (existingRows.length > 0) {
+      // 🔄 UPDATE karo agar already entry hai
+      const updateQuery = `
+        UPDATE RESULT 
+        SET GAME_NAME = ?, RESULT1 = ?, RESULT2 = ?, 
+            Jodi = ?, Manual = ?, andarHaraf = ?, baharHaraf = ?, 
+            Crossing = ?, CopyPaste = ?
+        WHERE GAME_ID = ? AND DATE(DATE) = CURDATE()
+      `;
+
+      await req.db.query(updateQuery, [
+        game_name,
+        result,
+        result,
+        jodiNumber,
+        manualWinningNumbers,
+        harraf.andarHaraf,
+        harraf.baharHaraf,
+        crossingNumbers,
+        copyPasteResult,
+        gameId
+      ]);
+
+    } else {
+      // 🆕 Agar entry nahi hai toh INSERT karo
+      const insertQuery = `
+        INSERT INTO RESULT 
+        (GAME_ID, GAME_NAME, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste, DATE)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+      `;
+
+      await req.db.query(insertQuery, [
+        gameId,
+        game_name,
+        result,
+        result,
+        jodiNumber,
+        manualWinningNumbers,
+        harraf.andarHaraf,
+        harraf.baharHaraf,
+        crossingNumbers,
+        copyPasteResult
+      ]);
     }
 
-    // ---- Insert into DB ----
-    const insertQuery = `
-  INSERT INTO RESULT 
-  (GAME_ID, GAME_NAME, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste)
-  VALUES (?, ?,? , ?, ?, ?, ?, ?, ?, ?)
-`;
-
-
-
-    const values = [
-      gameId,
-      game_name,
-      openResult,
-      closeResult,
-      jodiNumber,
-      manualWinningNumbers,
-      harraf.andarHaraf,
-      harraf.baharHaraf,
-      crossingNumbers,
-      copyPasteResult
-    ];
-
-    await req.db.query(insertQuery, values);
-
-
-
-
-    // Fetch inserted row (with DATE_TIME too)
-    const [insertedRows] = await req.db.query(
-      "SELECT * FROM RESULT WHERE GAME_ID = ? ORDER BY DATE DESC LIMIT 1",
+     // ✅ Ab naya/latest result nikal lo
+     const [insertedRows] = await req.db.query(
+      "SELECT * FROM RESULT WHERE GAME_ID = ? AND DATE(DATE) = CURDATE() LIMIT 1",
       [gameId]
     );
 
@@ -934,7 +910,7 @@ export const CalculateGameResults = async (req, res) => {
      WHERE ID = ?
    `;
 
-    await req.db.query(updateGameQuery, [openResult, closeResult, gameId]);
+    await req.db.query(updateGameQuery, [openResult, openResult, gameId]);
 
 
 
@@ -978,6 +954,34 @@ export const getUserInfo = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
+
+export const editProfileUser = async (req, res) => {
+  try {
+    const { name, mobile } = req.body; // new values
+    const oldMobile = req.user.mobile; // comes from auth middleware
+
+    if (!name || !mobile) {
+      return res.status(400).json({ message: "Name and Mobile required" });
+    }
+
+    const sql = "UPDATE users SET name = ?, mobile = ? WHERE mobile = ?";
+    const [result] = await req.db.query(sql, [name, mobile, oldMobile]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      name,
+      mobile,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 export const getUserBetHistory = async (req, res) => {
@@ -1170,9 +1174,9 @@ export const getDepositList = async (req, res) => {
 export const UserWithdraw = async (req, res) => {
   const { acnumber, amount, bankname, holder, ifsc, mobile, status, upi } = req.body;
 
-  if (!mobile || !amount || !holder || !bankname || !acnumber) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
+  // if (!mobile || !amount || !holder || !bankname || !acnumber) {
+  //   return res.status(400).json({ message: "Missing required fields" });
+  // }
 
   try {
     const timeNow = new Date();
@@ -1283,8 +1287,8 @@ export const GetReferredUsers = async (req, res) => {
         earning: parseFloat((bet.POINT * 0.05).toFixed(2)) // keep numeric with 2 decimals
       }));
 
-       // 4. Calculate total earning of this user
-       const totalEarn = lossBets.reduce((sum, bet) => sum + bet.earning, 0);
+      // 4. Calculate total earning of this user
+      const totalEarn = lossBets.reduce((sum, bet) => sum + bet.earning, 0);
 
 
       finalResult.push({
@@ -1316,7 +1320,7 @@ export const GetAllReferredUsersAdmin = async (req, res) => {
     const [users] = await req.db.query(
       "SELECT id, mobile, refer_by, wallet FROM users WHERE refer_by IS NOT NULL AND refer_by <> ''"
     );
-    
+
 
     if (!users.length) {
       return res.status(200).json({
@@ -1385,5 +1389,33 @@ export const GetAllReferredUsersAdmin = async (req, res) => {
   } catch (err) {
     console.error("Error fetching admin referral data:", err);
     return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const resultHistory = async (req, res) => {
+  try {
+    // Query to fetch all game results
+    const [rows] = await req.db.query(
+      `SELECT 
+          GAME_ID ,
+          GAME_NAME ,
+          RESULT1 ,
+          RESULT2,
+          DATE 
+       FROM RESULT
+       ORDER BY DATE DESC`
+    );
+
+    return res.json({
+      success: true,
+      message: "Result history fetched ✅",
+      data: rows,
+    });
+  } catch (err) {
+    console.error("Result History Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error ❌",
+    });
   }
 };

@@ -47,8 +47,8 @@ const Withdraw = () => {
       toast.error('Enter a valid amount');
       return;
     }
-    if (Number(amount) < 100) {
-      toast.error('Minimum withdraw amount is 100');
+    if (Number(amount) < 1000) {
+      toast.error('Minimum withdraw amount is 1000');
       return;
     }
     if (Number(amount) > 50000) {
