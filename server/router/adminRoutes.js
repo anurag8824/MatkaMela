@@ -1,5 +1,5 @@
 import express from 'express';
-import { AdminAddUser, adminDashboardData, AdminLogin, approveDeposits, approveWithdraws, ChangePasswordAdmin, declareResultList, editGame, getAdminDetails, getAllBetsGameLoad, GetAllUsers, GetQr, GetUPI, toggleUserState, UpdateQr, UpdateUPI, updateWallet, winningReportList } from '../contollers/Admin.controller.js';
+import { AddNewGame, AdminAddUser, adminDashboardData, AdminLogin, approveDeposits, approveWithdraws, ChangePasswordAdmin, declareResultList, editGame, getAdminDetails, getAllBetsGameLoad, GetAllUsers, GetQr, GetUPI, toggleUserState, UpdateQr, UpdateUPI, updateWallet, winningReportList } from '../contollers/Admin.controller.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { qrMulter } from '../middlewares/qrMulter.js';
 
@@ -21,6 +21,9 @@ router.get('/get-users', authMiddleware , GetAllUsers)
 
 router.post('/admin-add-user', authMiddleware , AdminAddUser)
 
+
+
+
 router.post('/admin-update-wallet', authMiddleware , updateWallet)
 router.post('/toggle-user-state', authMiddleware , toggleUserState )
 
@@ -35,6 +38,8 @@ router.get('/winning-report-list', authMiddleware , winningReportList)
 
 
 router.post('/edit-game', authMiddleware , editGame)
+router.post('/add-new-game', authMiddleware , AddNewGame)
+
 
 
 

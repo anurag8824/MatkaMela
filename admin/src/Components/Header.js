@@ -116,6 +116,10 @@ const menuItems = [
         title: "User Commission ",
         link: "/public/administrator/user/commission-list",
       },
+      {
+        title: "Commission Pay List ",
+        link: "/public/administrator/user/commission-pay-list",
+      },
     ],
   },
   {

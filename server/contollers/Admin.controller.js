@@ -294,6 +294,26 @@ export const editGame = async (req, res) => {
     }
 };
 
+export const AddNewGame = async (req, res) => {
+  try {
+    const { name, time1, time2 } = req.body;
+
+    if (!name || !time1 || !time2) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const query = "INSERT INTO games (name, time1, time2 , RESULT1, RESULT2) VALUES (?, ?, ?,?,? )";
+    const [result] = await req.db.query(query, [name, time1, time2, "",""]);
+
+    res.json({
+      message: "Game added successfully",
+      gameId: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error inserting game:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
 
 
 

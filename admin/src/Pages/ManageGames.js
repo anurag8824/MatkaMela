@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form, Button, Alert, Row, Col, Breadcrumb, Card } from 'react-bootstrap'
-import axios from "axios";
+import axios from "axios"
 
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import axiosInstance from "../Utils/axiosInstance"
+
 
 export default function ManageGames() {
-    const backUrl = process.env.REACT_APP_BACKEND_URL;
+  const backUrl = process.env.REACT_APP_BACKEND_URL;
   const [games, setGames] = useState([]);
   const [editGame, setEditGame] = useState({
     id: "",
@@ -22,7 +24,7 @@ export default function ManageGames() {
     fetchGames()
   }, []);
 
- 
+
 
   const fetchGames = async () => {
     try {
@@ -49,7 +51,7 @@ export default function ManageGames() {
     //   time2: game.time2Raw || "",
     //   days: game.days || "7",
     // });
-    navigate (`/public/administrator/game/edit-game/${game}`)
+    navigate(`/public/administrator/game/edit-game/${game}`)
   };
 
   const handleDelete = async (id) => {
@@ -95,10 +97,37 @@ export default function ManageGames() {
     }
   };
 
-//   marginLeft: "250px" 
+  //   marginLeft: "250px" 
+
+
+  const [gameName, setGameName] = useState("");
+  const [time1, setTime1] = useState("");
+  const [time2, setTime2] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const payload = {
+        name: gameName,
+        time1: time1,
+        time2: time2,
+      };
+
+      const response = await axiosInstance.post("admin/add-new-game", payload);
+      console.log("Game Added:", response.data);
+
+      // clear form after submit
+      setGameName("");
+      setTime1("");
+      setTime2("");
+    } catch (error) {
+      console.error("Error adding game:", error);
+    }
+  };
 
   return (
-    <div className="p-3" style={{ marginTop: "60px"}}>
+    <div className="p-3" style={{ marginTop: "60px" }}>
       <Row className="mb-2">
         <Col>
           <h1 className="text-dark">Manage Games</h1>
@@ -118,52 +147,59 @@ export default function ManageGames() {
       )}
 
       {/* Game Form */}
-      <Card className="mb-4">
-        <Card.Body>
-          <Form onSubmit={handleFormSubmit}>
-            <Row>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Game Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Game Name"
-                    required
-                    value={editGame.name}
-                    onChange={(e) => setEditGame({ ...editGame, name: e.target.value })}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Time 1</Form.Label>
-                  <Form.Control
-                    type="time"
-                    required
-                    value={editGame.time1}
-                    onChange={(e) => setEditGame({ ...editGame, time1: e.target.value })}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Time 2</Form.Label>
-                  <Form.Control
-                    type="time"
-                    required
-                    value={editGame.time2}
-                    onChange={(e) => setEditGame({ ...editGame, time2: e.target.value })}
-                  />
-                </Form.Group>
-              </Col>
-              
-            </Row>
-            <Button type="submit" variant="primary">
-              {editGame.id ? "Update" : "Add"}
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
+      <div className="p-1 borderj rounded shakdow w-full">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Game Name */}
+            <div>
+              <label className="block mb-1 font-medium">Game Name</label>
+              <input
+                type="text"
+                placeholder="Enter game name"
+                value={gameName}
+                onChange={(e) => setGameName(e.target.value)}
+                required
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+
+            {/* Time 1 */}
+            <div>
+              <label className="block mb-1 font-medium">Time 1</label>
+              <input
+                type="time"
+                value={time1}
+                onChange={(e) => setTime1(e.target.value)}
+                required
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+
+            {/* Time 2 */}
+            <div>
+              <label className="block mb-1 font-medium">Time 2</label>
+              <input
+                type="time"
+                value={time2}
+                onChange={(e) => setTime2(e.target.value)}
+                required
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+          </div>
+
+          {/* Button aligned right */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
+              Add
+            </button>
+          </div>
+        </form>
+
+      </div>
 
       {/* Games Table with Holiday Checkbox */}
       <Form onSubmit={handleHolidaySubmit}>

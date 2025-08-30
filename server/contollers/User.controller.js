@@ -660,21 +660,26 @@ export const ProcessLossBets = async (req, LossBets) => {
       // 3. Calculate 5% commission
       const commission = (parseFloat(bet.point) * 5) / 100;
 
-      // 4. Update referBy user wallet
-      const [refUsers] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [referBy]);
-      if (!refUsers.length) {
-        console.log(`⚠️ ReferBy user ${referBy} not found`);
-        continue;
-      }
+      // 4. Insert entry in commission table (wallet update nahi karna)
+      const insertQuery = `
+        INSERT INTO commission 
+        (betId, betuser, DATE_TIME, phone, point, GAME_ID, GAME, Pay, STATUS, earn)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      await req.db.query(insertQuery, [
+        bet.betId,            // betId
+        bet.user,             // betuser
+        bet.DATE_TIME,        // DATE_TIME
+        referBy,              // phone (refer_by user)
+        bet.point,            // point
+        bet.gameId,           // GAME_ID
+        bet.type,             // GAME
+        "pending",            // Pay
+        bet.status,           // STATUS
+        commission            // earn
+      ]);
 
-      let refWallet = parseFloat(refUsers[0].wallet);
-      if (isNaN(refWallet)) refWallet = 0;
-
-      const newWallet = refWallet + commission;
-
-      await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, referBy]);
-
-      console.log(`✅ ReferBy user ${referBy} got +${commission} from bet ${bet.betId}`);
+      console.log(`✅ Commission entry created for referBy ${referBy} from bet ${bet.betId}`);
     }
   } catch (err) {
     console.error("Error processing loss bets:", err);
@@ -779,6 +784,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       if (status === "Loss") {
         LossBets.push({
           gameId: GAME_ID,
+          time: bet.DATE_TIME,
           betId: bet.ID,
           type: bet.TYPE,
           number: bet.number,
@@ -838,8 +844,8 @@ export const CalculateGameResults = async (req, res) => {
     const copyPasteResult = result; // same as result
 
 
-     // ✅ Pehle check karo same GAME_ID + DATE entry exist karti hai ya nahi
-     const [existingRows] = await req.db.query(
+    // ✅ Pehle check karo same GAME_ID + DATE entry exist karti hai ya nahi
+    const [existingRows] = await req.db.query(
       `SELECT * FROM RESULT 
        WHERE GAME_ID = ? AND DATE(DATE) = CURDATE()`,
       [gameId]
@@ -892,8 +898,8 @@ export const CalculateGameResults = async (req, res) => {
       ]);
     }
 
-     // ✅ Ab naya/latest result nikal lo
-     const [insertedRows] = await req.db.query(
+    // ✅ Ab naya/latest result nikal lo
+    const [insertedRows] = await req.db.query(
       "SELECT * FROM RESULT WHERE GAME_ID = ? AND DATE(DATE) = CURDATE() LIMIT 1",
       [gameId]
     );
@@ -954,6 +960,83 @@ export const getUserInfo = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
+export const getCommissions = async (req, res) => {
+  try {
+    const { date } = req.query;
+    let query = "SELECT * FROM commission";
+    let params = [];
+
+    if (date) {
+      // agar date diya gaya hai to filter lagao
+      query += " WHERE DATE(DATE_TIME) = ?";
+      params.push(date);
+    }
+
+    query += " ORDER BY id DESC";
+
+    const [rows] = await req.db.query(query, params);
+
+    res.json({
+      success: true,
+      data: rows,
+    });
+  } catch (err) {
+    console.error("Error fetching commission data:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+
+export const payCommission = async (req, res) => {
+  try {
+    // ✅ payList hamesha array bana lo (single object bhi ho toh)
+    const entries = Array.isArray(req.body.payList)
+      ? req.body.payList
+      : [req.body.payList];
+
+    console.log(entries, "entries to pay");
+
+    for (const entry of entries) {
+      const { ID, phone, earn } = entry;
+
+      // 1️⃣ Commission entry check karo aur sirf pending ko hi allow karo
+      const [commissionRows] = await req.db.query(
+        "SELECT * FROM commission WHERE ID = ? AND pay = 'pending'",
+        [ID]
+      );
+      if (commissionRows.length === 0) {
+        console.log(`Commission ID ${ID} not found or already paid`);
+        continue; // skip agar already success ho chuka hai
+      }
+
+      // 2️⃣ User wallet update (phone se)
+      await req.db.query(
+        "UPDATE users SET wallet = wallet + ? WHERE MOBILE = ?",
+        [parseFloat(earn), phone]
+      );
+
+      // 3️⃣ Commission entry update karo
+      await req.db.query(
+        "UPDATE commission SET pay = 'success' WHERE ID = ?",
+        [ID]
+      );
+    }
+
+    res.json({
+      success: true,
+      message: "Commission(s) paid successfully",
+      count: entries.length,
+    });
+  } catch (err) {
+    console.error("Error in payCommission:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to pay commission" });
+  }
+};
+
+
 
 
 export const editProfileUser = async (req, res) => {
@@ -1317,8 +1400,10 @@ export const GetReferredUsers = async (req, res) => {
 export const GetAllReferredUsersAdmin = async (req, res) => {
   try {
     // 1. Fetch all users who have been referred (refer_by not null/empty)
+    const { date } = req.query;
+
     const [users] = await req.db.query(
-      "SELECT id, mobile, refer_by, wallet FROM users WHERE refer_by IS NOT NULL AND refer_by <> ''"
+      "SELECT id, mobile, name, refer_by, wallet FROM users WHERE refer_by IS NOT NULL AND refer_by <> ''"
     );
 
 
@@ -1334,13 +1419,21 @@ export const GetAllReferredUsersAdmin = async (req, res) => {
     let groupedResult = {};
 
     for (const user of users) {
-      const [bets] = await req.db.query(
-        `SELECT 
-           ID, DATE_TIME, phone, STATUS, GAME, GAME_ID, POINT, TYPE 
-         FROM bets 
-         WHERE phone = ? AND STATUS = 'Loss'`,
-        [user.mobile]
-      );
+
+      let betQuery = `
+        SELECT ID, DATE_TIME, phone, STATUS, GAME, GAME_ID, POINT, TYPE 
+        FROM bets 
+        WHERE phone = ? AND STATUS = 'Loss'
+      `;
+      let params = [user.mobile];
+
+      // 👇 agar date aayi hai to filter lagao
+      if (date) {
+        betQuery += " AND DATE(DATE_TIME) = ?";
+        params.push(date);
+      }
+
+      const [bets] = await req.db.query(betQuery, params);
 
       // Add earning field (5% of point)
       const lossBets = bets.map(bet => ({
@@ -1354,6 +1447,7 @@ export const GetAllReferredUsersAdmin = async (req, res) => {
       // Prepare user object
       const userObj = {
         mobile: user.mobile,
+        name: user.name,
         wallet: user.wallet,
         totalEarn: parseFloat(totalEarn.toFixed(2)),
         lossBets
@@ -1363,6 +1457,7 @@ export const GetAllReferredUsersAdmin = async (req, res) => {
       if (!groupedResult[user.refer_by]) {
         groupedResult[user.refer_by] = {
           referBy: user.refer_by,
+          name: user.name,
           users: [],
           totalEarn: 0
         };
