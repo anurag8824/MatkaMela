@@ -784,7 +784,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       if (status === "Loss") {
         LossBets.push({
           gameId: GAME_ID,
-          time: bet.DATE_TIME,
+          DATE_TIME: bet.DATE_TIME,
           betId: bet.ID,
           type: bet.TYPE,
           number: bet.number,
