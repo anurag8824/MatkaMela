@@ -71,6 +71,7 @@ const Deposit = () => {
       } else {
         alert("Error: " + res.data.message);
       }
+      window.location.reload();
     } catch (error) {
       alert("Something went wrong!");
       console.error(error);

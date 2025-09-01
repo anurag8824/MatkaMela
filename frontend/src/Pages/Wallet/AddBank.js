@@ -50,6 +50,7 @@ const AddBank = () => {
             if (response.status === 200) {
                 alert('Bank details saved successfully!');
             }
+            window.location.reload();
         } catch (error) {
             console.error('Error saving bank details:', error);
             alert('Failed to save bank details. Please try again.');

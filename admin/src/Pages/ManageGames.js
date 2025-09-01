@@ -121,6 +121,8 @@ export default function ManageGames() {
       setGameName("");
       setTime1("");
       setTime2("");
+      window.location.reload();
+
     } catch (error) {
       console.error("Error adding game:", error);
     }
@@ -232,13 +234,13 @@ export default function ManageGames() {
                   <Button variant="warning" size="sm" onClick={() => handleEdit(game.ID)}>
                     <i className="fa fa-pen"></i>
                   </Button>{" "}
-                  <Button
+                  {/* <Button
                     variant="danger"
                     size="sm"
                     onClick={() => handleDelete(game.id)}
                   >
                     <i className="fa fa-trash"></i>
-                  </Button>
+                  </Button> */}
                 </td>
               </tr>
             ))}

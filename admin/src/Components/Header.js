@@ -102,10 +102,10 @@ const menuItems = [
         title: "Update Number",
         link: "/public/administrator/result/update-number",
       },
-      // {
-      //   title: "Winning Number",
-      //   link: "/public/administrator/result/winning-number",
-      // },
+      {
+        title: "Winning Number",
+        link: "/public/administrator/result/winning-number",
+      },
     ],
   },
   {

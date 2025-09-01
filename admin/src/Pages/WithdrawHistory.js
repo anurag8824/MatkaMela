@@ -83,6 +83,8 @@ const WithdrawHistory = () => {
     try {
       await axiosInstance.post("/admin/approve-withdraws", { ...row, method });
       alert(`Withdraw ${method} ✅`);
+      window.location.reload();
+
     } catch (err) {
       console.error(err);
       alert("Failed to update withdraw ❌");
@@ -101,6 +103,7 @@ const WithdrawHistory = () => {
       );
       await axiosInstance.post("/admin/approve-withdraws", { withdraws: selectedData, method });
       alert("Selected withdraws updated ✅");
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Bulk approval failed ❌");
@@ -179,7 +182,9 @@ const WithdrawHistory = () => {
                 <th className="border p-2">Amount</th>
                 <th className="border p-2">Status</th>
                 <th className="border p-2">Time</th>
-                <th className="border p-2">Actions</th>
+                <th className="border p-2">Action</th>
+                <th className="border p-2"></th>
+
               </tr>
             </thead>
             <tbody>
@@ -205,6 +210,7 @@ const WithdrawHistory = () => {
                   <td className="border p-2">
                     {new Date(row.TIME).toLocaleString()}
                   </td>
+
                   <td className="border p-2 flex gap-2">
                     {type === "pending" ? (
                       <>
@@ -222,9 +228,11 @@ const WithdrawHistory = () => {
                         </button>
                       </>
                     ) : (
-                      type
+                     <button     onClick={() => approveWithdraw(row, "reverse")} className="bg-red-600 text-white px-2 py-1 rounded">Reverse</button>
                     )}
                   </td>
+                  <td className="border p-2">{type}</td>
+
                 </tr>
               ))}
             </tbody>

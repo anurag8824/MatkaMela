@@ -110,107 +110,24 @@ export default function HomePage() {
     //     </>
     //   ),
     // },
-    // {
-    //   title: "Delhi Bazar",
-    //   icon: "fa-users",
-    //   value: "489.65",
-    //   extra: (
-    //     <>
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Bidding Rs. 1867
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Wining Rs. 2420
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Total Bal . -553
-    //       </span>
-    //     </>
-    //   ),
-    // },
-    // {
-    //   title: "Shree Ganesh",
-    //   icon: "fa-users",
-    //   value: "29.65",
-    //   extra: (
-    //     <>
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Bidding Rs. 2155
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Wining Rs. 0
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Total Bal . 2155
-    //       </span>
-    //     </>
-    //   ),
-    // },
-    // {
-    //   title: "Faridabad",
-    //   icon: "fa-users",
-    //   value: "439.65",
-    //   extra: (
-    //     <>
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Bidding Rs. 400
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Wining Rs. 0
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Total Bal . 400
-    //       </span>
-    //     </>
-    //   ),
-    // },
-    // {
-    //   title: "Ghaziabad",
-    //   icon: "fa-users",
-    //   value: "19.65",
-    //   extra: (
-    //     <>
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Bidding Rs. 66
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Wining Rs. 0
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Total Bal . 66
-    //       </span>
-    //     </>
-    //   ),
-    // },
-    // {
-    //   title: "Gali",
-    //   icon: "fa-users",
-    //   value: "989.65",
-    //   extra: (
-    //     <>
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Bidding Rs. 35
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Wining Rs. 0
-    //       </span>
-    //       <br />
-    //       <span className="weight-500 uppercase-font txt-light font-13">
-    //         Total Bal . 35
-    //       </span>
-    //     </>
-    //   ),
-    // },
+    
   ];
+
+   // 🔹 Dynamic cards (gamesData se)
+   const gameCards = dashboardData?.gamesData?.map((game) => ({
+    title: game?.GAME,
+    value: `Total Bid: ${game?.totalBid}`,
+    icon: "fa-gamepad",
+    extra: (
+      <>
+        <span>Bidding Rs: {game.totalBid}</span><br />
+        <span>Winning Rs: {game.totalWin}</span><br />
+        <span>Total Rs: {game?.totalBid - game?.totalWin}</span>
+
+      </>
+    )
+  })) || [];
+
 
   return (
     <div className="content-wrapper p-3">
@@ -221,92 +138,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Main content */}
-      <section className="content hidden">
-        <div className="container-fluid">
-          <div className="row g-3">
-            <div className="col-12 col-sm-6 col-md-3">
-              <div className="info-box bg-light p-3 shadow-sm">
-                <span className="info-box bg-info text-red rounded">
-                  <i className="fas fa-users fa-2x"></i>
-                </span>
-                <div className="info-box-content">
-                  <Link to="/users" style={{ color: "black" }}>
-                    <span className="info-box-text">Users</span>
-                    <span className="info-box-number">
-                      {stats.user_count}
-                    </span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-12 col-sm-6 col-md-3">
-              <div className="info-box bg-light p-3 shadow-sm">
-                <span className="info-box-icon bg-success text-red rounded">
-                  <i className="fas fa-wallet fa-2x"></i>
-                </span>
-                <div className="info-box-content">
-                  <a href="#" style={{ color: "black" }}>
-                    <span className="info-box-text">Total Wallet</span>
-                    <span className="info-box-number">
-                      {stats.total_wallet}
-                    </span>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-12 col-sm-6 col-md-3">
-              <div className="info-box bg-light p-3 shadow-sm">
-                <span className="info-box-icon bg-danger text-red rounded">
-                  <i className="fas fa-clipboard fa-2x"></i>
-                </span>
-                <div className="info-box-content">
-                  <Link to="/bets" style={{ color: "black" }}>
-                    <span className="info-box-text">Pending Bet</span>
-                    <span className="info-box-number">
-                      {stats.bet_count}
-                    </span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-12 col-sm-6 col-md-3">
-              <div className="info-box bg-light p-3 shadow-sm">
-                <span className="info-box-icon bg-dark text-red rounded">
-                  <i className="fas fa-rupee-sign fa-2x"></i>
-                </span>
-                <div className="info-box-content">
-                  <Link to="/payment_queue" style={{ color: "black" }}>
-                    <span className="info-box-text">Recharge Queue</span>
-                    <span className="info-box-number">
-                      {stats.payment_count}
-                    </span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-12 col-sm-6 col-md-3">
-              <div className="info-box bg-light p-3 shadow-sm">
-                <span className="info-box-icon bg-warning text-red rounded">
-                  <i className="fas fa-rupee-sign fa-2x"></i>
-                </span>
-                <div className="info-box-content">
-                  <a href="/with_queue" style={{ color: "black" }}>
-                    <span className="info-box-text">Withdraw Queue</span>
-                    <span className="info-box-number">
-                      {stats.with_count}
-                    </span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
 
 
@@ -344,7 +175,7 @@ export default function HomePage() {
 
 
       <div className="row">
-        {cards?.map((card, index) => (
+        {[...cards, ...gameCards]?.map((card, index) => (
           <div key={index} className="col-lg-3 col-md-6 col-sm-12 col-xs-12 mb-3">
             <div className="card bg-[#673e0e] text-white py-1 h-44 flex flex-col justify-between rounded-xl shadow-md">
               <div className="card-body flex flex-col justify-between h-full">

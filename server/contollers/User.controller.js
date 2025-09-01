@@ -1264,6 +1264,27 @@ export const UserWithdraw = async (req, res) => {
   try {
     const timeNow = new Date();
 
+
+     // 1️⃣ User fetch karo
+     const [userRows] = await req.db.query(
+      `SELECT WALLET FROM users WHERE MOBILE = ?`,
+      [mobile]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ message: "User not found ❌" });
+    }
+
+    const userWallet = parseFloat(userRows[0].WALLET);
+    const withdrawAmount = parseFloat(amount);
+
+    // 2️⃣ Balance check karo
+    if (withdrawAmount > userWallet) {
+      return res
+        .status(400)
+        .json({ message: "You don't have enough balance in wallet ❌" });
+    }
+
     const query = `
       INSERT INTO WITHDRAW 
       (MOBILE, HOLDER, UPI, AMOUNT, TIME, STATUS, BANK, IFSC, ACCOUNT)
@@ -1283,6 +1304,14 @@ export const UserWithdraw = async (req, res) => {
     ];
 
     await req.db.query(query, values);
+
+     // 4️⃣ Wallet balance update karo
+     const updateWalletSql = `
+     UPDATE users 
+     SET WALLET = WALLET - ? 
+     WHERE MOBILE = ?
+   `;
+   await req.db.query(updateWalletSql, [withdrawAmount, mobile]);
 
     res.status(200).json({ message: "Withdraw request stored successfully" });
   } catch (error) {

@@ -35,7 +35,8 @@ const Header = () => {
     localStorage.removeItem("token"); // example
     localStorage.removeItem("id"); // example
     localStorage.removeItem("mobile"); // example
-    window.location.reload(); // reload the page to reflect changes
+    window.location.href = "/login";
+    
   };
 
 

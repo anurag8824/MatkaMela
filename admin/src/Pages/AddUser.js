@@ -28,7 +28,7 @@ export default function AddUser() {
 
             alert(response.data.message || "User added successfully");
             setFormData({ name: "", phone: "", referby: "", dob: "" }); // clear form
-
+            
         } catch (err) {
             console.error("Error adding user:", err);
             alert(err.response?.data?.message || "Failed to add user");

@@ -101,7 +101,8 @@ export const adminDashboardData = async (req, res) => {
         const [userBalanceRows] = await req.db.query(
             `SELECT SUM(WALLET) as totalBalance 
          FROM users 
-         WHERE STATE = 'active'`
+         WHERE STATE = 'active' ${date ? "AND DATE(DATE) = ?" : ""}`,
+         date ? [date] : []
         );
         const customerBalance = userBalanceRows[0]?.totalBalance || 0;
 
@@ -172,6 +173,33 @@ export const adminDashboardData = async (req, res) => {
         );
         const totalProfit = profitRows[0]?.totalProfit || 0;
 
+
+    // // 8️⃣ Games wise data (GAME_ID, GAME, SUM of POINT, SUM of WIN_AMOUNT)
+    // const [gamesDataRows] = await req.db.query(
+    //   `SELECT GAME_ID, GAME, 
+    //           SUM(POINT) as totalBid, 
+    //           SUM(WIN_AMOUNT) as totalWin
+    //    FROM bets
+    //    WHERE 1=1 ${date ? "AND DATE(DATE_TIME) = ?" : ""}
+    //    GROUP BY GAME_ID, GAME`,
+    //   date ? [date] : []
+    // );
+
+    // 8️⃣ Games wise data (All games with totalBid & totalWin)
+const [gamesDataRows] = await req.db.query(
+  `SELECT g.ID AS GAME_ID, 
+          g.NAME AS GAME, 
+          IFNULL(SUM(b.POINT), 0) AS totalBid, 
+          IFNULL(SUM(b.WIN_AMOUNT), 0) AS totalWin
+   FROM games g
+   LEFT JOIN bets b 
+          ON g.ID = b.GAME_ID
+          ${date ? "AND DATE(b.DATE_TIME) = ?" : ""}
+   GROUP BY g.ID, g.NAME
+   ORDER BY g.ID`,
+  date ? [date] : []
+);
+
         return res.json({
             success: true,
             message: "Admin dashboard data fetched ✅",
@@ -183,6 +211,7 @@ export const adminDashboardData = async (req, res) => {
                 totalWinAmount,
                 totalCommission,
                 totalProfit,
+                gamesData: gamesDataRows, 
             },
         });
     } catch (err) {
@@ -319,128 +348,328 @@ export const AddNewGame = async (req, res) => {
 
 
 
-// ✅ Approve / Cancel Deposit API
+// // ✅ Approve / Cancel Deposit API
+// export const approveDeposits = async (req, res) => {
+//     const { method } = req.body; // "approved" | "cancelled"
+//     console.log(req.body, "req body in approve deposits");
+//     try {
+//         let deposits = [];
+
+//         // Single object aaya hai
+//         if (!Array.isArray(req.body.deposits)) {
+//             deposits = [req.body];
+//         } else {
+//             deposits = req.body.deposits;
+//         }
+
+//         try {
+//             for (let dep of deposits) {
+//                 const { ID, USER_ID, AMOUNT } = dep;
+
+//                 if (method === "approved") {
+//                     // 1️⃣ User ke wallet balance ko update karna
+//                     const updateWalletSql = `
+//               UPDATE users 
+//               SET WALLET = WALLET + ? 
+//               WHERE MOBILE = ?
+//             `;
+//                     await req.db.query(updateWalletSql, [parseFloat(AMOUNT), USER_ID]);
+//                 }
+
+//                 // 2️⃣ Deposit entry ka status update karna
+//                 const updateDepositSql = `
+//             UPDATE PAYMENT_QUEUE 
+//             SET STATUS = ? 
+//             WHERE ID = ?
+//           `;
+//                 await req.db.query(updateDepositSql, [method, ID]);
+//             }
+
+//             return res.json({
+//                 success: true,
+//                 message:
+//                     method === "approved"
+//                         ? "Deposits approved and wallet updated ✅"
+//                         : "Deposits cancelled successfully ❌",
+//             });
+//         } catch (err) {
+//             console.error("Transaction Error:", err);
+//             return res.status(500).json({
+//                 success: false,
+//                 message: "Failed to update deposits ❌",
+//             });
+//         }
+//     } catch (err) {
+//         console.error("Approve Deposit API Error:", err);
+//         return res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error ❌",
+//         });
+//     }
+// };
+
+// ✅ Approve / Cancel / Reverse Deposit API
 export const approveDeposits = async (req, res) => {
-    const { method } = req.body; // "approved" | "cancelled"
-    console.log(req.body, "req body in approve deposits");
-    try {
-        let deposits = [];
+  const { method } = req.body; // "approved" | "cancelled" | "reverse"
+  console.log(req.body, "req body in approve deposits");
+  try {
+      let deposits = [];
 
-        // Single object aaya hai
-        if (!Array.isArray(req.body.deposits)) {
-            deposits = [req.body];
-        } else {
-            deposits = req.body.deposits;
-        }
+      // Single object aaya hai
+      if (!Array.isArray(req.body.deposits)) {
+          deposits = [req.body];
+      } else {
+          deposits = req.body.deposits;
+      }
 
-        try {
-            for (let dep of deposits) {
-                const { ID, USER_ID, AMOUNT } = dep;
+      try {
+          for (let dep of deposits) {
+              const { ID, USER_ID, AMOUNT } = dep;
 
-                if (method === "approved") {
-                    // 1️⃣ User ke wallet balance ko update karna
-                    const updateWalletSql = `
-              UPDATE users 
-              SET WALLET = WALLET + ? 
-              WHERE MOBILE = ?
-            `;
-                    await req.db.query(updateWalletSql, [parseFloat(AMOUNT), USER_ID]);
-                }
+              if (method === "approved") {
+                  // 1️⃣ Wallet me add karna
+                  const updateWalletSql = `
+                      UPDATE users 
+                      SET WALLET = WALLET + ? 
+                      WHERE MOBILE = ?
+                  `;
+                  await req.db.query(updateWalletSql, [parseFloat(AMOUNT), USER_ID]);
 
-                // 2️⃣ Deposit entry ka status update karna
-                const updateDepositSql = `
-            UPDATE PAYMENT_QUEUE 
-            SET STATUS = ? 
-            WHERE ID = ?
-          `;
-                await req.db.query(updateDepositSql, [method, ID]);
-            }
+                  // Deposit ko approved mark karo
+                  const updateDepositSql = `
+                      UPDATE PAYMENT_QUEUE 
+                      SET STATUS = ? 
+                      WHERE ID = ?
+                  `;
+                  await req.db.query(updateDepositSql, [method, ID]);
+              } 
+              
+              else if (method === "cancelled") {
+                  // Sirf status update karna (wallet me koi change nahi)
+                  const updateDepositSql = `
+                      UPDATE PAYMENT_QUEUE 
+                      SET STATUS = ? 
+                      WHERE ID = ?
+                  `;
+                  await req.db.query(updateDepositSql, [method, ID]);
+              } 
+              
+              else if (method === "reverse") {
+                  // ✅ Sirf approved entries reverse karo
+                  // Pehle check karo ki entry approved hai
+                  const [rows] = await req.db.query(
+                      "SELECT STATUS FROM PAYMENT_QUEUE WHERE ID = ?",
+                      [ID]
+                  );
+                  
+                  if (rows.length > 0 && rows[0].STATUS === "approved") {
+                      // 1️⃣ Wallet se paisa minus karo
+                      const updateWalletSql = `
+                          UPDATE users 
+                          SET WALLET = WALLET - ? 
+                          WHERE MOBILE = ?
+                      `;
+                      await req.db.query(updateWalletSql, [parseFloat(AMOUNT), USER_ID]);
 
-            return res.json({
-                success: true,
-                message:
-                    method === "approved"
-                        ? "Deposits approved and wallet updated ✅"
-                        : "Deposits cancelled successfully ❌",
-            });
-        } catch (err) {
-            console.error("Transaction Error:", err);
-            return res.status(500).json({
-                success: false,
-                message: "Failed to update deposits ❌",
-            });
-        }
-    } catch (err) {
-        console.error("Approve Deposit API Error:", err);
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error ❌",
-        });
-    }
+                      // 2️⃣ Status ko wapas Pending karo
+                      const updateDepositSql = `
+                          UPDATE PAYMENT_QUEUE 
+                          SET STATUS = 'pending' 
+                          WHERE ID = ?
+                      `;
+                      await req.db.query(updateDepositSql, [ID]);
+                  }
+              }
+          }
+
+          return res.json({
+              success: true,
+              message:
+                  method === "approved"
+                      ? "Deposits approved and wallet updated ✅"
+                      : method === "cancelled"
+                      ? "Deposits cancelled successfully ❌"
+                      : "Deposits reversed and set back to Pending 🔄",
+          });
+      } catch (err) {
+          console.error("Transaction Error:", err);
+          return res.status(500).json({
+              success: false,
+              message: "Failed to update deposits ❌",
+          });
+      }
+  } catch (err) {
+      console.error("Approve Deposit API Error:", err);
+      return res.status(500).json({
+          success: false,
+          message: "Internal Server Error ❌",
+      });
+  }
 };
 
 
-// ✅ Approve / Cancel Withdraw API
+// // ✅ Approve / Cancel Withdraw API
+// export const approveWithdraws = async (req, res) => {
+//     const { method } = req.body; // "approved" | "cancelled" 
+//     console.log(req.body, "req body in approve withdraws");
+
+//     try {
+//         let withdraws = [];
+
+//         // Single object aaya hai
+//         if (!Array.isArray(req.body.withdraws)) {
+//             withdraws = [req.body];
+//         } else {
+//             withdraws = req.body.withdraws;
+//         }
+
+//         try {
+//             for (let wd of withdraws) {
+//                 const { ID, MOBILE, AMOUNT } = wd;
+
+//                 if (method === "approved") {
+//                     // 1️⃣ Wallet balance se paisa minus karna
+//                     const updateWalletSql = `
+//               UPDATE users 
+//               SET WALLET = WALLET - ? 
+//               WHERE MOBILE = ?
+//             `;
+//                     await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
+//                 }
+
+//                 // 2️⃣ Withdraw entry ka status update karna
+//                 const updateWithdrawSql = `
+//             UPDATE WITHDRAW 
+//             SET STATUS = ? 
+//             WHERE ID = ?
+//           `;
+//                 await req.db.query(updateWithdrawSql, [method, ID]);
+//             }
+
+//             return res.json({
+//                 success: true,
+//                 message:
+//                     method === "approved"
+//                         ? "Withdraws approved and wallet updated ✅"
+//                         : "Withdraws cancelled successfully ❌",
+//             });
+//         } catch (err) {
+//             console.error("Transaction Error:", err);
+//             return res.status(500).json({
+//                 success: false,
+//                 message: "Failed to update withdraws ❌",
+//             });
+//         }
+//     } catch (err) {
+//         console.error("Approve Withdraw API Error:", err);
+//         return res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error ❌",
+//         });
+//     }
+// };
+
+
+// ✅ Approve / Cancel / Reverse Withdraw API
 export const approveWithdraws = async (req, res) => {
-    const { method } = req.body; // "approved" | "cancelled"
-    console.log(req.body, "req body in approve withdraws");
+  const { method } = req.body; // "approved" | "cancelled" | "reverse"
+  console.log(req.body, "req body in approve withdraws");
 
-    try {
-        let withdraws = [];
+  try {
+      let withdraws = [];
 
-        // Single object aaya hai
-        if (!Array.isArray(req.body.withdraws)) {
-            withdraws = [req.body];
-        } else {
-            withdraws = req.body.withdraws;
-        }
+      // Single object aaya hai
+      if (!Array.isArray(req.body.withdraws)) {
+          withdraws = [req.body];
+      } else {
+          withdraws = req.body.withdraws;
+      }
 
-        try {
-            for (let wd of withdraws) {
-                const { ID, MOBILE, AMOUNT } = wd;
+      try {
+          for (let wd of withdraws) {
+              const { ID, MOBILE, AMOUNT } = wd;
 
-                if (method === "approved") {
-                    // 1️⃣ Wallet balance se paisa minus karna
-                    const updateWalletSql = `
-              UPDATE users 
-              SET WALLET = WALLET - ? 
-              WHERE MOBILE = ?
-            `;
-                    await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
-                }
+              if (method === "approved") {
+                  // 1️⃣ Wallet se paisa minus karna
+                  // const updateWalletSql = `
+                  //     UPDATE users 
+                  //     SET WALLET = WALLET - ? 
+                  //     WHERE MOBILE = ?
+                  // `;
+                  // await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
 
-                // 2️⃣ Withdraw entry ka status update karna
-                const updateWithdrawSql = `
-            UPDATE WITHDRAW 
-            SET STATUS = ? 
-            WHERE ID = ?
-          `;
-                await req.db.query(updateWithdrawSql, [method, ID]);
-            }
+                  
 
-            return res.json({
-                success: true,
-                message:
-                    method === "approved"
-                        ? "Withdraws approved and wallet updated ✅"
-                        : "Withdraws cancelled successfully ❌",
-            });
-        } catch (err) {
-            console.error("Transaction Error:", err);
-            return res.status(500).json({
-                success: false,
-                message: "Failed to update withdraws ❌",
-            });
-        }
-    } catch (err) {
-        console.error("Approve Withdraw API Error:", err);
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error ❌",
-        });
-    }
+                  // Withdraw ko approved mark karo
+                  const updateWithdrawSql = `
+                      UPDATE WITHDRAW 
+                      SET STATUS = ? 
+                      WHERE ID = ?
+                  `;
+                  await req.db.query(updateWithdrawSql, [method, ID]);
+              } 
+              
+              else if (method === "cancelled") {
+                  // Sirf status update karna (wallet untouched)
+                  const updateWithdrawSql = `
+                      UPDATE WITHDRAW 
+                      SET STATUS = ? 
+                      WHERE ID = ?
+                  `;
+                  await req.db.query(updateWithdrawSql, [method, ID]);
+              } 
+              
+              else if (method === "reverse") {
+                  // ✅ Sirf approved withdraws ko reverse karna
+                  const [rows] = await req.db.query(
+                      "SELECT STATUS FROM WITHDRAW WHERE ID = ?",
+                      [ID]
+                  );
+
+                  if (rows.length > 0 && rows[0].STATUS === "approved") {
+                      // 1️⃣ Wallet me paisa wapas add karna
+                      const updateWalletSql = `
+                          UPDATE users 
+                          SET WALLET = WALLET + ? 
+                          WHERE MOBILE = ?
+                      `;
+                      await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
+
+                      // 2️⃣ Status wapas Pending karna
+                      const updateWithdrawSql = `
+                          UPDATE WITHDRAW 
+                          SET STATUS = 'pending' 
+                          WHERE ID = ?
+                      `;
+                      await req.db.query(updateWithdrawSql, [ID]);
+                  }
+              }
+          }
+
+          return res.json({
+              success: true,
+              message:
+                  method === "approved"
+                      ? "Withdraws approved and wallet updated ✅"
+                      : method === "cancelled"
+                      ? "Withdraws cancelled successfully ❌"
+                      : "Withdraws reversed and set back to Pending 🔄",
+          });
+      } catch (err) {
+          console.error("Transaction Error:", err);
+          return res.status(500).json({
+              success: false,
+              message: "Failed to update withdraws ❌",
+          });
+      }
+  } catch (err) {
+      console.error("Approve Withdraw API Error:", err);
+      return res.status(500).json({
+          success: false,
+          message: "Internal Server Error ❌",
+      });
+  }
 };
-
 
 
 
@@ -728,3 +957,39 @@ export const winningReportList = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
       }
   };
+
+  export const getWinningNumber = async (req, res) => {
+    const { date, gameId, result } = req.body;
+  
+    if (!date || !gameId || !result) {
+      return res.status(400).json({
+        success: false,
+        message: "date, gameId and result are required ❌",
+      });
+    }
+  
+    try {
+      const query = `
+        SELECT 
+          ID, DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE , STATUS, RESULT
+        FROM bets
+        WHERE DATE(DATE_TIME) = ? 
+          AND GAME_ID = ?
+          AND RESULT = ?
+      `;
+  
+      const [rows] = await req.db.query(query, [date, gameId, result]);
+  
+      return res.json({
+        success: true,
+        data: rows,
+      });
+    } catch (err) {
+      console.error("Error fetching bets:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error ❌",
+      });
+    }
+  };
+  

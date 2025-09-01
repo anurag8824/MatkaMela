@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios"
 import axiosInstance from "../Utils/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const EditResult = ({ initialId = "", apiBase }) => {
   const [games, setGames] = useState([]);
@@ -10,6 +11,7 @@ const EditResult = ({ initialId = "", apiBase }) => {
   const [remark, setRemark] = useState("");
   const [rId, setRId] = useState("");
   const [pattiOptions, setPattiOptions] = useState([]);
+  const navigate = useNavigate();
 
   console.log(selectedGameId);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
@@ -59,6 +61,7 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
       alert("Result updated successfully!");
       console.log("Response:", data);
+      navigate('/public/administrator/result/update-number'); // Redirect to manage results page
     } catch (error) {
       console.error("Error updating result:", error);
       alert("Something went wrong while updating the result!");

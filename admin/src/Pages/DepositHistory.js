@@ -81,8 +81,9 @@ const DepositHistory = () => {
   // ✅ Approve Single Entry
   const approveDeposit = async (row, method) => {
     try {
-      await axiosInstance.post("/admin/approve-deposits", {...row , method});
+      await axiosInstance.post("/admin/approve-deposits", { ...row, method });
       alert(`Deposit ${method} ✅`);
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Failed to approve deposit ❌");
@@ -101,6 +102,7 @@ const DepositHistory = () => {
       );
       await axiosInstance.post("/admin/approve-deposits", { deposits: selectedData, method });
       alert("Selected deposits approved ✅");
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Bulk approval failed ❌");
@@ -131,18 +133,25 @@ const DepositHistory = () => {
           onChange={(e) => setSearchMobile(e.target.value)}
           className="border p-2 rounded"
         />
-        { type === "pending" ? <button
+        {type === "pending" ? <button
           onClick={() => bulkApprove("approved")}
           className="bg-green-600 text-white px-3 py-1 rounded"
         >
           Approve
         </button> : ""}
 
-        { type === "pending" ? <button
+        {type === "pending" ? <button
           onClick={() => bulkApprove("cancelled")}
           className="bg-red-600 text-white px-3 py-1 rounded"
         >
           Cancel
+        </button> : ""}
+
+        {type === "approved" ? <button
+          onClick={() => bulkApprove("reverse")}
+          className="bg-red-600 text-white px-3 py-1 rounded hidden"
+        >
+          Reverse
         </button> : ""}
       </div>
 
@@ -175,7 +184,7 @@ const DepositHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredList.map((row , idx) => (
+              {filteredList.map((row, idx) => (
                 <tr key={row.ID}>
                   <td className="border p-2 text-center">
                     <input
@@ -194,16 +203,20 @@ const DepositHistory = () => {
                     {new Date(row.TIME).toLocaleString()}
                   </td>
                   <td className="border p-2">
-                   {type === "pending" ? <button
-                      onClick={() => approveDeposit(row , "approved")}
+                    {type === "pending" ? <button
+                      onClick={() => approveDeposit(row, "approved")}
                       className="bg-blue-600 text-white px-2 py-1 rounded"
                     >
                       Approve
-                    </button> : "Success"}
+                    </button> :
+
+                      <div>  {type === "cancelled" ? type : <button onClick={() => approveDeposit(row, "reverse")} className="bg-red-600 text-white px-2 py-1 rounded">Reverse</button>}</div>
+
+                    }
                   </td>
 
                   <td className="border p-2">
-                   {type === "pending" ? <button
+                    {type === "pending" ? <button
                       onClick={() => approveDeposit(row, "cancelled")}
                       className="bg-red-600 text-white px-2 py-1 rounded"
                     >

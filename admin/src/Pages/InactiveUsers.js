@@ -83,6 +83,7 @@ export default function InactiveUsers() {
 
       alert(res.data.message || "Transaction success!");
       setShowModal(false);
+      window.location.reload();
     } catch (err) {
       console.error("Transaction error:", err);
       alert("Transaction failed!");

@@ -67,11 +67,13 @@ function App() {
 
           
 
+          <Route path="result/winning-number" element={<WinningNumber />} />
    
 
 
           
           <Route path="result/update-number" element={<ManageResult />} />
+
           <Route path="edit-result/:id/:name" element={<EditResult />} />
           <Route path="login" element={<Login />} />
           <Route path="manage_starline" element={<ManageStarlineResult />} />

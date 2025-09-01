@@ -63,10 +63,12 @@ const Withdraw = () => {
       if (response.status === 200) {
         toast.success('Withdrawal request sent successfully!');
         setAmount('');
+        window.location.reload();
       }
+
     } catch (error) {
       console.error('Withdraw error:', error);
-      toast.error('Something went wrong. Try again.');
+      toast.error(error.response?.data?.message || 'Withdraw failed. Try again.');
     } finally {
       setLoading(false); // 👈 stop loading
     }
