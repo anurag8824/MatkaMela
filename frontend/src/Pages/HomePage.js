@@ -80,7 +80,7 @@ const HomePage = () => {
     const mobile = localStorage.getItem("mobile");
 
     if (!token || !mobile) {
-      navigate("/register"); // send to login if not authenticated
+      navigate("/login"); // send to login if not authenticated
     }
   }, [navigate]);
 

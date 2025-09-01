@@ -28,12 +28,12 @@ function Layout() {
         if (res?.data) {
           setUserinfo(res.data);
         } else {
-          navigate("/register");
+          navigate("/login");
         }
       })
       .catch((err) => {
         console.error("Auth Error:", err);
-        navigate("/register");
+        navigate("/login");
       })
       .finally(() => {
         setLoading(false); // 👈 loading false after response
