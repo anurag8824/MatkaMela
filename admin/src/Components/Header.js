@@ -206,7 +206,7 @@ const Header = () => {
 
 
 
-      <div className="w-full bg-[##094c73] px-3 py-2 shadow-md">
+      <div className="w-full bg-[##094c73] px-3 shadow-md">
         <div className="flex justify-between items-center">
           {/* Left: Hamburger + Badge + Home */}
           <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ const Header = () => {
             <img
               src="/images/blacklogo.png"
               alt="logo"
-              className="h-10"
+              className="h-16"
             />
           </div>
 

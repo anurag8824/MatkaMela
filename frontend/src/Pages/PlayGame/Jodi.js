@@ -52,7 +52,7 @@ const Jodi = () => {
     } catch (err) {
       console.error("API Error:", err);
       toast.error(err.response.data.message || "Error placing bet");
-    }finally {
+    } finally {
       setLoading(false); // ✅ Stop loading
     }
 
@@ -72,26 +72,32 @@ const Jodi = () => {
 
 
 
-        {Array.from({ length: 99 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex flex-col items-center justify-center gap-1"
-          >
-            {/* Number */}
-            <div className="number bg-[#094c73] text-white flex items-center justify-center w-full h-[52px] border border-[#094c73] text-center">
-              {String(i + 1).padStart(2, "0")}
-            </div>
+        {Array.from({ length: 100 }).map((_, i) => {
+          // 0 ko "00" banana hai, baaki ko 01..99
+          const number = i === 99 ? "00" : String(i + 1).padStart(2, "0");
 
-            {/* Input */}
-            <input
-              type="number"
-              inputmode="numeric"
-              value={bets[i]}
-              onChange={(e) => handleInputChange(i, e.target.value)}
-              className="w-full h-[33px] text-center border bg-transparent focus:outline-none"
-            />
-          </div>
-        ))}
+          return (
+            <div
+              key={i}
+              className="flex flex-col items-center justify-center gap-1"
+            >
+              {/* Number */}
+              <div className="number bg-[#094c73] text-white flex items-center justify-center w-full h-[52px] border border-[#094c73] text-center">
+                {number}
+              </div>
+
+              {/* Input */}
+              <input
+                type="number"
+                inputMode="numeric"
+                value={bets[i]}
+                onChange={(e) => handleInputChange(i, e.target.value)}
+                className="w-full h-[33px] text-center border bg-transparent focus:outline-none"
+              />
+            </div>
+          );
+        })}
+
       </div>
       {/* Place Bet Button */}
       <button

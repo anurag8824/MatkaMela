@@ -902,9 +902,9 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 
 
     // Process only win bets for wallet update
-    await ProcessWinningBets(req, updatedBets);
+    // await ProcessWinningBets(req, updatedBets);
 
-    await ProcessLossBets(req, LossBets);
+    // await ProcessLossBets(req, LossBets);
 
 
 

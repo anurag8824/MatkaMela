@@ -47,7 +47,7 @@ const Header = () => {
 
 
 
-      <div className="w-full bg-[#094c73] px-3 py-2 shadow-md">
+      <div className="w-full bg-[#094c73] px-3 shadow-md">
         <div className="flex justify-between items-center">
           {/* Left: Hamburger + Badge + Home */}
           <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ const Header = () => {
             <img
               src="/images/whitelogo.png"
               alt="logo"
-              className="h-10"
+              className="h-16"
             />
           </div>
 
@@ -108,7 +108,7 @@ const Header = () => {
               {/* Profile Top */}
               <div className="flex items-center justify-between mb-4">
                 <div className="profilephoto">
-                  <img src="/images/whitelogo.png" alt="Profile" className=" h-12 rounded-full" />
+                  <img src="/images/whitelogo.png" alt="Profile" className=" h-16 rounded-full" />
                 </div>
                 <Link to="/Profile" className="rounded font-medium text-xs text-blue-50 hover:underline">Edit Profile</Link>
               </div>
