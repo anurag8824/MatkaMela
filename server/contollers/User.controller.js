@@ -258,7 +258,7 @@ export const UserShop = async (req, res) => {
 };
 
 
-export const GetAllGame = async (req, res) => {
+export const GetAllGame2 = async (req, res) => {
   try {
     // Saare records fetch karna
     const [rows] = await req.db.query('SELECT * FROM games');
@@ -269,6 +269,106 @@ export const GetAllGame = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch games' });
   }
 };
+
+export const GetAllGame = async (req, res) => {
+  try {
+    // Yahan order by me teen cheezein handle ho rahi hain:
+    // 1. DISAWAR ko hamesha last me bhejne ke liye CASE
+    // 2. Baaki games ko position ke ascending order me
+    // 3. NULL position wale ko last me
+    const [rows] = await req.db.query(`
+      SELECT * FROM games
+      ORDER BY 
+        CASE WHEN NAME = 'DISAWAR' THEN 2 ELSE 1 END,   -- DISAWAR ko sabse last
+        CASE WHEN POSITION IS NULL THEN 1 ELSE 0 END,   -- NULL ko end me
+        POSITION ASC                                   -- Baaki ascending order
+    `);
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('Error fetching games:', err);
+    res.status(500).json({ error: 'Failed to fetch games' });
+  }
+};
+
+
+export const deleteGame = async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: "Game ID is required" });
+  }
+
+  try {
+    // Pehle check kar lete hain ki game exist karta hai ya nahi
+    const [rows] = await req.db.query("SELECT * FROM games WHERE ID = ?", [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+
+    // Game delete karte hain
+    await req.db.query("DELETE FROM games WHERE ID = ?", [id]);
+
+    return res.status(200).json({ message: "Game deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting game:", err);
+    return res.status(500).json({ error: "Failed to delete game" });
+  }
+}
+
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+
+    if (!mobile) {
+      return res.status(400).json({ error: "Mobile number is required" });
+    }
+
+   
+    // 1. Pehle user fetch karo
+    const [userRows] = await req.db.query("SELECT * FROM users WHERE mobile = ?", [mobile]);
+    if (userRows.length === 0) {
+    
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const user = userRows[0];
+    const userId = user.ID; // मान लिया users table ka primary key ID hai
+
+    // 2. Dusre users ke REFER_BY ko NULL kar do jinke refer_by = deleted_user.mobile
+    await req.db.query("UPDATE users SET REFER_BY = NULL WHERE REFER_BY = ?", [mobile]);
+
+    // 3. Bets delete (phone se match karke)
+    await req.db.query("DELETE FROM bets WHERE phone = ?", [mobile]);
+
+    // 4. Bank delete (mobile se match karke)
+    await req.db.query("DELETE FROM BANK WHERE mobile = ?", [mobile]);
+
+    // 5. Commission delete (phone se match karke)
+    await req.db.query("DELETE FROM commission WHERE phone = ?", [mobile]);
+
+    // 6. Payment Queue delete (user_id se match karke)
+    await req.db.query("DELETE FROM PAYMENT_QUEUE WHERE user_id = ?", [mobile]);
+
+    // 7. Withdraw delete (mobile se match karke)
+    await req.db.query("DELETE FROM WITHDRAW WHERE mobile = ?", [mobile]);
+
+    // 8. Ab main user delete karo
+    await req.db.query("DELETE FROM users WHERE mobile = ?", [mobile]);
+
+
+
+    return res.status(200).json({ message: "User and all related data deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting user and related data:", err);
+    return res.status(500).json({ error: "Failed to delete user and related data" });
+  }
+};
+
+
+
 
 
 // helpers/walletHelper.js

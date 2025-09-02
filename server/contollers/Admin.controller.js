@@ -233,6 +233,7 @@ export const editGame = async (req, res) => {
         NAME,
         TIME1,
         TIME2,
+        POSITION,
         RATE,
         PAGE,
         GUESS,
@@ -271,6 +272,7 @@ export const editGame = async (req, res) => {
                 NAME = ?,
                 TIME1 = ?,
                 TIME2 = ?,
+                POSITION = ?,
                 RATE = ?,
                 PAGE = ?,
                 GUESS = ?,
@@ -291,6 +293,7 @@ export const editGame = async (req, res) => {
             NAME,
             TIME1,
             TIME2,
+            POSITION,
             RATE,
             PAGE,
             GUESS,
@@ -635,10 +638,9 @@ export const approveWithdraws = async (req, res) => {
                       `;
                       await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
 
-                      // 2️⃣ Status wapas Pending karna
+                       // 2️⃣ Withdraw record ko delete karna
                       const updateWithdrawSql = `
-                          UPDATE WITHDRAW 
-                          SET STATUS = 'pending' 
+                          DELETE FROM WITHDRAW 
                           WHERE ID = ?
                       `;
                       await req.db.query(updateWithdrawSql, [ID]);

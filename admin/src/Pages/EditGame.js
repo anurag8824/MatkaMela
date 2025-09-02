@@ -12,6 +12,7 @@ export default function EditGame() {
     NAME: "",
     TIME1: "",
     TIME2: "",
+    POSITION: "",
     RATE: "",
     PAGE: "",
     GUESS: "",
@@ -110,6 +111,18 @@ export default function EditGame() {
             type="time"
             name="TIME2"
             value={formData.TIME2}
+            onChange={handleChange}
+            className="w-full p-2 border rounded-lg"
+          />
+        </div>
+
+        {/* Position */}
+        <div>
+          <label className="block font-semibold">Position</label>
+          <input
+            type="number"
+            name="POSITION"
+            value={formData.POSITION}
             onChange={handleChange}
             className="w-full p-2 border rounded-lg"
           />

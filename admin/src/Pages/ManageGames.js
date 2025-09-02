@@ -54,10 +54,10 @@ export default function ManageGames() {
     navigate(`/public/administrator/game/edit-game/${game}`)
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (ID) => {
     if (window.confirm("Are you sure you want to delete this game?")) {
       try {
-        await axios.delete(`/api/games/${id}`);
+        await axiosInstance.post(`/api/delete-game`, { id: ID });
         setMessage("Game Deleted!");
         fetchGames();
       } catch (error) {
@@ -212,17 +212,19 @@ export default function ManageGames() {
               <th>Game</th>
               <th>Open Time</th>
               <th>Close Time</th>
-              {/* <th>Holiday</th> */}
+              <th>Game Position</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {games.map((game) => (
+            {games.map((game, idx) => (
               <tr key={game.id}>
                 <td className="text-center">{game.ID}</td>
                 <td className="text-center">{game.NAME}</td>
                 <td className="text-center">{game.TIME1}</td>
                 <td className="text-center">{game.TIME2}</td>
+                <td className="text-center">{game.POSITION}</td>
+
                 <td className="text-center hidden">
                   <Form.Check
                     type="checkbox"
@@ -230,18 +232,18 @@ export default function ManageGames() {
                     onChange={() => handleHolidayChange(game.id)}
                   />
                 </td>
-                <td>
+                {game.NAME === "DISAWAR" ? "" : <td>
                   <Button variant="warning" size="sm" onClick={() => handleEdit(game.ID)}>
                     <i className="fa fa-pen"></i>
                   </Button>{" "}
-                  {/* <Button
+                  <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(game.id)}
+                    onClick={() => handleDelete(game.ID)}
                   >
                     <i className="fa fa-trash"></i>
-                  </Button> */}
-                </td>
+                  </Button>
+                </td>}
               </tr>
             ))}
             <tr>

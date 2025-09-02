@@ -32,7 +32,8 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
   // Fetch patti options
 
-
+  const today = new Date().toISOString().split("T")[0]; // 👉 YYYY-MM-DD format
+  const [date, setDate] = useState(today);
 
 
   const handleSubmit = async (e) => {
@@ -72,7 +73,7 @@ const EditResult = ({ initialId = "", apiBase }) => {
   return (
     <div className="container my-4">
       {/* Breadcrumb */}
-      <nav aria-label="breadcrumb">
+      {/* <nav aria-label="breadcrumb">
         <ol className="breadcrumb">
           <li className="breadcrumb-item">
             <a href="index.php">Home</a>
@@ -84,14 +85,24 @@ const EditResult = ({ initialId = "", apiBase }) => {
             Edit Result
           </li>
         </ol>
-      </nav>
+      </nav> */}
 
-      <h1 className="mb-4">Manage Result</h1>
+      {/* <h1 className="mb-4">Manage Result</h1> */}
+
+      <label className="block text-sm font-medium text-gray-600 mb-2">
+          Select Date:
+        </label>
+        <input
+          type="date"
+          value={date}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+
 
       <form onSubmit={handleSubmit} className="row g-3">
         {/* Game Selector */}
         <div className="col-lg-2">
-          <label className="form-label fw-bold">Game</label>
+          <label className="form-label fw-bold">Market</label>
           <select
             className="form-select"
             value={selectedGameId}
@@ -99,7 +110,7 @@ const EditResult = ({ initialId = "", apiBase }) => {
             required
           >
             <option value="" disabld>
-              Select Game
+              Select Market
             </option>
             {games.map((game) => (
               <option key={game.ID} value={game.ID}>
@@ -122,7 +133,7 @@ const EditResult = ({ initialId = "", apiBase }) => {
                 setResult1(val);
               }
             }}
-            placeholder="Enter Result "
+            placeholder="Declare Result "
             maxLength={2}
             required
           />

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import EditResult from "./EditResult";
 
 
 export default function ManageResult() {
@@ -65,6 +66,9 @@ export default function ManageResult() {
           Add Result
         </Link>
       </div> */}
+
+
+      <EditResult />
 
       {/* Results Table */}
       <div className="table-responsive">

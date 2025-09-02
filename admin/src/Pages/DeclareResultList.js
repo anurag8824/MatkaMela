@@ -62,8 +62,7 @@ const DeclareResultList = () => {
               <th>SR.</th>
               <th>Market ID</th>
               <th>Market Name</th>
-              <th>Result 1</th>
-              <th>Result 2</th>
+              <th>Result</th>
               <th>Date</th>
             </tr>
           </thead>
@@ -75,7 +74,6 @@ const DeclareResultList = () => {
                   <td>{item.GAME_ID}</td>
                   <td>{item.GAME_NAME}</td>
                   <td>{item.RESULT1}</td>
-                  <td>{item.RESULT2}</td>
                   <td>
                     {new Date(item.DATE).toLocaleString("en-IN", {
                       dateStyle: "medium",

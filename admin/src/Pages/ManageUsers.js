@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../Utils/axiosInstance";
+import { FiTrash } from "react-icons/fi";
+import { Alert } from "react-bootstrap";
 
 export default function ManageUsers() {
   const { id } = useParams();
@@ -16,6 +18,9 @@ export default function ManageUsers() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [transactionType, setTransactionType] = useState("");
   const [amount, setAmount] = useState("");
+
+    const [message, setMessage] = useState("");
+  
 
   const [mobileFilter, setMobileFilter] = useState(""); // New filter state
 
@@ -88,6 +93,27 @@ export default function ManageUsers() {
     }
   };
 
+
+  const handleDelete = async (mobile) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete user with mobile: ${mobile}?`
+    );
+
+    if (confirmDelete) {
+      try {
+        const res = await axiosInstance.post("/api/delete-user", { mobile });
+        if (res.status === 200) {
+          setMessage("User deleted successfully!");
+          // 🔄 Optional: refresh list after delete
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert("Failed to delete user.");
+      }
+    }
+  };
+
   return (
     <div className="content-wrapper p-3">
       {/* Page Header */}
@@ -108,6 +134,12 @@ export default function ManageUsers() {
           </div>
         </div>
       </div>
+
+      {message && (
+        <Alert variant="success" onClose={() => setMessage("")} dismissible>
+          {message}
+        </Alert>
+      )}
 
       <div className="text-right"><Link to={"/public/administrator/user/add-user"} className="btn btn-primary">Add User</Link></div>
 
@@ -145,8 +177,9 @@ export default function ManageUsers() {
                     <th>Balance</th>
                     <th>Refer By</th>
                     <th>State</th>
-
                     <th>Action</th>
+                    <th>Remove</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -180,22 +213,29 @@ export default function ManageUsers() {
                           }
                         }} className="btn btn-sm btn-outline-danger">{user.state}</button></td>
 
-                        <td className="text-center  gap-1 md:flex">
-                          
-
+                        <td className="text-center flex flex-col md:flex-row md:justify-center gap-2">
                           <button
-                            className="btn text-white bg-success"
+                            className="px-3 py-1 text-sm rounded-md text-white bg-green-600 hover:bg-green-700 transition"
                             onClick={() => handleOpenModal(user, "deposit")}
                           >
                             Deposit
                           </button>
                           <button
-                            className="btn text-white bg-danger"
+                            className="px-3 py-1 text-sm rounded-md text-white bg-red-600 hover:bg-red-700 transition"
                             onClick={() => handleOpenModal(user, "withdraw")}
                           >
                             Withdraw
                           </button>
 
+                        </td>
+
+                        <td>
+                          <button
+                            onClick={() => handleDelete(user.mobile)}
+                            className="p-1 rounded hover:bg-red-100 transition"
+                          >
+                            <FiTrash className="text-red-500 cursor-pointer w-5 h-5" />
+                          </button>
                         </td>
                       </tr>
                     ))

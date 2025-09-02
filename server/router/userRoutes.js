@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddBankDetails, AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getCommissions, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, payCommission, resultHistory, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
+import { AddBankDetails, AddMoney, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, deleteGame, deleteUser, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getCommissions, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, payCommission, resultHistory, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
 import upload from '../middlewares/upload.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -33,6 +33,12 @@ const buyFileFields = [
 router.post('/user-buy', authMiddleware, upload.fields(buyFileFields), UserShop);
 
 router.get('/get-games',  GetAllGame);
+
+router.post('/delete-game', authMiddleware ,  deleteGame);
+
+router.post('/delete-user', authMiddleware ,  deleteUser);
+
+
 
 router.post('/bet-game-jodi', authMiddleware,  BetGameJodi);
 router.post('/bet-game-manual',authMiddleware,  BetGameManual);
