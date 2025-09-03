@@ -3,16 +3,13 @@ import { Link } from "react-router-dom"
 import axiosInstance from "../Utils/axiosInstance";
 
 export default function HomePage() {
-  const [stats, setStats] = useState({
-    user_count: 0,
-    total_wallet: 0,
-    bet_count: 0,
-    payment_count: 0,
-    with_count: 0,
-  });
 
   const [dashboardData, setDashboardData] = useState({});
   const [selectedDate, setSelectedDate] = useState("");
+
+  const getToday = () => {
+    return new Date().toISOString().split("T")[0];
+  };
 
 
 
@@ -38,14 +35,12 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-
-
-    fetchDashboardData();
+    const today = getToday();
+    setSelectedDate(today);
+    fetchDashboardData(today);
   }, []);
 
-  const getToday = () => {
-    return new Date().toISOString().split("T")[0];
-  };
+ 
 
 
   const cards = [
@@ -110,11 +105,11 @@ export default function HomePage() {
     //     </>
     //   ),
     // },
-    
+
   ];
 
-   // 🔹 Dynamic cards (gamesData se)
-   const gameCards = dashboardData?.gamesData?.map((game) => ({
+  // 🔹 Dynamic cards (gamesData se)
+  const gameCards = dashboardData?.gamesData?.map((game) => ({
     title: game?.GAME,
     value: `Total Bid: ${game?.totalBid}`,
     icon: "fa-gamepad",
@@ -163,7 +158,11 @@ export default function HomePage() {
             </div>
             <div>
               <button
-                onClick={() => fetchDashboardData(getToday())}
+                 onClick={() => {
+          const today = getToday();
+          setSelectedDate(today); // ✅ input me bhi update ho
+          fetchDashboardData(today);
+        }}
                 className="btn btn-success m-0 ms-2"
               >
                 Refresh Today

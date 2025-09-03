@@ -213,8 +213,31 @@ const HomePage = () => {
               ></div>
             ))}
           </div>
-          <p className="text-blue-950 font-bold text-xl">{games[7]?.NAME}</p>
-          <span className="font-bold text-xl text-blue-950">{games[7]?.RESULT1 ? games[7]?.RESULT1 : "-"}</span>
+          {/* <p className="text-blue-950 font-bold text-xl">{games[7]?.NAME}</p>
+          <span className="font-bold text-xl text-blue-950">{games[7]?.RESULT1 ? games[7]?.RESULT1 : "-"}</span> */}
+
+          {(() => {
+            if (!games || games?.length === 0) return <p>No Results</p>;
+
+            // latest RESULT_TIME find karna
+            const latestGame = games?.reduce((latest, game) => {
+              if (!latest) return game;
+              return new Date(game.RESULT_TIME) > new Date(latest.RESULT_TIME) ? game : latest;
+            }, null);
+
+            return (
+              <>
+                <p className="text-blue-950 font-bold text-xl">{latestGame?.NAME}</p>
+                <span className="font-bold text-xl text-blue-950">
+                  {latestGame?.RESULT1 ? latestGame.RESULT1 : "-"}
+                </span>
+              </>
+            );
+          })()}
+
+
+
+
         </div>
 
 
@@ -226,7 +249,7 @@ const HomePage = () => {
         <div className="relative bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 p-0.5 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02]">
 
           {/* Inner Content */}
-          <div style={{background: "linear-gradient(15deg, rgb(113 9 238), rgb(241 15 15))"}} className=" backdrop-blur-sm rounded-xl p-1 relative overflow-hidden">
+          <div style={{ background: "linear-gradient(15deg, rgb(113 9 238), rgb(241 15 15))" }} className=" backdrop-blur-sm rounded-xl p-1 relative overflow-hidden">
 
             {/* Animated Background Pattern */}
             <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-indigo-50/50 opacity-50"></div>
@@ -243,7 +266,7 @@ const HomePage = () => {
             <div className="relative z-10 text-center">
 
               {/* Icon Container */}
-            
+
 
               {/* Main Text */}
               <h2 className="text-xl text-white font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">

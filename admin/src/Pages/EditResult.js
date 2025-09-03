@@ -32,8 +32,9 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
   // Fetch patti options
 
-  const today = new Date().toISOString().split("T")[0]; // 👉 YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]; // 👉 YYYY-MM-DD
   const [date, setDate] = useState(today);
+  
 
 
   const handleSubmit = async (e) => {
@@ -51,6 +52,7 @@ const EditResult = ({ initialId = "", apiBase }) => {
       openResult: result1,
       closeResult: result2,
       remark, // agar remark bhi bhejna hai to
+      resultDate: date,
     };
 
     try {
@@ -72,31 +74,16 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
   return (
     <div className="container my-4">
-      {/* Breadcrumb */}
-      {/* <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <a href="index.php">Home</a>
-          </li>
-          <li className="breadcrumb-item">
-            <a href="manage_result.php">Manage Result</a>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            Edit Result
-          </li>
-        </ol>
-      </nav> */}
-
-      {/* <h1 className="mb-4">Manage Result</h1> */}
 
       <label className="block text-sm font-medium text-gray-600 mb-2">
-          Select Date:
-        </label>
-        <input
-          type="date"
-          value={date}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+        Select Date:
+      </label>
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
 
 
       <form onSubmit={handleSubmit} className="row g-3">

@@ -75,25 +75,29 @@ export default function ManageResult() {
         <table className="table table-bordered">
           <thead className="bg-primary text-white text-center">
             <tr>
+            <th>SR.</th>
               <th>Game</th>
               <th>Result</th>
               {/* <th>Result 2</th> */}
-              <th>Today's<br />Result</th>
-              {/* <th>Old<br />Result</th> */}
+              {/* <th>Today's<br />Result</th> */}
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            {games.length > 0 ? (
-              games.map((game) => (
-                <tr key={game.ID}>
+            {games?.length > 0 ? (
+              games?.map((game , idx) => (
+                <tr key={game.ID} className="text-center">
+                  <td>{idx + 1}</td>
                   <td>{game.NAME}</td>
                   <td>{game.RESULT1 || ""}</td>
                   {/* <td>{game.RESULT2 || ""}</td> */}
-                  <td className="text-center">
+                  {/* <td className="text-center">
                     <Link to={`/public/administrator/edit-result/${game.ID}/${game.PAGE}`}>
                       <i className="fa fa-pen"></i>
                     </Link>
-                  </td>
+                  </td> */}
+                  <td>{new Date().toLocaleDateString()}</td>
+
                   {/* <td className="text-center">
                     <Link to={`/update_result/${game.ID}`}>
                       <i className="fa fa-pen"></i>

@@ -112,17 +112,13 @@ export default function ResultCalendar() {
         return new Date(currentYear, selectedMonth, i + 1); // full date object
     });
 
+    const formatDate = (d) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
     // ✅ Helper: get result for a game & date
-    const getResultForGame = (gameId, date) => {
-        const dateString = new Date(currentYear, selectedMonth, date)
-            .toISOString()
-            .split("T")[0]; // yyyy-mm-dd
-
-        const result = results.find((r) => {
-            const resultDate = new Date(r.DATE).toISOString().split("T")[0];
-            return r.GAME_ID === String(gameId) && resultDate === dateString;
-        });
-
+    const getResultForGame = (gameId, dateObj) => {
+        const dateString = formatDate(dateObj);
+        const result = results.find((r) => formatDate(new Date(r.DATE)) === dateString && r.GAME_ID === String(gameId));
         return result ? result.RESULT1 : "";
     };
 
@@ -171,7 +167,7 @@ export default function ResultCalendar() {
 
                                     {games.map((game) => (
                                         <td key={game.ID} className="border px-2 py-1 text-green-600">
-                                            {getResultForGame(game.ID, dateObj.getDate())}
+                                        {getResultForGame(game.ID, dateObj)} 
                                         </td>
                                     ))}
                                 </tr>

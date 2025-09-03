@@ -34,10 +34,19 @@ const Jodi = () => {
   const handlePlaceBet = async () => {
     // Sirf filled inputs ka array banao
     const filledBets = bets
-      .map((val, index) => ({
-        number: String(index + 1).padStart(2, "0"), // 01, 02, ...
-        value: val
-      }))
+      .map((val, index) => {
+        let number;
+        if (index === 99) {
+          number = "00"; // ✅ last index pe "00"
+        } else {
+          number = String(index + 1).padStart(2, "0"); // 01, 02 ... 99
+        }
+    
+        return {
+          number,
+          value: val,
+        };
+      })
       .filter((item) => item.value.trim() !== "");
 
     console.log("Filled Bets:", filledBets); // Send se pehle console

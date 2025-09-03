@@ -678,6 +678,7 @@ export const BetGameCopyPaste = async (req, res) => {
 
 //update win_amount in bets and user of WIN bets 
 export const ProcessWinningBets = async (req, updatedBets) => {
+  console.log("Processing winning bets:", updatedBets);
   try {
     if (!updatedBets.length) {
       console.log("⚠️ No winning bets to process");
@@ -689,23 +690,23 @@ export const ProcessWinningBets = async (req, updatedBets) => {
 
     for (const bet of updatedBets) {
       // 1. Fetch game rate
-      const [gameRows] = await req.db.query("SELECT RATE FROM games WHERE ID = ?", [bet.gameId]);
+      const [gameRows] = await req.db.query("SELECT RATE FROM games WHERE ID = ?", [bet.GAME_ID]);
       if (!gameRows.length) continue;
 
       const rate = parseFloat(gameRows[0].RATE) || 1.5;
-      const winAmount = bet.point * rate;
+      const winAmount = bet.POINT * rate;
 
       // 2. Update bet with WIN_AMOUNT
       await req.db.query(
         "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
-        [winAmount, bet.betId]
+        [winAmount, bet.ID]
       );
 
       // 3. Collect user’s total win
-      if (!userWins[bet.user]) {
-        userWins[bet.user] = 0;
+      if (!userWins[bet.PHONE]) {
+        userWins[bet.PHONE] = 0;
       }
-      userWins[bet.user] += winAmount;
+      userWins[bet.PHONE] += winAmount;
     }
 
     // 4. Update each user wallet
@@ -728,6 +729,40 @@ export const ProcessWinningBets = async (req, updatedBets) => {
 
   } catch (err) {
     console.error("Error processing winning bets:", err);
+  }
+};
+
+// ye hai admin jo winniing number se update krega data users ki bets ko 
+export const AdminUpdateBetsStatus = async (req, res) => {
+  try {
+    const { type, finalBets } = req.body;
+    console.log("Request body for updating bets:", req.body);
+
+    if (!finalBets || !finalBets.length) {
+      return res.status(400).json({ success: false, message: "No bets provided" });
+    }
+
+    console.log("📩 Received bets update:", type, finalBets);
+
+    if (type === "paid") {
+      // ✅ Wallet update + Win_Amount update
+      await ProcessWinningBets(req, finalBets);
+    } else if (type === "unpaid") {
+      // 🔹 Placeholder for future
+      console.log("⏸ Unpaid logic hold");
+    } else if (type === "lost") {
+      console.log("⏸ Lost logic hold");
+    } else if (type === "unLost") {
+      console.log("⏸ UnLost logic hold");
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Bets updated successfully for type: ${type}`
+    });
+  } catch (err) {
+    console.error("❌ Error updating bets:", err);
+    return res.status(500).json({ success: false, message: "Failed to update bets" });
   }
 };
 
@@ -791,7 +826,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
   try {
     const { GAME_ID, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste, DATE } = resultRow;
 
-    // console.log(resultRow, "resutl Row")
+    console.log(resultRow, "resutl Row")
 
     // Fetch bets of that gameId & same date
     const betsQuery = `
@@ -800,7 +835,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       AND DATE(DATE_TIME) = DATE(?)
     `;
     const [bets] = await req.db.query(betsQuery, [GAME_ID, DATE]);
-    // console.log(bets, "betss ki non result ")
+    console.log(bets, "betss ki non result ")
 
     if (!bets.length) {
       console.log("No bets found for this game and date.");
@@ -818,12 +853,12 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
       switch (bet.TYPE) {
         case "Jodi":
           expectedResult = Jodi;
-          status = bet.number === Jodi ? "Win" : "Loss";
+          status = bet.number == Jodi ? "Win" : "Loss";
           break;
 
         case "Manual":
           expectedResult = Manual; // ex: "56"
-          status = bet.number === Manual ? "Win" : "Loss";
+          status = bet.number == Manual ? "Win" : "Loss";
           break;
 
         case "AndarHaraf": {
@@ -834,7 +869,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
           const betDigit = bet.number[0];
 
           expectedResult = andarValue; // "5"
-          status = betDigit === andarValue ? "Win" : "Loss";
+          status = betDigit == andarValue ? "Win" : "Loss";
           break;
         }
 
@@ -845,18 +880,18 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
           const betDigit = bet.number[0]; // e.g. "777" → "7"
 
           expectedResult = baharValue; // "6"
-          status = betDigit === baharValue ? "Win" : "Loss";
+          status = betDigit == baharValue ? "Win" : "Loss";
           break;
         }
 
         case "Crossing":
           expectedResult = Crossing; // ex: "56"
-          status = bet.number === Crossing ? "Win" : "Loss";
+          status = bet.number == Crossing ? "Win" : "Loss";
           break;
 
         case "CopyPaste":
           expectedResult = CopyPaste; // ex: "56"
-          status = bet.number === CopyPaste ? "Win" : "Loss";
+          status = bet.number == CopyPaste ? "Win" : "Loss";
           break;
       }
 
@@ -881,6 +916,7 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
         });
       }
 
+      // isme bhi dekhna hoga ki LossBets me kya kya bhejna hai with kya kya vale name hai 
       if (status === "Loss") {
         LossBets.push({
           gameId: GAME_ID,
@@ -915,12 +951,15 @@ export const UpdateBetsWithResults = async (req, resultRow) => {
 };
 
 
-
 export const CalculateGameResults = async (req, res) => {
   console.log(req.body, "chcck")
   try {
-    const { openResult, closeResult, gameId, game_name } = req.body;
+    const { openResult, closeResult, gameId, game_name , resultDate } = req.body;
     console.log(req.body, "reqbody")
+
+    if (!resultDate) {
+      resultDate = new Date().toISOString().split("T")[0];
+    }
 
     // ✅ Ek hi result declare hota hai
     const result = openResult.toString();
@@ -947,8 +986,8 @@ export const CalculateGameResults = async (req, res) => {
     // ✅ Pehle check karo same GAME_ID + DATE entry exist karti hai ya nahi
     const [existingRows] = await req.db.query(
       `SELECT * FROM RESULT 
-       WHERE GAME_ID = ? AND DATE(DATE) = CURDATE()`,
-      [gameId]
+       WHERE GAME_ID = ? AND DATE(DATE) = ?`,
+      [gameId, resultDate]
     );
 
 
@@ -960,7 +999,7 @@ export const CalculateGameResults = async (req, res) => {
         SET GAME_NAME = ?, RESULT1 = ?, RESULT2 = ?, 
             Jodi = ?, Manual = ?, andarHaraf = ?, baharHaraf = ?, 
             Crossing = ?, CopyPaste = ?
-        WHERE GAME_ID = ? AND DATE(DATE) = CURDATE()
+        WHERE GAME_ID = ? AND DATE(DATE) = ?
       `;
 
       await req.db.query(updateQuery, [
@@ -973,7 +1012,8 @@ export const CalculateGameResults = async (req, res) => {
         harraf.baharHaraf,
         crossingNumbers,
         copyPasteResult,
-        gameId
+        gameId,
+        resultDate,
       ]);
 
     } else {
@@ -981,7 +1021,7 @@ export const CalculateGameResults = async (req, res) => {
       const insertQuery = `
         INSERT INTO RESULT 
         (GAME_ID, GAME_NAME, RESULT1, RESULT2, Jodi, Manual, andarHaraf, baharHaraf, Crossing, CopyPaste, DATE)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       await req.db.query(insertQuery, [
@@ -994,14 +1034,15 @@ export const CalculateGameResults = async (req, res) => {
         harraf.andarHaraf,
         harraf.baharHaraf,
         crossingNumbers,
-        copyPasteResult
+        copyPasteResult,
+        resultDate,
       ]);
     }
 
     // ✅ Ab naya/latest result nikal lo
     const [insertedRows] = await req.db.query(
-      "SELECT * FROM RESULT WHERE GAME_ID = ? AND DATE(DATE) = CURDATE() LIMIT 1",
-      [gameId]
+      "SELECT * FROM RESULT WHERE GAME_ID = ? AND DATE(DATE) = ? LIMIT 1",
+      [gameId, resultDate]
     );
 
     if (insertedRows.length) {
@@ -1025,7 +1066,8 @@ export const CalculateGameResults = async (req, res) => {
       Manual: manualWinningNumbers,
       Harraf: harraf,
       Crossing: crossingNumbers,
-      CopyPaste: copyPasteResult
+      CopyPaste: copyPasteResult,
+      date: resultDate
     };
 
     // console.log("Calculated Game Results:", resultObj);
@@ -1034,6 +1076,7 @@ export const CalculateGameResults = async (req, res) => {
       success: true,
       message: "Results calculated and saved successfully",
       results: resultObj
+      
     });
 
 
