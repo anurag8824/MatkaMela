@@ -228,7 +228,11 @@ const WithdrawHistory = () => {
                         </button>
                       </>
                     ) : (
-                     <button     onClick={() => approveWithdraw(row, "reverse")} className="bg-red-600 text-white px-2 py-1 rounded">Reverse</button>
+                      <div>
+                    { type === "cancelled" ? type : <button  onClick={() => approveWithdraw(row, "reverse")} className="bg-red-600 text-white px-2 py-1 rounded">Reverse</button>}
+
+
+                      </div>
                     )}
                   </td>
                   <td className="border p-2">{type}</td>

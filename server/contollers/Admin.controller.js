@@ -613,7 +613,10 @@ export const approveWithdraws = async (req, res) => {
               } 
               
               else if (method === "cancelled") {
-                  // Sirf status update karna (wallet untouched)
+                  const updateWalletSql = `UPDATE users SET WALLET = WALLET + ? WHERE MOBILE = ?`;
+
+                  await req.db.query(updateWalletSql, [parseFloat(AMOUNT), MOBILE]);
+                  // Sirf status 
                   const updateWithdrawSql = `
                       UPDATE WITHDRAW 
                       SET STATUS = ? 
