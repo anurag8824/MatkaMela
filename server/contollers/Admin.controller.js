@@ -963,7 +963,7 @@ export const winningReportList = async (req, res) => {
       }
   };
 
-  export const getWinningNumber = async (req, res) => {
+export const getWinningNumberold = async (req, res) => {
     const { date, gameId, result } = req.body;
   
     if (!date || !gameId || !result) {
@@ -989,6 +989,100 @@ export const winningReportList = async (req, res) => {
         success: true,
         data: rows,
       });
+    } catch (err) {
+      console.error("Error fetching bets:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error ❌",
+      });
+    }
+  };
+  
+
+  export const getWinningNumber = async (req, res) => {
+    const { date, gameId, result } = req.body;
+  
+    if (!date || !gameId || !result) {
+      return res.status(400).json({
+        success: false,
+        message: "date, gameId and result are required ❌",
+      });
+    }
+  
+    try {
+      // Step 1: Check if any bets exist with given RESULT
+      const resultQuery = `
+        SELECT 
+          ID, DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
+        FROM bets
+        WHERE DATE(DATE_TIME) = ?
+          AND GAME_ID = ?
+          AND RESULT = ?
+      `;
+      const [resultRows] = await req.db.query(resultQuery, [date, gameId, result]);
+  
+      if (resultRows.length > 0) {
+        // Only return rows where STATUS = 'win'
+        const winningBets = resultRows.filter(bet => bet.STATUS === 'Win');
+
+          // Extra check: also fetch bets where RESULT is any digit of given result
+      const digits = result.split(""); // "15" => ["1","5"]
+
+      if (digits.length > 1) {
+        const placeholders = digits.map(() => "?").join(",");
+        const digitQuery = `
+          SELECT 
+            ID, DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
+          FROM bets
+          WHERE DATE(DATE_TIME) = ?
+            AND GAME_ID = ?
+            AND RESULT IN (${placeholders})
+        `;
+        const [digitRows] = await req.db.query(digitQuery, [date, gameId, ...digits]);
+
+           // ✅ Filter digit bets also where STATUS = 'Win'
+           const winningDigitBets = digitRows.filter(bet => bet.STATUS === "Win");
+
+        // Merge both exact matches + digit matches
+        // (avoid duplicates if same bet appears)
+        const allRows = [...winningBets, ...winningDigitBets];
+        const uniqueRows = Array.from(
+          new Map(allRows.map(item => [item.ID, item])).values()
+        );
+
+        return res.json({
+          success: true,
+          type: "matched_result_with_digits",
+          data: uniqueRows,
+        });
+      }
+
+
+
+        return res.json({
+          success: true,
+          type: "matched_result",
+          data: winningBets,
+        });
+      }
+  
+      // Step 2: If no result match, check by NUMBER
+      const numberQuery = `
+        SELECT 
+          ID, DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
+        FROM bets
+        WHERE DATE(DATE_TIME) = ?
+          AND GAME_ID = ?
+          AND NUMBER = ?
+      `;
+      const [numberRows] = await req.db.query(numberQuery, [date, gameId, result]);
+  
+      return res.json({
+        success: true,
+        type: "matched_number",
+        data: numberRows,
+      });
+  
     } catch (err) {
       console.error("Error fetching bets:", err);
       return res.status(500).json({
