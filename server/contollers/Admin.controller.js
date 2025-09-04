@@ -814,7 +814,7 @@ export const getAllBetsGameLoad = async (req, res) => {
     try {
       // SQL query to get all bets (no phone filter)
       const [bets] = await req.db.query(
-        `SELECT id, number, point, type, game, game_id, date_time, status, result, phone
+        `SELECT id, number, point, type, game, game_id, DATE_FORMAT(date_time, '%Y-%m-%d %H:%i:%s') as date_time, status, result, phone
          FROM bets
          WHERE type IN ('Jodi', 'AndarHaraf', 'BaharHaraf')
          ORDER BY id DESC`
