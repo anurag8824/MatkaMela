@@ -64,20 +64,21 @@ const GameLoad = () => {
       }, [bets, selectedDate, selectedGame, applyFilter]);
 
   // 🔹 Helper to group bets by type
-  const groupByType = (type) => {
-    const filtered = filteredBets.filter((b) => b.type === type);
-    const map = {};
-    let total = 0;
-    filtered.forEach((b) => {
-      map[b.number] = (map[b.number] || 0) + b.point;
-      total += b.point;
-    });
-    return { map, total };
-  };
+const groupByType = (types) => {
+  const filtered = filteredBets?.filter((b) => types.includes(b.type));
+  const map = {};
+  let total = 0;
+  filtered.forEach((b) => {
+    map[b.number] = (map[b.number] || 0) + b.point;
+    total += b.point;
+  });
+  return { map, total };
+};
 
-  const jodi = groupByType("Jodi");
-  const andarHaraf = groupByType("AndarHaraf");
-  const baharHaraf = groupByType("BaharHaraf");
+// 🔹 Merge Jodi + Crossing + CopyPaste together
+const jodi = groupByType(["Jodi", "Crossing", "CopyPaste"]);
+const andarHaraf = groupByType(["AndarHaraf"]);
+const baharHaraf = groupByType(["BaharHaraf"]);
 
   const grandTotal = jodi.total + andarHaraf.total + baharHaraf.total;
 

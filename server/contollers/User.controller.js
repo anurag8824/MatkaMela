@@ -694,7 +694,13 @@ export const ProcessWinningBets = async (req, updatedBets) => {
       if (!gameRows.length) continue;
 
       const rate = parseFloat(gameRows[0].RATE) || 1.5;
-      const winAmount = bet.POINT * rate;
+     // 2. Calculate win amount (special case for AndarHaraf & BaharHaraf)
+     let winAmount = 0;
+     if (bet.TYPE === "AndarHaraf" || bet.TYPE === "BaharHaraf") {
+       winAmount = (rate / 10) * bet.POINT;
+     } else {
+       winAmount = rate * bet.POINT;
+     }
 
       // 2. Update bet with WIN_AMOUNT
       await req.db.query(

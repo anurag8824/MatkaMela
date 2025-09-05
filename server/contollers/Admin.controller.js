@@ -816,7 +816,7 @@ export const getAllBetsGameLoad = async (req, res) => {
       const [bets] = await req.db.query(
         `SELECT id, number, point, type, game, game_id, DATE_FORMAT(date_time, '%Y-%m-%d %H:%i:%s') as date_time, status, result, phone
          FROM bets
-         WHERE type IN ('Jodi', 'AndarHaraf', 'BaharHaraf')
+         WHERE type IN ('Jodi', 'AndarHaraf', 'BaharHaraf' , 'Manual' , 'Crossing' , 'CopyPaste' )
          ORDER BY id DESC`
       );
   
