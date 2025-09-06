@@ -13,6 +13,9 @@ const EditResult = ({ initialId = "", apiBase }) => {
   const [pattiOptions, setPattiOptions] = useState([]);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
+
   console.log(selectedGameId);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -34,11 +37,12 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
   const today = new Date().toISOString().split("T")[0]; // 👉 YYYY-MM-DD
   const [date, setDate] = useState(today);
-  
+
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     // Selected game ka name nikalna
     const selectedGame = games.find((game) => game.ID === selectedGameId);
@@ -64,10 +68,12 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
       alert("Result updated successfully!");
       console.log("Response:", data);
-      navigate('/public/administrator/result/update-number'); // Redirect to manage results page
+      window.location.href = '/public/administrator/result/update-number'; // Redirect to manage results page
     } catch (error) {
       console.error("Error updating result:", error);
       alert("Something went wrong while updating the result!");
+    } finally {
+      setLoading(false); // Stop loading after request completes
     }
   };
 
@@ -147,8 +153,12 @@ const EditResult = ({ initialId = "", apiBase }) => {
 
         {/* Update Button */}
         <div className="col-lg-4 d-flex align-items-end">
-          <button type="submit" className="btn btn-success">
-            Update
+          <button
+            type="submit"
+            className="btn btn-success"
+            disabled={loading}  // disable while loading
+          >
+            {loading ? "Updating..." : "Update"}
           </button>
         </div>
       </form>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import EditResult from "./EditResult";
+import ResultCalendar from "./History";
 
 
 export default function ManageResult() {
@@ -70,6 +71,9 @@ export default function ManageResult() {
 
       <EditResult />
 
+<div className="flex items-center mb-3 justify-content-end">
+      <a href={"#result"}  className="btn btn-sm underline bg-gray-300 hover:bg-gray-400 text-black"> View Result History</a></div>
+
       {/* Results Table */}
       <div className="table-responsive">
         <table className="table table-bordered">
@@ -115,6 +119,8 @@ export default function ManageResult() {
           </tbody>
         </table>
       </div>
+
+     <div id="result"><ResultCalendar/></div> 
     </div>
   );
 }
