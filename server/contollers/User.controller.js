@@ -738,6 +738,191 @@ export const ProcessWinningBets = async (req, updatedBets) => {
   }
 };
 
+// helper function
+const formatDateTime = (isoString) => {
+  const d = new Date(isoString);
+  const pad = (n) => (n < 10 ? "0" + n : n);
+
+  return (
+    d.getFullYear() +
+    "-" +
+    pad(d.getMonth() + 1) +
+    "-" +
+    pad(d.getDate()) +
+    " " +
+    pad(d.getHours()) +
+    ":" +
+    pad(d.getMinutes()) +
+    ":" +
+    pad(d.getSeconds())
+  );
+};
+
+
+export const ProcessLossBets = async (req, LossBets) => {
+  console.log(LossBets ,"Loss betsfor calicua winnig numerb")
+  try {
+    if (!LossBets.length) {
+      console.log("⚠️ No loss bets to process");
+      return;
+    }
+
+    for (const bet of LossBets) {
+      // 1. Update bet WIN_AMOUNT = 0
+      await req.db.query(
+        "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
+        [0, bet.ID]
+      );
+
+      // 2. Get user info
+      const [users] = await req.db.query("SELECT REFER_BY FROM users WHERE mobile = ?", [bet.PHONE]);
+      if (!users.length) continue;
+
+      const referBy = users[0].REFER_BY;
+      if (!referBy) {
+        console.log(`ℹ️ Bet ${bet.ID} user ${bet.PHONE} has no refer_by`);
+        continue;
+      }
+
+      // 3. Calculate 5% commission
+      const commission = (parseFloat(bet.POINT) * 5) / 100;
+
+       // 4. Format DATE_TIME properly
+       const formattedDateTime = formatDateTime(bet.DATE_TIME);
+
+      // 4. Insert entry in commission table (wallet update nahi karna)
+      const insertQuery = `
+        INSERT INTO commission 
+        (betId, betuser, DATE_TIME, phone, point, GAME_ID, GAME, Pay, STATUS, earn)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      await req.db.query(insertQuery, [
+        bet.ID,            // betId
+        bet.PHONE,         // betuser
+        formattedDateTime,     // DATE_TIME
+        referBy,              // phone (refer_by user)
+        bet.POINT,            // point
+        bet.GAME_ID,           // GAME_ID
+        bet.TYPE,             // GAME
+        "pending",            // Pay
+        bet.STATUS,           // STATUS
+        commission            // earn
+      ]);
+
+      console.log(`✅ Commission entry created for referBy ${referBy} from bet ${bet.ID}`);
+    }
+  } catch (err) {
+    console.error("Error processing loss bets:", err);
+  }
+};
+
+//update reversere win_amount in bets and user of WIN bets 
+export const ReverseWinningBets = async (req, updatedBets) => {
+  console.log("Reverse winning bets:", updatedBets);
+  try {
+    if (!updatedBets.length) {
+      console.log("⚠️ No winning bets to process");
+      return;
+    }
+
+    // Group wins by user
+    let userWins = {};
+
+    for (const bet of updatedBets) {
+      // 1. Fetch game rate
+      const [gameRows] = await req.db.query("SELECT RATE FROM games WHERE ID = ?", [bet.GAME_ID]);
+      if (!gameRows.length) continue;
+
+      const rate = parseFloat(gameRows[0].RATE) || 1.5;
+     // 2. Calculate win amount (special case for AndarHaraf & BaharHaraf)
+     let winAmount = 0;
+     if (bet.TYPE === "AndarHaraf" || bet.TYPE === "BaharHaraf") {
+       winAmount = (rate / 10) * bet.POINT;
+     } else {
+       winAmount = rate * bet.POINT;
+     }
+
+     
+
+      // 3. Collect user’s total win
+      if (!userWins[bet.PHONE]) {
+        userWins[bet.PHONE] = 0;
+      }
+      userWins[bet.PHONE] += winAmount;
+
+       // ✅ Reset WIN_AMOUNT in bets table to 0 (since we are reversing)
+       await req.db.query("UPDATE bets SET WIN_AMOUNT = 0 WHERE ID = ?", [bet.ID]);
+    }
+
+    // 4. Update each user wallet
+    for (const mobile in userWins) {
+      const winTotal = userWins[mobile];
+
+      // fetch wallet
+      const [users] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [mobile]);
+      if (!users.length) continue;
+
+      let wallet = parseFloat(users[0].wallet);
+      if (isNaN(wallet)) wallet = 0;
+
+         // ensure wallet never goes below 0
+      let newWallet = wallet - winTotal;
+      if (newWallet < 0) newWallet = 0;
+
+      await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, mobile]);
+
+      console.log(`✅ Wallet updated: ${mobile} +${winTotal} → ${newWallet}`);
+    }
+
+  } catch (err) {
+    console.error("Error processing winning bets:", err);
+  }
+};
+
+
+// ✅ Change status from WIN → LOSS
+export const StatustoLossBets = async (req, updatedBets) => {
+  console.log("Changing WIN bets to LOSS:", updatedBets);
+  try {
+    if (!updatedBets.length) {
+      console.log("⚠️ No bets to update");
+      return;
+    }
+
+    for (const bet of updatedBets) {
+      await req.db.query(
+        "UPDATE bets SET STATUS = 'Loss' WHERE ID = ? AND STATUS = 'Win'",
+        [bet.ID]
+      );
+      console.log(`🔄 Bet ${bet.ID} → WIN → LOSS`);
+    }
+  } catch (err) {
+    console.error("❌ Error changing bets to LOSS:", err);
+  }
+};
+
+// ✅ Change status from LOSS → WIN
+export const StatustoWinBets = async (req, updatedBets) => {
+  console.log("Changing LOSS bets to WIN:", updatedBets);
+  try {
+    if (!updatedBets.length) {
+      console.log("⚠️ No bets to update");
+      return;
+    }
+
+    for (const bet of updatedBets) {
+      await req.db.query(
+        "UPDATE bets SET STATUS = 'Win' WHERE ID = ? AND STATUS = 'Loss'",
+        [bet.ID]
+      );
+      console.log(`🔄 Bet ${bet.ID} → LOSS → WIN`);
+    }
+  } catch (err) {
+    console.error("❌ Error changing bets to WIN:", err);
+  }
+};
+
+
 // ye hai admin jo winniing number se update krega data users ki bets ko 
 export const AdminUpdateBetsStatus = async (req, res) => {
   try {
@@ -751,15 +936,23 @@ export const AdminUpdateBetsStatus = async (req, res) => {
     console.log("📩 Received bets update:", type, finalBets);
 
     if (type === "paid") {
-      // ✅ Wallet update + Win_Amount update
-      await ProcessWinningBets(req, finalBets);
+         // ✅ Separate WIN and LOSS bets
+      const winBets = finalBets.filter(bet => bet.STATUS === "Win");
+      const lossBets = finalBets.filter(bet => bet.STATUS === "Loss");
+     
+      if (winBets.length) {
+        await ProcessWinningBets(req, winBets);
+      }
+      if (lossBets.length) {
+        await ProcessLossBets(req, lossBets);
+      }
     } else if (type === "unpaid") {
-      // 🔹 Placeholder for future
+      await ReverseWinningBets(req, finalBets);
       console.log("⏸ Unpaid logic hold");
     } else if (type === "lost") {
-      console.log("⏸ Lost logic hold");
+      await StatustoLossBets(req, finalBets);
     } else if (type === "unLost") {
-      console.log("⏸ UnLost logic hold");
+      await StatustoWinBets(req, finalBets);
     }
 
     return res.status(200).json({
@@ -774,58 +967,6 @@ export const AdminUpdateBetsStatus = async (req, res) => {
 
 
 
-export const ProcessLossBets = async (req, LossBets) => {
-  try {
-    if (!LossBets.length) {
-      console.log("⚠️ No loss bets to process");
-      return;
-    }
-
-    for (const bet of LossBets) {
-      // 1. Update bet WIN_AMOUNT = 0
-      await req.db.query(
-        "UPDATE bets SET WIN_AMOUNT = ? WHERE ID = ?",
-        [0, bet.betId]
-      );
-
-      // 2. Get user info
-      const [users] = await req.db.query("SELECT REFER_BY FROM users WHERE mobile = ?", [bet.user]);
-      if (!users.length) continue;
-
-      const referBy = users[0].REFER_BY;
-      if (!referBy) {
-        console.log(`ℹ️ Bet ${bet.betId} user ${bet.user} has no refer_by`);
-        continue;
-      }
-
-      // 3. Calculate 5% commission
-      const commission = (parseFloat(bet.point) * 5) / 100;
-
-      // 4. Insert entry in commission table (wallet update nahi karna)
-      const insertQuery = `
-        INSERT INTO commission 
-        (betId, betuser, DATE_TIME, phone, point, GAME_ID, GAME, Pay, STATUS, earn)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      await req.db.query(insertQuery, [
-        bet.betId,            // betId
-        bet.user,             // betuser
-        bet.DATE_TIME,        // DATE_TIME
-        referBy,              // phone (refer_by user)
-        bet.point,            // point
-        bet.gameId,           // GAME_ID
-        bet.type,             // GAME
-        "pending",            // Pay
-        bet.status,           // STATUS
-        commission            // earn
-      ]);
-
-      console.log(`✅ Commission entry created for referBy ${referBy} from bet ${bet.betId}`);
-    }
-  } catch (err) {
-    console.error("Error processing loss bets:", err);
-  }
-};
 
 
 export const UpdateBetsWithResults = async (req, resultRow) => {
@@ -1057,6 +1198,9 @@ export const CalculateGameResults = async (req, res) => {
 
 
     // ---- Update games table ----
+    // Sirf aaj ki date ke liye update karo
+    const today = new Date().toISOString().split("T")[0];
+    if (resultDate === today) {
     const updateGameQuery = `
      UPDATE games 
      SET RESULT1 = ?, RESULT2 = ? , PLAY = 'unchecked'
@@ -1065,7 +1209,7 @@ export const CalculateGameResults = async (req, res) => {
 
     await req.db.query(updateGameQuery, [openResult, openResult, gameId]);
 
-
+  }
 
     const resultObj = {
       Jodi: jodiNumber,

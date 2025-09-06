@@ -6,11 +6,11 @@ import { toast } from "react-toastify";
 
 const Manual = () => {
 
-    const gameId = useParams().id
-    const backUrl = process.env.REACT_APP_BACKEND_URL;
-    
+  const gameId = useParams().id
+  const backUrl = process.env.REACT_APP_BACKEND_URL;
 
-   
+
+
   // 10 rows banate hain, har row ke liye initial state
   const [rows, setRows] = useState(
     Array.from({ length: 10 }, (_, i) => ({
@@ -58,8 +58,8 @@ const Manual = () => {
     console.log("Data to send:", dataToSend); // Send se pehle check
 
     try {
-      setLoading(true); 
-      const res = await axiosInstance.post(`${backUrl}/api/bet-game-manual`, {dataToSend,totalPoints,gameId});
+      setLoading(true);
+      const res = await axiosInstance.post(`${backUrl}/api/bet-game-manual`, { dataToSend, totalPoints, gameId });
       console.log("API Response:", res.data);
       toast.success("Bet Placed Successfully ✅");
       // ✅ Reset rows after bet
@@ -131,7 +131,19 @@ const Manual = () => {
                   <input
                     type="number"
                     value={row.points}
-                    onChange={(e) => handlePointsChange(rowIndex, e.target.value)}
+                    min="0"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || Number(val) >= 0) {
+                        handlePointsChange(rowIndex, val);
+                      }
+                    }}
+                    onWheel={(e) => e.target.blur()} // scroll disable
+                    onKeyDown={(e) => {
+                      if (["e", "E", "+", "-"].includes(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     className="w-20 h-7 border border-gray-400 rounded text-center text-sm focus:outline-none focus:border-blue-500"
                   />
                 </td>

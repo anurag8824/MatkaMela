@@ -6,10 +6,10 @@ import { toast } from "react-toastify";
 
 const Haraf = () => {
 
-    const backUrl = process.env.REACT_APP_BACKEND_URL;
+  const backUrl = process.env.REACT_APP_BACKEND_URL;
 
 
-    const gameId = useParams().id
+  const gameId = useParams().id
 
   const [andarHaraf, setAndarHaraf] = useState(Array(10).fill(""));
   const [baharHaraf, setBaharHaraf] = useState(Array(10).fill(""));
@@ -87,9 +87,22 @@ const Haraf = () => {
           <input
             type="number"
             value={val}
-            onChange={(e) => handleChange(type, i, e.target.value)}
+            min="0"
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "" || Number(value) >= 0) {
+                handleChange(type, i, value);
+              }
+            }}
+            onWheel={(e) => e.target.blur()} // scroll disable
+            onKeyDown={(e) => {
+              if (["e", "E", "+", "-"].includes(e.key)) {
+                e.preventDefault();
+              }
+            }}
             className="w-full h-[33px] text-center border bg-transparent focus:outline-none"
           />
+
         </div>
       ))}
     </div>
@@ -116,8 +129,8 @@ const Haraf = () => {
       {renderGrid("bahar", baharHaraf)}
 
       {/* Place Bet Button */}
-       {/* Place Bet Button */}
-       <button
+      {/* Place Bet Button */}
+      <button
         onClick={placeBet}
         disabled={loading} // ✅ Disabled while loading
         className={`w-full mt-6 text-white py-2 rounded 

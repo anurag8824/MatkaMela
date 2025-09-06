@@ -41,7 +41,7 @@ const Jodi = () => {
         } else {
           number = String(index + 1).padStart(2, "0"); // 01, 02 ... 99
         }
-    
+
         return {
           number,
           value: val,
@@ -99,8 +99,21 @@ const Jodi = () => {
               <input
                 type="number"
                 inputMode="numeric"
+                min="0"
                 value={bets[i]}
-                onChange={(e) => handleInputChange(i, e.target.value)}
+                onWheel={(e) => e.target.blur()}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "" || Number(val) >= 0) {
+                    handleInputChange(i, val);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  // "e" (exponential), "+", "-" block karna
+                  if (["e", "E", "+", "-"].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
                 className="w-full h-[33px] text-center border bg-transparent focus:outline-none"
               />
             </div>

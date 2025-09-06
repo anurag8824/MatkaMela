@@ -1023,7 +1023,7 @@ export const getWinningNumberold = async (req, res) => {
   
       if (resultRows.length > 0) {
         // Only return rows where STATUS = 'win'
-        const winningBets = resultRows.filter(bet => bet.STATUS === 'Win');
+        const winningBets = resultRows.filter(bet => bet.STATUS === 'Win' );
 
           // Extra check: also fetch bets where RESULT is any digit of given result
       const digits = result.split(""); // "15" => ["1","5"]
