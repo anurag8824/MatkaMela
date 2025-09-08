@@ -27,6 +27,7 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD || 'mypassword',
     database: process.env.DB_NAME || 'matka',
     port: process.env.DB_PORT || 3306,
+    timezone: '+05:30' ,
 });
 
 export default pool;
