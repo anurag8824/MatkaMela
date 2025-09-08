@@ -80,19 +80,17 @@ const History = () => {
                 filteredBets.map((bet, index) => (
                   <tr key={bet.id}>
                     <td>{index + 1}</td>
-                    <td>{bet.date_time}</td>
                     <td>
-                      {new Date(bet.date_time).toLocaleString("en-IN", {
-                        timeZone: "Asia/Kolkata",  // convert UTC → IST
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",          // optional, agar seconds bhi chahiye
-                        hour12: true
-                      })}
-                    </td>
+  {new Date(bet.date_time).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true          // ✅ AM/PM format
+  })}
+</td>
+
                     <td>{bet.game}</td>
                     <td>{bet.type}</td>
                     <td>{bet.number}</td>
