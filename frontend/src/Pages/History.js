@@ -80,6 +80,7 @@ const History = () => {
                 filteredBets.map((bet, index) => (
                   <tr key={bet.id}>
                     <td>{index + 1}</td>
+                    <td>{bet.date_time}</td>
                     <td>
                       {new Date(bet.date_time).toLocaleString("en-IN", {
                         timeZone: "Asia/Kolkata",  // convert UTC → IST
