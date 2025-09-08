@@ -1555,7 +1555,7 @@ export const UserWithdraw = async (req, res) => {
   // }
 
   try {
-    // const timeNow = new Date();
+    const timeNow = new Date();
 
 
      // 1️⃣ User fetch karo
@@ -1589,7 +1589,7 @@ export const UserWithdraw = async (req, res) => {
       holder,
       upi || null,
       amount,
-      // timeNow,
+      timeNow,
       status || "pending",
       bankname,
       ifsc,
