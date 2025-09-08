@@ -32,9 +32,8 @@ const History = () => {
           {/* Pending Bet */}
           <div className="flex-fill text-center">
             <button
-              className={`btn w-100 ${
-                filter === "pending" ? "btn-primary" : "btn-outline-primary"
-              }`}
+              className={`btn w-100 ${filter === "pending" ? "btn-primary" : "btn-outline-primary"
+                }`}
               onClick={() => setFilter("pending")}
             >
               Pending Bet
@@ -47,9 +46,8 @@ const History = () => {
           {/* Declared Bet */}
           <div className="flex-fill text-center">
             <button
-              className={`btn w-100 ${
-                filter === "declared" ? "btn-primary" : "btn-outline-primary"
-              }`}
+              className={`btn w-100 ${filter === "declared" ? "btn-primary" : "btn-outline-primary"
+                }`}
               onClick={() => setFilter("declared")}
             >
               Declared Bet
@@ -84,21 +82,23 @@ const History = () => {
                     <td>{index + 1}</td>
                     <td>
                       {new Date(bet.date_time).toLocaleString("en-IN", {
+                        timeZone: "Asia/Kolkata",  // convert UTC → IST
                         day: "2-digit",
                         month: "2-digit",
                         year: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
-                        hour12: true,
+                        second: "2-digit",          // optional, agar seconds bhi chahiye
+                        hour12: true
                       })}
                     </td>
                     <td>{bet.game}</td>
                     <td>{bet.type}</td>
                     <td>{bet.number}</td>
                     <td>{bet.point}</td>
-                  
 
-                    <td>{bet.result ? bet?.result : "-" }</td>
+
+                    <td>{bet.result ? bet?.result : "-"}</td>
                     <td>{bet.win_amount}</td>
 
                     <td>
