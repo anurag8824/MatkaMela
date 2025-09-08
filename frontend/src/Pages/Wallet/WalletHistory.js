@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import axiosInstance from "../../Utils/axiosInstance";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const WalletHistory = () => {
   const [accounts, setAccounts] = useState([]);
@@ -12,6 +13,7 @@ const WalletHistory = () => {
         console.log("Wallet history:", response.data.accounts);
       } catch (error) {
         console.error("Error fetching wallet history:", error);
+        toast.error("Failed to fetch wallet history");
       }
     };
 

@@ -29,7 +29,7 @@ const Tnc = () => {
         ))}
       </ul>
     </div>
-                <WalletHistory />
+  
 
     
     </div>

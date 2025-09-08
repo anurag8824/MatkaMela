@@ -38,8 +38,8 @@ export default function Wallet() {
         {activeTab === "add" ? (
           <>
             <AddPoint />
-            <DepositHistory />
-            {/* <WalletHistory /> */}
+            {/* <DepositHistory /> */}
+            <WalletHistory />
           </>
         ) : (
           <>
