@@ -84,7 +84,6 @@ const History = () => {
                     <td>{index + 1}</td>
                     <td>
                       {new Date(bet.date_time).toLocaleString("en-IN", {
-                        timeZone: "Asia/Kolkata",
                         day: "2-digit",
                         month: "2-digit",
                         year: "numeric",
