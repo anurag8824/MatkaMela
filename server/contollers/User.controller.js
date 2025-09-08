@@ -482,7 +482,7 @@ export const BetGameManual = async (req, res) => {
     const gameName = await getGameNameById(req.db, gameID);
 
     try {
-      await deductWalletBalance(req.db, mobile, req.body.totalPoints);
+      await deductWalletBalance(req.db, mobile, req.body.totalPoints , gameName);
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
@@ -539,7 +539,7 @@ export const BetGameHarraf = async (req, res) => {
     const gameName = await getGameNameById(req.db, gameId);
 
     try {
-      await deductWalletBalance(req.db, mobile, totalPoints);
+      await deductWalletBalance(req.db, mobile, totalPoints , gameName);
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
@@ -608,7 +608,7 @@ export const BetGameCrossing = async (req, res) => {
 
     const gameName = await getGameNameById(req.db, gameId);
     try {
-      await deductWalletBalance(req.db, mobile, totalPoints);
+      await deductWalletBalance(req.db, mobile, totalPoints ,gameName);
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
@@ -652,7 +652,7 @@ export const BetGameCopyPaste = async (req, res) => {
 
     const gameName = await getGameNameById(req.db, gameId);
     try {
-      await deductWalletBalance(req.db, mobile, totalPoints);
+      await deductWalletBalance(req.db, mobile, totalPoints , gameName);
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
