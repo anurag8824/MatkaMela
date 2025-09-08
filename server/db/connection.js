@@ -28,7 +28,7 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME || 'matka',
     port: process.env.DB_PORT || 3306,
     // timezone: '+05:30' ,
-    // dateStrings: true
+    dateStrings: true
 });
 
 export default pool;
