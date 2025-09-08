@@ -4,6 +4,7 @@ import AddPoint from "./AddPoint";
 import Withdraw from "./Withdraw";
 import DepositHistory from "./DepositHistory";
 import WithdrawHistory from "./WithdrawHistory";
+import WalletHistory from "./WalletHistory";
 
 export default function Wallet() {
   const [activeTab, setActiveTab] = useState("add");
@@ -38,6 +39,7 @@ export default function Wallet() {
           <>
             <AddPoint />
             <DepositHistory />
+            {/* <WalletHistory /> */}
           </>
         ) : (
           <>

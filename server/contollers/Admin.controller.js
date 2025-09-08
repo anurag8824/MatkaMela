@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import path from "path";
 import fs from "fs";
 import { scheduleCronForGame } from "./cronController.js";
+import { insertAccountEntry } from "./utils/accountHelper.js";
 
 
 
@@ -411,6 +412,9 @@ export const AddNewGame = async (req, res) => {
 //     }
 // };
 
+// // Helper function for inserting into account table
+
+
 // ✅ Approve / Cancel / Reverse Deposit API
 export const approveDeposits = async (req, res) => {
   const { method } = req.body; // "approved" | "cancelled" | "reverse"
@@ -445,6 +449,24 @@ export const approveDeposits = async (req, res) => {
                       WHERE ID = ?
                   `;
                   await req.db.query(updateDepositSql, [method, ID]);
+
+                  // 3️⃣ Wallet ka latest balance fetch karo
+                  const [walletRows] = await req.db.query(
+                    "SELECT WALLET FROM users WHERE MOBILE = ?",
+                    [USER_ID]
+                );
+                const latestWallet = walletRows[0]?.WALLET || 0;
+
+               
+                    // 4️⃣ Account table me entry insert karo
+                    await insertAccountEntry(req.db, {
+                      mobile: USER_ID,
+                      paymode: "Online",
+                      point: AMOUNT,
+                      closing: latestWallet,
+                      status: "Success"
+                  });
+
               } 
               
               else if (method === "cancelled") {
@@ -481,6 +503,24 @@ export const approveDeposits = async (req, res) => {
                           WHERE ID = ?
                       `;
                       await req.db.query(updateDepositSql, [ID]);
+
+                       // 3️⃣ Wallet ka latest balance fetch karo after deduction
+                       const [walletRows] = await req.db.query(
+                        "SELECT WALLET FROM users WHERE MOBILE = ?",
+                        [USER_ID]
+                    );
+                    const latestWallet = walletRows[0]?.WALLET || 0;
+
+                     // 4️⃣ Account table me entry insert karo for reverse
+                     // 4️⃣ Account table me entry insert karo
+                     await insertAccountEntry(req.db, {
+                      mobile: USER_ID,
+                      paymode: "Online",
+                      point: AMOUNT,
+                      closing: latestWallet,
+                      status: "Cancelled"
+                  });
+
                   }
               }
           }
@@ -489,7 +529,7 @@ export const approveDeposits = async (req, res) => {
               success: true,
               message:
                   method === "approved"
-                      ? "Deposits approved and wallet updated ✅"
+                      ? "Deposits approved and wallet updated ✅ account statement created"
                       : method === "cancelled"
                       ? "Deposits cancelled successfully ❌"
                       : "Deposits reversed and set back to Pending 🔄",
@@ -623,6 +663,23 @@ export const approveWithdraws = async (req, res) => {
                       WHERE ID = ?
                   `;
                   await req.db.query(updateWithdrawSql, [method, ID]);
+
+                  // 3️⃣ Account table me entry insert karo for cancel
+                 // 3️⃣ Latest wallet fetch karo
+                 const [walletRows] = await req.db.query(
+                  "SELECT WALLET FROM users WHERE MOBILE = ?",
+                  [MOBILE]
+              );
+               const latestWallet = walletRows[0]?.WALLET || 0;
+
+               // 4️⃣ Account entry insert karo
+               await insertAccountEntry(req.db, {
+                mobile: MOBILE,
+                paymode: "Withdraw",
+                point: AMOUNT,
+                closing: latestWallet,
+                status: "Cancelled"
+            });
               } 
               
               else if (method === "reverse") {
@@ -647,6 +704,23 @@ export const approveWithdraws = async (req, res) => {
                           WHERE ID = ?
                       `;
                       await req.db.query(updateWithdrawSql, [ID]);
+
+                      // 3️⃣ Account table me entry insert karo for reverse
+                       // 3️⃣ Latest wallet fetch karo
+                       const [walletRows] = await req.db.query(
+                        "SELECT WALLET FROM users WHERE MOBILE = ?",
+                        [MOBILE]
+                    );
+                    const latestWallet = walletRows[0]?.WALLET || 0;
+
+                     // 4️⃣ Account entry insert karo
+                     await insertAccountEntry(req.db, {
+                      mobile: MOBILE,
+                      paymode: "Withdraw",
+                      point: AMOUNT,
+                      closing: latestWallet,
+                      status: "Cancelled"
+                  });
                   }
               }
           }

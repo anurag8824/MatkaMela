@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddBankDetails, AddMoney, AdminUpdateBetsStatus, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, deleteGame, deleteUser, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getCommissions, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, payCommission, resultHistory, SendOTP, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
+import { AddBankDetails, AddMoney, AdminUpdateBetsStatus, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, deleteGame, deleteUser, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getCommissions, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, payCommission, resultHistory, SendOTP, userAccountStatement, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
 import upload from '../middlewares/upload.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -67,6 +67,9 @@ router.post('/edit-profile', authMiddleware, editProfileUser);
 
 
 router.get('/bet-game-history', authMiddleware, getUserBetHistory);
+
+router.get('/wallet-history', authMiddleware, userAccountStatement);
+
 
 
 router.post('/update-bets-status', authMiddleware , AdminUpdateBetsStatus  );

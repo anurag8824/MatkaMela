@@ -4,6 +4,7 @@ import UserApplication from "../models/UserApplication.js";
 import UserBuy from "../models/UserBuyModel.js";
 import bcrypt from "bcrypt"; // ✅ CORRECT spelling
 import jwt from "jsonwebtoken"
+import { insertAccountEntry } from "./utils/accountHelper.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 console.log(JWT_SECRET, "jswtt")
@@ -372,7 +373,7 @@ export const deleteUser = async (req, res) => {
 
 
 // helpers/walletHelper.js
-export const deductWalletBalance = async (db, phone, totalPoints) => {
+export const deductWalletBalance = async (db, phone, totalPoints, gameName ) => {
   try {
     // 1. User fetch karo
     const [users] = await db.query("SELECT wallet FROM users WHERE mobile = ?", [phone]);
@@ -390,6 +391,14 @@ export const deductWalletBalance = async (db, phone, totalPoints) => {
     // 3. Update wallet
     const newBalance = walletBalance - totalPoints;
     await db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newBalance, phone]);
+
+    await insertAccountEntry(db, {
+      mobile:phone,
+      paymode: gameName,       // game ka naam jayega paymode me
+      point: totalPoints,      // total bet points
+      closing: newBalance,     // deduct hone ke baad wallet balance
+      status: "Success",       // bet successfully placed
+    });
 
     return { success: true, newBalance };
   } catch (err) {
@@ -427,14 +436,13 @@ export const BetGameJodi = async (req, res) => {
       return res.status(400).json({ success: false, message: "No bets provided." });
     }
 
+    const gameName = await getGameNameById(req.db, gameId);
+
     try {
-      await deductWalletBalance(req.db, mobile, totalPoints);
+      await deductWalletBalance(req.db, mobile, totalPoints , gameName);
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
-
-
-    const gameName = await getGameNameById(req.db, gameId);
 
 
     // Transform data for bulk insert
@@ -1388,6 +1396,36 @@ export const getUserBetHistory = async (req, res) => {
 };
 
 
+export const userAccountStatement = async (req, res) => {
+  try {
+    const mobile = req.user.mobile; // from JWT middleware
+
+    if (!mobile) {
+      return res.status(400).json({ message: "Mobile number missing" });
+    }
+
+    // SQL query to get account statement by user's mobile
+    const [accounts] = await req.db.query(
+      `SELECT *
+       FROM account
+       WHERE MOBILE = ?
+       ORDER BY id DESC`,
+      [mobile]
+    );
+
+    return res.json({
+      message: "Account statement fetched successfully",
+      accounts
+    });
+  } catch (error) {
+    console.error("Error fetching account history:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
 export const AddMoney = async (req, res) => {
   try {
     let { amount } = req.body;
@@ -1562,7 +1600,7 @@ export const UserWithdraw = async (req, res) => {
      const [userRows] = await req.db.query(
       `SELECT WALLET FROM users WHERE MOBILE = ?`,
       [mobile]
-    );
+    ); 
 
     if (userRows.length === 0) {
       return res.status(404).json({ message: "User not found ❌" });
@@ -1605,6 +1643,23 @@ export const UserWithdraw = async (req, res) => {
      WHERE MOBILE = ?
    `;
    await req.db.query(updateWalletSql, [withdrawAmount, mobile]);
+
+    // 5️⃣ Latest wallet fetch karo after deduction
+    const [walletRows] = await req.db.query(
+      "SELECT WALLET FROM users WHERE MOBILE = ?",
+      [mobile]
+    );
+    const latestWallet = walletRows[0]?.WALLET || 0;
+
+    // 6️⃣ Account table entry insert karo
+    await insertAccountEntry(req.db, {
+      mobile,
+      paymode: "Withdraw",
+      point: withdrawAmount,
+      closing: latestWallet,
+      status: "Success",
+    });
+
 
     res.status(200).json({ message: "Withdraw request stored successfully" });
   } catch (error) {

@@ -1,4 +1,5 @@
 import React from 'react'
+import WalletHistory from './Wallet/WalletHistory';
 
 const Tnc = () => {
     const terms = [
@@ -27,7 +28,11 @@ const Tnc = () => {
           </li>
         ))}
       </ul>
-    </div></div>
+    </div>
+                <WalletHistory />
+
+    
+    </div>
   )
 }
 
