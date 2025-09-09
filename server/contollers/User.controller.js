@@ -1730,7 +1730,19 @@ export const getWithdrawList = async (req, res) => {
 
     if (req.user?.role === "admin") {
       // 🔹 Admin -> sabhi users ke withdraws
-      sql = `SELECT * FROM WITHDRAW ORDER BY id DESC`;
+      sql = `SELECT 
+          ID,
+          MOBILE,
+          HOLDER,
+          UPI,
+          AMOUNT,
+          DATE_FORMAT(CONVERT_TZ(TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS TIME,
+          STATUS,
+          BANK,
+          IFSC,
+          ACCOUNT
+        FROM WITHDRAW
+        ORDER BY ID DESC`;
       params = [];
     } else {
       // 🔹 Normal user -> sirf apne withdraws
@@ -1742,7 +1754,20 @@ export const getWithdrawList = async (req, res) => {
         });
       }
 
-      sql = `SELECT * FROM WITHDRAW WHERE MOBILE = ? ORDER BY id DESC`;
+      sql = `SELECT 
+          ID,
+          MOBILE,
+          HOLDER,
+          UPI,
+          AMOUNT,
+          DATE_FORMAT(CONVERT_TZ(TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS TIME,
+          STATUS,
+          BANK,
+          IFSC,
+          ACCOUNT
+        FROM WITHDRAW
+        WHERE MOBILE = ?
+        ORDER BY ID DESC`;
       params = [userMobile];
     }
 
