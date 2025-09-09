@@ -20,7 +20,9 @@ export default function CommissionPayList() {
         : "api/game-commission";
       const res = await axiosInstance.get(url);
       if (res.data.success) {
-        const pendingData = res.data.data.filter(c => c.Pay === "pending");
+        // const pendingData = res.data.data.filter(c => c.Pay === "pending");
+        const pendingData = res.data.data
+
         setCommissions(pendingData);
       }
     } catch (err) {

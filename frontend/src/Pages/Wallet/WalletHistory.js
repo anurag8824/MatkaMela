@@ -60,7 +60,18 @@ const WalletHistory = () => {
                   <td className="border p-2">{acc.paymode}</td>
                   <td className="border p-2">{acc.point}</td>
                   <td className="border p-2">{acc.closing}</td>
-                  <td className="border p-2">{acc.status}</td>
+                  <td
+  className={`border p-2 ${
+    acc.status === "Loss" || acc.status === "Cancelled"
+      ? "text-red-600 "
+      : acc.status === "Win" || acc.status === "Success"
+      ? "text-green-600 "
+      : ""
+  }`}
+>
+  {acc.status}
+</td>
+
                   <td className="border p-2">{formatDate(acc.DATE)}</td>
                 </tr>
               ))}

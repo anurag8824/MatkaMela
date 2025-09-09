@@ -937,6 +937,22 @@ export const updateWallet = async (req, res) => {
         // Update wallet in DB
         await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, mobile]);
 
+          // 5️⃣ Latest wallet fetch karo after deduction
+        const [walletRows] = await req.db.query(
+       "SELECT WALLET FROM users WHERE MOBILE = ?",[mobile]);
+
+       const latestWallet = walletRows[0]?.WALLET || 0;
+
+         // 2️⃣ Account statement me entry banao
+         await insertAccountEntry(req.db, {
+         mobile,
+         paymode: "Online",     // fixed Online
+         point: amt,            // transaction amount
+         closing: latestWallet,    // latest balance after transaction
+         status: "Success"      // transaction status
+    });
+
+
         return res.status(200).json({
             message: `${type} successful`,
             wallet: newWallet,

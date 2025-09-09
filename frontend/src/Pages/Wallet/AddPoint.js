@@ -25,17 +25,6 @@ const navigate = useNavigate();
 
     navigate(`/deposit/${amount}`);
 
-    // try {
-    //   const res = await axiosInstance.post(`${backUrl}/api/add-points`, {
-    //     amount,
-    //   });
-    
-    //   console.log("API Response:", res.data);
-    //   alert("Points added successfully!");
-    // } catch (err) {
-    //   console.error(err);
-    //   alert("Error adding points");
-    // }
   };
 
   return (

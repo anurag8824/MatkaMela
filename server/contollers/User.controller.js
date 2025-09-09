@@ -718,15 +718,16 @@ export const ProcessWinningBets = async (req, updatedBets) => {
 
       // 3. Collect user’s total win
       if (!userWins[bet.PHONE]) {
-        userWins[bet.PHONE] = 0;
+        userWins[bet.PHONE] = { total: 0, game: bet.GAME };;
       }
-      userWins[bet.PHONE] += winAmount;
+      userWins[bet.PHONE].total += winAmount;
     }
+
+    console.log(userWins, "user wins collected");
 
     // 4. Update each user wallet
     for (const mobile in userWins) {
-      const winTotal = userWins[mobile];
-
+      const { total: winTotal, game } = userWins[mobile];
       // fetch wallet
       const [users] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [mobile]);
       if (!users.length) continue;
@@ -737,6 +738,17 @@ export const ProcessWinningBets = async (req, updatedBets) => {
       const newWallet = wallet + winTotal;
 
       await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, mobile]);
+
+      // update account entry for win amount
+       // 🔥 insert into account table
+       await insertAccountEntry(req.db, {
+        mobile,
+        paymode: game,       // bet.GAME se
+        point: winTotal.toFixed(2),     // user ka total winning
+        closing: newWallet,  // latest wallet balance
+        status: "Win"
+      });
+     
 
       console.log(`✅ Wallet updated: ${mobile} +${winTotal} → ${newWallet}`);
     }
@@ -852,11 +864,11 @@ export const ReverseWinningBets = async (req, updatedBets) => {
 
      
 
-      // 3. Collect user’s total win
+      // 3. Collect user’s total reversal (store game too)
       if (!userWins[bet.PHONE]) {
-        userWins[bet.PHONE] = 0;
+        userWins[bet.PHONE] = { total: 0, game: bet.GAME };
       }
-      userWins[bet.PHONE] += winAmount;
+      userWins[bet.PHONE].total += winAmount;
 
        // ✅ Reset WIN_AMOUNT in bets table to 0 (since we are reversing)
        await req.db.query("UPDATE bets SET WIN_AMOUNT = 0 WHERE ID = ?", [bet.ID]);
@@ -864,7 +876,7 @@ export const ReverseWinningBets = async (req, updatedBets) => {
 
     // 4. Update each user wallet
     for (const mobile in userWins) {
-      const winTotal = userWins[mobile];
+      const { total: winTotal, game } = userWins[mobile];
 
       // fetch wallet
       const [users] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [mobile]);
@@ -878,6 +890,16 @@ export const ReverseWinningBets = async (req, updatedBets) => {
       if (newWallet < 0) newWallet = 0;
 
       await req.db.query("UPDATE users SET wallet = ? WHERE mobile = ?", [newWallet, mobile]);
+
+      // update account entry for reversed win amount
+      // 🔥 insert into account table for reversal
+       await insertAccountEntry(req.db, {
+        mobile,
+        paymode: game,             // bet.GAME se game ka naam
+        point: winTotal.toFixed(2),// reversed amount
+        closing: newWallet,        // updated balance
+        status: "Loss"             // reversal entry
+      });
 
       console.log(`✅ Wallet updated: ${mobile} +${winTotal} → ${newWallet}`);
     }
@@ -1316,6 +1338,19 @@ export const payCommission = async (req, res) => {
         "UPDATE users SET wallet = wallet + ? WHERE MOBILE = ?",
         [parseFloat(earn), phone]
       );
+
+      // 🔥 account table entry bhi karo
+      // fetch updated wallet balance
+      const [users] = await req.db.query("SELECT wallet FROM users WHERE mobile = ?", [phone]);
+      const closingBalance = users.length ? parseFloat(users[0].wallet) : 0;
+      // 4️⃣ Account statement me entry banao
+      await insertAccountEntry(req.db, {
+        mobile: phone,         // jis user ka hai
+        paymode: "Commission", // fixed "Commission"
+        point: earn,           // commission amount
+        closing: closingBalance, // updated wallet balance
+        status: "Success",     // success mark karo
+      });
 
       // 3️⃣ Commission entry update karo
       await req.db.query(
