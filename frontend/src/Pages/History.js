@@ -102,7 +102,7 @@ const History = () => {
 
                     <td>
                       {bet.status ? (
-                        <span className={`badge ${bet.ststus === "Win" ? "bg-success" : "bg-danger"}`}>{bet.status}</span>
+                        <span className={`badge ${bet.status === "Win" ? "bg-success" : "bg-danger"}`}>{bet.status}</span>
                       ) : (
                         <span className="badge bg-warning text-dark">
                           Pending
