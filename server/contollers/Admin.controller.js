@@ -1011,6 +1011,7 @@ export const declareResultList = async (req, res) => {
           baharHaraf,
           Crossing,
           CopyPaste,
+          DATE_FORMAT(CONVERT_TZ(DATE,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS
           DATE
          FROM RESULT
          ORDER BY ID DESC`
