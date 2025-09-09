@@ -1649,7 +1649,7 @@ export const UserWithdraw = async (req, res) => {
   // }
 
   try {
-    const timeNow = new Date();
+    // const timeNow = new Date();
 
 
      // 1️⃣ User fetch karo
@@ -1674,8 +1674,8 @@ export const UserWithdraw = async (req, res) => {
 
     const query = `
       INSERT INTO WITHDRAW 
-      (MOBILE, HOLDER, UPI, AMOUNT, TIME, STATUS, BANK, IFSC, ACCOUNT)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (MOBILE, HOLDER, UPI, AMOUNT, STATUS, BANK, IFSC, ACCOUNT)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -1683,7 +1683,6 @@ export const UserWithdraw = async (req, res) => {
       holder,
       upi || null,
       amount,
-      timeNow,
       status || "pending",
       bankname,
       ifsc,
