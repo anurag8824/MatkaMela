@@ -159,8 +159,8 @@ export const adminDashboardData = async (req, res) => {
 
         // 6️⃣ Total Commission (5% of POINT where STATUS = 'Loss')
         const [commissionRows] = await req.db.query(
-            `SELECT SUM(POINT * 0.05) as totalCommission
-             FROM bets
+            `SELECT SUM(earn) as totalCommission
+             FROM commission
              WHERE STATUS = 'Loss' ${date ? "AND DATE(DATE_TIME) = ?" : ""}`,date ? [date] : []
         );
         const totalCommission = commissionRows[0]?.totalCommission || 0;
