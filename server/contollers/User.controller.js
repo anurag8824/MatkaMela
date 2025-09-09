@@ -1595,7 +1595,17 @@ export const getDepositList = async (req, res) => {
 
     if (req.user?.role === "admin") {
       // 🔹 Admin -> sabhi users ka data
-      sql = `SELECT * FROM PAYMENT_QUEUE ORDER BY id DESC`;
+      sql = `SELECT 
+          ID,
+          USER_ID,
+          AMOUNT,
+          DATE_FORMAT(CONVERT_TZ(TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS TIME,
+          IMAGE,
+          MODE,
+          STATUS,
+          TXN_ID
+        FROM PAYMENT_QUEUE 
+        ORDER BY ID DESC`;
       params = [];
     } else {
       // 🔹 Normal user -> sirf uska data
@@ -1603,7 +1613,18 @@ export const getDepositList = async (req, res) => {
       if (!userId) {
         return res.status(400).json({ success: false, message: "User ID missing" });
       }
-      sql = `SELECT * FROM PAYMENT_QUEUE WHERE USER_ID = ? ORDER BY id DESC`;
+      sql = `SELECT 
+          ID,
+          USER_ID,
+          AMOUNT,
+          DATE_FORMAT(CONVERT_TZ(TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS TIME,
+          IMAGE,
+          MODE,
+          STATUS,
+          TXN_ID
+        FROM PAYMENT_QUEUE 
+        WHERE USER_ID = ? 
+        ORDER BY ID DESC`;
       params = [userId];
     }
 
