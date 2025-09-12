@@ -232,7 +232,12 @@ export default function ManageGames() {
                     onChange={() => handleHolidayChange(game.id)}
                   />
                 </td>
-                {game.NAME === "DISAWAR" ? "" : <td>
+                {game.NAME === "DISAWAR" ? <td>
+                  <Button variant="warning" size="sm" onClick={() => handleEdit(game.ID)}>
+                    <i className="fa fa-pen"></i>
+                  </Button>{" "}
+                  
+                </td> : <td>
                   <Button variant="warning" size="sm" onClick={() => handleEdit(game.ID)}>
                     <i className="fa fa-pen"></i>
                   </Button>{" "}
