@@ -12,6 +12,7 @@ export default function EditGame() {
     NAME: "",
     TIME1: "",
     TIME2: "",
+    RTIME:"",
     POSITION: "",
     RATE: "",
     PAGE: "",
@@ -115,6 +116,20 @@ export default function EditGame() {
             className="w-full p-2 border rounded-lg"
           />
         </div>
+        {/* RTime */}
+        <div>
+          <label className="block font-semibold">Result Time</label>
+          <input
+            type="time"
+            name="RTIME"
+            value={formData.RTIME}
+            onChange={handleChange}
+            className="w-full p-2 border rounded-lg"
+          />
+        </div>
+
+
+
 
         {/* Position */}
         <div>

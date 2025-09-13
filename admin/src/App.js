@@ -33,6 +33,7 @@ import AddUser from './Pages/AddUser';
 import CommissionList from './Pages/CommsionList';
 import UserRefferList from './Pages/UserRefferList';
 import CommissionPayList from './Pages/CommissionPayList';
+import EditWhatsApp from './Components/EditWhatsapp';
 
 
 const basePath = "public/administrator"
@@ -93,6 +94,9 @@ function App() {
 
           <Route path='user/commission-list' element= {<CommissionList />} />
           <Route path='user/user-reffer-list' element= {<UserRefferList />} />
+
+          <Route path='edit-whatsapp' element= {<EditWhatsApp />} />
+
 
           <Route path='user/commission-pay-list' element= {<CommissionPayList />} />
 

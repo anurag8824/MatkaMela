@@ -108,28 +108,11 @@ const Haraf = () => {
     </div>
   );
 
-  const [timeLeft, setTimeLeft] = useState(7); // ✅ countdown state
- const navigate = useNavigate();
-  // ✅ Timer useEffect
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      toast.info("Time is up! Redirecting...");
-      navigate("/"); // redirect after 7 sec
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [timeLeft, navigate]);
+ 
 
   return (
     <div className="p-4">
-    <div className="bg-red-600 text-white text-center py-2 rounded mb-3 font-bold text-lg">
-        Bet Time Left: {timeLeft}s
-      </div>
+   
     
       {/* Top Bar */}
       <div className="flex justify-between mb-4 p-2 border rounded bg-gray-100">

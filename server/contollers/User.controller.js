@@ -421,6 +421,20 @@ export const getGameNameById = async (db, gameId) => {
   return rows[0].name;
 };
 
+// helpers/gameHelper.js
+export const getGamePlayById = async (db, gameId) => {
+  const [rows] = await db.query(
+    "SELECT PLAY FROM games WHERE id = ?",
+    [gameId]
+  );
+
+  if (rows.length === 0) {
+    throw new Error("Game not found");
+  }
+
+  return rows[0].PLAY;
+};
+
 
 
 
@@ -437,6 +451,11 @@ export const BetGameJodi = async (req, res) => {
     }
 
     const gameName = await getGameNameById(req.db, gameId);
+    const gamePlay = await getGamePlayById(req.db , gameId)
+     // ✅ Agar "unchecked" hai toh timeout error dena
+     if (gamePlay.toLowerCase() === "unchecked") {
+      return res.status(400).json({ success: false, message: "Game play timed out." });
+    }
 
     try {
       await deductWalletBalance(req.db, mobile, totalPoints , gameName);
@@ -480,6 +499,12 @@ export const BetGameManual = async (req, res) => {
     const mobile = req.user.mobile
 
     const gameName = await getGameNameById(req.db, gameID);
+
+    const gamePlay = await getGamePlayById(req.db , gameID)
+     // ✅ Agar "unchecked" hai toh timeout error dena
+     if (gamePlay.toLowerCase() === "unchecked") {
+      return res.status(400).json({ success: false, message: "Game play timed out." });
+    }
 
     try {
       await deductWalletBalance(req.db, mobile, req.body.totalPoints , gameName);
@@ -537,6 +562,11 @@ export const BetGameHarraf = async (req, res) => {
     console.log("Request body harraf:", req.body);
 
     const gameName = await getGameNameById(req.db, gameId);
+    const gamePlay = await getGamePlayById(req.db , gameId)
+     // ✅ Agar "unchecked" hai toh timeout error dena
+     if (gamePlay.toLowerCase() === "unchecked") {
+      return res.status(400).json({ success: false, message: "Game play timed out." });
+    }
 
     try {
       await deductWalletBalance(req.db, mobile, totalPoints , gameName);
@@ -607,6 +637,12 @@ export const BetGameCrossing = async (req, res) => {
 
 
     const gameName = await getGameNameById(req.db, gameId);
+    const gamePlay = await getGamePlayById(req.db , gameId)
+     // ✅ Agar "unchecked" hai toh timeout error dena
+     if (gamePlay.toLowerCase() === "unchecked") {
+      return res.status(400).json({ success: false, message: "Game play timed out." });
+    }
+
     try {
       await deductWalletBalance(req.db, mobile, totalPoints ,gameName);
     } catch (err) {
@@ -651,6 +687,12 @@ export const BetGameCopyPaste = async (req, res) => {
     }
 
     const gameName = await getGameNameById(req.db, gameId);
+    const gamePlay = await getGamePlayById(req.db , gameId)
+     // ✅ Agar "unchecked" hai toh timeout error dena
+     if (gamePlay.toLowerCase() === "unchecked") {
+      return res.status(400).json({ success: false, message: "Game play timed out." });
+    }
+
     try {
       await deductWalletBalance(req.db, mobile, totalPoints , gameName);
     } catch (err) {
@@ -1570,7 +1612,7 @@ export const UserDeposit = async (req, res) => {
     const userId = req.user?.mobile;
     console.log(req.user)
 
-    if (!userId || !amount || !utr_number || !type) {
+    if (!userId || !amount || !type) {
       return res.status(400).json({ success: false, message: "Missing fields" });
     }
 

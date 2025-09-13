@@ -94,7 +94,7 @@ const Withdraw = () => {
 
       {/* Quick amount buttons */}
       <div className="grid grid-cols-3 gap-2 mb-4">
-        {[100, 200, 300, 500, 1000, 2000].map((amt) => (
+        {[1000, 2000, 3000, 5000, 7000, 10000].map((amt) => (
           <button
             key={amt}
             onClick={() => setAmount(amt)}

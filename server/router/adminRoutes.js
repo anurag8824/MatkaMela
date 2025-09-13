@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddNewGame, AdminAddUser, adminDashboardData, AdminLogin, approveDeposits, approveWithdraws, ChangePasswordAdmin, declareResultList, editGame, getAdminDetails, getAllBetsGameLoad, GetAllUsers, GetQr, GetUPI, getWinningNumber, toggleUserState, UpdateQr, UpdateUPI, updateWallet, winningReportList } from '../contollers/Admin.controller.js';
+import { AddNewGame, AdminAddUser, adminDashboardData, AdminLogin, approveDeposits, approveWithdraws, ChangePasswordAdmin, declareResultList, editGame, getAdminDetails, getAllBetsGameLoad, GetAllUsers, GetQr, GetUPI, getWhatsApp, getWinningNumber, toggleUserState, UpdateQr, UpdateUPI, updateWallet, updateWhatsApp, winningReportList } from '../contollers/Admin.controller.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { qrMulter } from '../middlewares/qrMulter.js';
 
@@ -50,6 +50,12 @@ router.post("/upload-qr", authMiddleware , qrMulter.single("qrImage"), UpdateQr)
 
 router.post("/update-upi-id", authMiddleware , UpdateUPI);
 router.get("/get-upi-id", authMiddleware , GetUPI);
+
+router.get("/get-whatsapp", authMiddleware , getWhatsApp);
+
+router.post("/edit-whatsapp", authMiddleware , updateWhatsApp);
+
+
 
 
 

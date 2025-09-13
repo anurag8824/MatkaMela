@@ -75,21 +75,21 @@ const HomeMarket = ({markets}) => {
                 <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">
                   Open Time
                 </span>
-                <span className="block">{market.TIME1}</span>
+                <span className="block">{market?.TIME1}</span>
               </li>
               <li>|</li>
               <li className="text-center">
                 <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">
                   Close Time
                 </span>
-                <span className="block">{market.TIME2}</span>
+                <span className="block">{market?.TIME2}</span>
               </li>
               <li>|</li>
               <li className="text-center">
                 <span className="block font-light bg-white text-black rounded-b-none px-[1px] rounded-md">
                   Result Time
                 </span>
-                <span className="block">{market.TIME2}</span>
+                <span className="block">{market?.RTIME}</span>
               </li>
             </ul>
           </div>

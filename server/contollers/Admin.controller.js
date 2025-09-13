@@ -234,6 +234,7 @@ export const editGame = async (req, res) => {
         NAME,
         TIME1,
         TIME2,
+        RTIME,
         POSITION,
         RATE,
         PAGE,
@@ -273,6 +274,7 @@ export const editGame = async (req, res) => {
                 NAME = ?,
                 TIME1 = ?,
                 TIME2 = ?,
+                RTIME = ?,
                 POSITION = ?,
                 RATE = ?,
                 PAGE = ?,
@@ -294,6 +296,7 @@ export const editGame = async (req, res) => {
             NAME,
             TIME1,
             TIME2,
+            RTIME,
             POSITION,
             RATE,
             PAGE,
@@ -812,6 +815,51 @@ export const UpdateUPI = async (req, res) => {
         return res.status(500).json({ error: "Database Error" });
       }
   }
+
+  export const getWhatsApp = async (req, res) => {
+    try {
+      const [rows] = await req.db.query(
+        "SELECT WHATSAPP FROM SETTINGS"
+      );
+  
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "No WhatsApp details found" });
+      }
+  
+      return res.json({ whatsapp: rows[0].WHATSAPP });
+    } catch (err) {
+      console.error("DB error in GET /whatsapp:", err);
+      return res.status(500).json({ error: "Database Error" });
+    }
+  };
+
+  // controllers/settingsController.js
+export const updateWhatsApp = async (req, res) => {
+  try {
+    const { whatsapp } = req.body;
+
+    if (!whatsapp || whatsapp.trim().length < 10) {
+      return res.status(400).json({ error: "Please provide a valid WhatsApp number" });
+    }
+
+    // SETTINGS table me ek hi row hai
+    const [result] = await req.db.query(
+      "UPDATE SETTINGS SET WHATSAPP = ? LIMIT 1",
+      [whatsapp]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Settings not found" });
+    }
+
+    return res.json({ success: true, message: "WhatsApp updated successfully" });
+  } catch (err) {
+    console.error("DB error in POST /whatsapp:", err);
+    return res.status(500).json({ error: "Database Error" });
+  }
+};
+
+  
   
 
 

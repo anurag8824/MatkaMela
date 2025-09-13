@@ -8,7 +8,7 @@ import { FaTachometerAlt, FaUsers, FaCogs, FaGamepad } from "react-icons/fa";
 import { FaCaretDown } from "react-icons/fa6";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { FaWallet } from "react-icons/fa";
-import { FaTrophy } from "react-icons/fa";
+import { FaTrophy ,FaWhatsapp } from "react-icons/fa";
 import { FaPercentage } from "react-icons/fa";
 import { FaQuestionCircle } from "react-icons/fa";
 import { FaCreditCard, FaUserShield } from "react-icons/fa";
@@ -153,6 +153,12 @@ const menuItems = [
     title: "User Reffer List",
     icon: <FaUsers />,
     link: "/public/administrator/user/user-reffer-list",
+  },
+
+  {
+    title: "Edit Whatsapp",
+    icon: <FaWhatsapp />,
+    link: "/public/administrator/edit-whatsapp",
   },
   // {
   //   title: "User Wallet Data",
