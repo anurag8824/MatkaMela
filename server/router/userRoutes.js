@@ -1,5 +1,5 @@
 import express from 'express';
-import { AddBankDetails, AddMoney, AdminUpdateBetsStatus, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, deleteGame, deleteUser, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getCommissions, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, payCommission, resultHistory, SendOTP, userAccountStatement, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
+import { AddBankDetails, AddMoney, AdminUpdateBetsStatus, ApplicationForm , BetGameCopyPaste, BetGameCrossing, BetGameHarraf, BetGameJodi, BetGameManual, CalculateGameResults, deleteGame, DeleteOldResult, deleteUser, editProfileUser, GetAllGame, GetAllReferredUsersAdmin, GetBankDetails, getCommissions, getDepositList, GetReferredUsers, getUserBetHistory, getUserInfo, getWithdrawList, MSMEForm, payCommission, resultHistory, SendOTP, userAccountStatement, UserDeposit, UserLogin, UserRegister, UserShop, UserWithdraw } from '../contollers/User.controller.js';
 import upload from '../middlewares/upload.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -83,6 +83,9 @@ router.get('/commission-list', authMiddleware ,  GetAllReferredUsersAdmin);
 
 
 router.get('/game-result-history', authMiddleware, resultHistory);
+router.post('/delete-old-result', authMiddleware ,  DeleteOldResult);
+
+
 router.get('/game-commission', authMiddleware, getCommissions);
 
 router.post('/pay-commission', authMiddleware, payCommission);
@@ -103,8 +106,13 @@ router.post('/login', UserLogin);
 
 router.get('/me', authMiddleware, (req, res) => {
   res.json({
-    message: 'Access granted to protected route',
-    user: req.user,
+   
+      success: true,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        mobile: req.user.mobile,
+      },
   });
 });
 

@@ -11,34 +11,25 @@ import axiosInstance from "../Utils/axiosInstance";
 function Layout() {
 
   const backUrl = process.env.REACT_APP_BACKEND_URL;
-  const [user, setUserinfo] = useState(null);
+  const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true); // 👈 loader state
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // 👈 check if token exists
-    if (!token) {
-      // navigate("/register");
-      return;
-    }
+  
 
-    axiosInstance
-      .get(`/api/getUserInfo`)
-      .then((res) => {
-        if (res?.data) {
-          setUserinfo(res.data);
-        } else {
-          navigate("/login");
-        }
-      })
-      .catch((err) => {
-        console.error("Auth Error:", err);
-        navigate("/login");
-      })
-      .finally(() => {
-        setLoading(false); // 👈 loading false after response
-      });
-  }, [backUrl, navigate]);
+    useEffect(() => {
+    
+  
+      axiosInstance
+        .get("/api/me") // ✅ sirf /me call
+        .then((res) => {
+          if (res.data?.success) {
+            setIsAuth(true);
+          } 
+        })
+        .catch(() => console.log("/login"))
+        .finally(() => setLoading(false));
+    }, [navigate]);
 
 
  
@@ -47,13 +38,13 @@ function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
-     {user && <Header />}
+     {isAuth && <Header />}
       <main className="flex-grow ">
       <ToastContainer position="top-center" autoClose={2000} />
 
         <Outlet />
       </main>
-      {user && <Footer />}
+      {isAuth && <Footer />}
     </div>
   );
 }

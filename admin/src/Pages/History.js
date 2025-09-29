@@ -119,7 +119,35 @@ export default function ResultCalendar() {
     const getResultForGame = (gameId, dateObj) => {
         const dateString = formatDate(dateObj);
         const result = results.find((r) => formatDate(new Date(r.DATE)) === dateString && r.GAME_ID === String(gameId));
-        return result ? result.RESULT1 : "";
+        return result ? result : "";
+    };
+
+    const handleDelete = async (result) => {
+
+        // Convert DB date to JS Date object
+        const date = new Date(result.DATE);
+
+        // Add 1 day (in milliseconds)
+        date.setDate(date.getDate() + 1);
+
+        // Format as YYYY-MM-DD
+        const formattedDate = date.toISOString().slice(0, 10);
+
+        try {
+            await axiosInstance.post("/api/delete-old-result", {
+                ID: result.ID,
+                DATE: formattedDate,
+                GAME_ID: result.GAME_ID,
+                RESULT1: result.RESULT1,
+                GAME_NAME: result.GAME_NAME,
+            });
+            // Remove locally after delete
+            setResults(results.filter((r) => r.ID !== result.ID));
+            alert("Result deleted successfully");
+            window.location.reload();
+        } catch (err) {
+            console.error("Delete failed:", err);
+        }
     };
 
     return (
@@ -165,11 +193,22 @@ export default function ResultCalendar() {
                                     {/* ✅ Proper Date */}
                                     <td className="border px-2 py-1 font-semibold">{formattedDate}</td>
 
-                                    {games.map((game) => (
-                                        <td key={game.ID} className="border px-2 py-1 text-green-600">
-                                        {getResultForGame(game.ID, dateObj)} 
-                                        </td>
-                                    ))}
+                                    {games.map((game) => {
+                                        const result = getResultForGame(game.ID, dateObj);
+                                        return (
+                                            <td key={game.ID} className="border px-2 py-1 text-green-600">
+                                                {result.RESULT1 || ""}
+                                                {result && (
+                                                    <button
+                                                        onClick={() => handleDelete(result)}
+                                                        className="ml-2 text-red-500 hover:text-red-700"
+                                                    >
+                                                        <i className="fa fa-trash"></i>
+                                                    </button>
+                                                )}
+                                            </td>
+                                        );
+                                    })}
                                 </tr>
                             );
                         })}

@@ -20,6 +20,8 @@ const HomePage = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const backUrl = process.env.REACT_APP_BACKEND_URL;
+  const [isAuth, setIsAuth] = useState(false);
+
 
   const [dateTime, setDateTime] = useState("");
 
@@ -77,11 +79,20 @@ const HomePage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const mobile = localStorage.getItem("mobile");
-
-    if (!token || !mobile) {
-      navigate("/login"); // send to login if not authenticated
+    if (!token) {
+      navigate("/login");
+      return;
     }
+
+    axiosInstance
+      .get("/api/me") // ✅ sirf /me call
+      .then((res) => {
+        if (res.data?.success) {
+          setIsAuth(true);
+        } 
+      })
+      .catch(() => navigate("/login"))
+      .finally(() => setLoading(false));
   }, [navigate]);
 
   const [userinfo, setUserinfo] = useState({});

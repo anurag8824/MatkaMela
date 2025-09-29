@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import { toast } from "react-toastify";
 import PWAInstallButton from "../../Components/PWAInstallButton";
+import DownLoadApk from "../../Components/DownloadApk";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -100,75 +101,71 @@ export default function Register() {
 
     {/* Step 1 */}
     {step === 1 && (
-      <form onSubmit={handleSendOtp} className="space-y-5">
-        {/* Name */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-          <input
-            name="name"
-            type="text"
-            placeholder="Enter your name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-          />
-        </div>
+      <><form onSubmit={handleSendOtp} className="space-y-5">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+              <input
+                name="name"
+                type="text"
+                placeholder="Enter your name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+            </div>
 
-        {/* Phone */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number</label>
-          <input
-            name="phone"
-            type="text"
-            placeholder="Enter mobile number"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-          />
-        </div>
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number</label>
+              <input
+                name="phone"
+                type="text"
+                placeholder="Enter mobile number"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+            </div>
 
-        {/* Refer Code */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Refer Number (optional)</label>
-          <div className="flex items-center border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-            <span className="px-3 text-gray-500">
-              <FiUser size={18} />
-            </span>
-            <input
-              name="referby"
-              type="number"
-              placeholder="Refer code"
-              value={formData.referby}
-              onChange={handleChange}
-              className="w-full px-3 py-2 outline-none"
-            />
-          </div>
-        </div>
+            {/* Refer Code */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Refer Number (optional)</label>
+              <div className="flex items-center border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+                <span className="px-3 text-gray-500">
+                  <FiUser size={18} />
+                </span>
+                <input
+                  name="referby"
+                  type="number"
+                  placeholder="Refer code"
+                  value={formData.referby}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 outline-none" />
+              </div>
+            </div>
 
-        {/* Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 rounded-lg font-semibold transition ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
-          }`}
-        >
-          {loading ? "Please wait..." : "Send OTP"}
-        </button>
+            {/* Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 rounded-lg font-semibold transition ${loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"}`}
+            >
+              {loading ? "Please wait..." : "Send OTP"}
+            </button>
 
-        <PWAInstallButton />
 
-        <p className="text-center text-sm mt-4 text-gray-700">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 font-medium hover:underline">
-            Login
-          </Link>
-        </p>
-      </form>
+
+
+            <p className="text-center text-sm mt-4 text-gray-700">
+              Already have an account?{" "}
+              <Link to="/login" className="text-blue-600 font-medium hover:underline">
+                Login
+              </Link>
+            </p>
+          </form><PWAInstallButton /><DownLoadApk /></>
     )}
 
     {/* Step 2 */}

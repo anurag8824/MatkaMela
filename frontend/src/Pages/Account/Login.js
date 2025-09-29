@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FiPhone, FiUser } from 'react-icons/fi';
 import PWAInstallButton from '../../Components/PWAInstallButton';
 import { toast } from 'react-toastify';
+import DownLoadApk from '../../Components/DownloadApk';
 
 export default function Login() {
   const [step, setStep] = useState(1);
@@ -18,14 +19,6 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const mobile = localStorage.getItem("mobile");
-
-    if (token && mobile) {
-      navigate("/"); // redirect to home if already logged in
-    }
-  }, [navigate]);
 
 
 
@@ -160,6 +153,13 @@ export default function Login() {
 
 
         <PWAInstallButton />
+        <DownLoadApk />
+
+
+
+        
+
+
 <p className="text-center text-sm mt-4">
             Don't have an account?{" "}
             <Link to="/register" className="text-blue-600 underline hover:text-blue-800">

@@ -1308,6 +1308,51 @@ export const CalculateGameResults = async (req, res) => {
   }
 };
 
+
+export const DeleteOldResult = async (req, res) => {
+  try {
+    const { ID, DATE: resultDate, GAME_ID: gameId } = req.body;
+
+    if (!ID || !resultDate || !gameId) {
+      return res.status(400).json({ message: "ID, DATE and GAME_ID are required" });
+    }
+
+
+    // ✅ Convert DATE to YYYY-MM-DD
+    const formattedDate = new Date(resultDate).toISOString().slice(0, 10);
+
+
+    // ✅ 1. Delete from RESULT table using ID
+    const [deleteResult] = await req.db.query(
+      `DELETE FROM RESULT WHERE ID = ?`,
+      [ID]
+    );
+
+    // Check if a row was actually deleted
+    if (deleteResult.affectedRows === 0) {
+      return res.status(404).json({ message: "Result not found" });
+    }
+
+    // ✅ 2. Clear RESULT1 and RESULT2 in GAMES table for the same GAME_ID and DATE
+    const [updateGames] = await req.db.query(
+      `UPDATE games 
+       SET RESULT1 = '', RESULT2 = '' 
+       WHERE ID = ? AND DATE(RESULT_TIME) = ?`,
+      [gameId, formattedDate]
+    );
+
+    return res.status(200).json({
+      message: "Result deleted and corresponding game results cleared",
+      deletedResultId: ID,
+      updatedGamesRows: updateGames.affectedRows,
+    });
+  } catch (error) {
+    console.error("Error deleting old result:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 export const getUserInfo = async (req, res) => {
   try {
     const [rows] = await req.db.query(
@@ -1991,6 +2036,7 @@ export const resultHistory = async (req, res) => {
     // Query to fetch all game results
     const [rows] = await req.db.query(
       `SELECT 
+          ID,
           GAME_ID ,
           GAME_NAME ,
           RESULT1 ,
