@@ -1500,7 +1500,7 @@ export const getUserBetHistory = async (req, res) => {
 
     // SQL query to get bets by user's mobile
     const [bets] = await req.db.query(
-      `SELECT id, number, point, type, game,game_id, DATE_FORMAT(CONVERT_TZ(date_time,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS date_time, status,result,win_amount
+      `SELECT id, number, point, type, game,game_id, DATE_FORMAT(date_time, '%Y-%m-%d %H:%i:%s') AS date_time, status,result,win_amount
        FROM bets
        WHERE phone = ?
        ORDER BY id DESC`,
