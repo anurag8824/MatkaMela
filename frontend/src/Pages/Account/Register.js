@@ -72,36 +72,36 @@ export default function Register() {
   };
 
   return (
-<div
-  className="min-h-screen bg-cover bg-center flex items-center justify-center px-4"
-  style={{ backgroundImage: "url('images/register.jpg')" }} // 👈 apna background image path yahan dalen
->
-  
-  {/* Dark Overlay */}
-  <div   style={{ backgroundColor: "rgba(0,0,0,0.5)" }} className="absolute inset-0 "></div>
+    <div
+      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4"
+      style={{ backgroundImage: "url('images/register.jpg')" }} // 👈 apna background image path yahan dalen
+    >
 
-  
+      {/* Dark Overlay */}
+      <div style={{ backgroundColor: "rgba(0,0,0,0.5)" }} className="absolute inset-0 "></div>
 
-  {/* Main Content */}
-  <div className="relative w-full max-w-md p-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl">
-  <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-base text-red-500 bg-white font-medium px-1 rounded-md">
-        <h2>फरीदाबाद , गाजियाबाद , गली और दिसावर गेम खेलने के वाले नीचे से एप्लीकेशन डाउनलोड करे । यहां मिलता है आपको सबसे ज्यादा रेट 10 के 980 और सबसे फास्ट एंड सैफ पेमेंट ।</h2>
-      </div>
-    <div className="flex justify-center mb-6">
-      <img
-        src="/images/blacklogo.png"
-        alt="Logo"
-        className="h-20 w-auto rounded-full border-48 border-white8 shadow-lg"
-      />
-    </div>
 
-    <h2 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-      Register
-    </h2>
 
-    {/* Step 1 */}
-    {step === 1 && (
-      <><form onSubmit={handleSendOtp} className="space-y-5">
+      {/* Main Content */}
+      <div className="relative w-full max-w-md p-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl">
+        <div class="border-dotted border-2 border-black text-center ring-offset-4 mb-3 mx-3 ring-4 ring-[#094c73] text-base text-red-500 bg-white font-medium px-1 rounded-md">
+          <h2>फरीदाबाद , गाजियाबाद , गली और दिसावर गेम खेलने के वाले नीचे से एप्लीकेशन डाउनलोड करे । यहां मिलता है आपको सबसे ज्यादा रेट 10 के 980 और सबसे फास्ट एंड सैफ पेमेंट ।</h2>
+        </div>
+        <div className="flex justify-center mb-6">
+          <img
+            src="/images/blacklogo.png"
+            alt="Logo"
+            className="h-20 w-auto rounded-full border-48 border-white8 shadow-lg"
+          />
+        </div>
+
+        <h2 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Register
+        </h2>
+
+        {/* Step 1 */}
+        {step === 1 && (
+          <><form onSubmit={handleSendOtp} className="space-y-5">
             {/* Name */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
@@ -150,8 +150,8 @@ export default function Register() {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg font-semibold transition ${loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"}`}
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"}`}
             >
               {loading ? "Please wait..." : "Send OTP"}
             </button>
@@ -165,40 +165,43 @@ export default function Register() {
                 Login
               </Link>
             </p>
-          </form><PWAInstallButton /><DownLoadApk /></>
-    )}
+          </form>
+            <PWAInstallButton />
 
-    {/* Step 2 */}
-    {step === 2 && (
-      <form onSubmit={handleRegister} className="space-y-5">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Enter OTP</label>
-          <input
-            name="otp"
-            type="text"
-            placeholder="Enter OTP"
-            value={formData.otp}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-center tracking-widest focus:ring-2 focus:ring-green-500 focus:border-green-500"
-          />
-        </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 rounded-lg font-semibold transition ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700 text-white shadow-md"
-          }`}
-        >
-          {loading ? "Please wait..." : "Verify & Register"}
-        </button>
-      </form>
-    )}
-  </div>
-</div>
+          </>
+        )}
+
+        {/* Step 2 */}
+        {step === 2 && (
+          <form onSubmit={handleRegister} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Enter OTP</label>
+              <input
+                name="otp"
+                type="text"
+                placeholder="Enter OTP"
+                value={formData.otp}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-center tracking-widest focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 rounded-lg font-semibold transition ${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700 text-white shadow-md"
+                }`}
+            >
+              {loading ? "Please wait..." : "Verify & Register"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
 
   );
 }

@@ -153,7 +153,7 @@ export default function Login() {
 
 
         <PWAInstallButton />
-        <DownLoadApk />
+
 
 
 
