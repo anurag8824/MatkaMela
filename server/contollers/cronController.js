@@ -90,15 +90,58 @@ export const scheduleCronForGame = (db, game) => {
     });
   }
 
-  // TIME2 (unchecked)
-  if (TIME2) {
-    const [h, m, s] = TIME2.split(":");
-    const exp = `${s} ${m} ${h} * * *`;
+  // // TIME2 (unchecked)
+  // if (TIME2) {
+  //   const [h, m, s] = TIME2.split(":");
+  //   const exp = `${s} ${m} ${h} * * *`;
 
-    time2Job = cron.schedule(exp, async () => {
-      await db.query("UPDATE games SET PLAY = 'unchecked' WHERE ID = ?", [ID]);
-      console.log(`[${NAME}] PLAY -> unchecked at ${TIME2}`);
-    });
+  //   time2Job = cron.schedule(exp, async () => {
+  //     await db.query("UPDATE games SET PLAY = 'unchecked' WHERE ID = ?", [ID]);
+  //     console.log(`[${NAME}] PLAY -> unchecked at ${TIME2}`);
+  //   });
+  // }
+
+   // ---- TIME2 ----
+   if (TIME2) {
+    const [h, m, s] = TIME2.split(":");
+
+    let exp;
+
+    // 🟢 Special case: DISAWAR (ID = 5)
+    // TIME2 is *next day's morning* (e.g. 03:30 next day)
+    if (ID === 5) {
+      // Run at next day's same time — shift cron day by +1
+      // node-cron format: second minute hour day-of-month month day-of-week
+      // So we use "day-of-month + 1" logic using day-of-week.
+      // But cron doesn’t support “+1 day” directly, so we handle it manually:
+      // Schedule every day at 03:30, but only run if it's *next day of open time*.
+
+      exp = `${s} ${m} ${h} * * *`; // still daily, but logic inside will check date
+
+      time2Job = cron.schedule(exp, async () => {
+        // Get current date/time
+        const now = new Date();
+
+        // Get current hour/minute and compare if it's after midnight but before TIME1
+        // Example: at 03:30 AM on 7 Oct, TIME1 was 07:15 AM on 6 Oct (previous day)
+        // So this means we should close DISAWAR now.
+
+        // So, only mark unchecked if current time < TIME1 (means early morning)
+        const [h1, m1] = TIME1.split(":").map(Number);
+        if (now.getHours() < h1 || (now.getHours() === h1 && now.getMinutes() < m1)) {
+          await db.query("UPDATE games SET PLAY = 'unchecked' WHERE ID = ?", [ID]);
+          console.log(`[${NAME}] (Next Day Close) PLAY -> unchecked at ${TIME2}`);
+        }
+      });
+    } else {
+      // 🟡 Normal case (same-day close)
+      exp = `${s} ${m} ${h} * * *`;
+
+      time2Job = cron.schedule(exp, async () => {
+        await db.query("UPDATE games SET PLAY = 'unchecked' WHERE ID = ?", [ID]);
+        console.log(`[${NAME}] PLAY -> unchecked at ${TIME2}`);
+      });
+    }
   }
 
   // Save/update jobs

@@ -5,6 +5,7 @@ import UserBuy from "../models/UserBuyModel.js";
 import bcrypt from "bcrypt"; // ✅ CORRECT spelling
 import jwt from "jsonwebtoken"
 import { insertAccountEntry } from "./utils/accountHelper.js";
+import { getAdjustedBetDateTime } from "./helpers/betHelper.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 console.log(JWT_SECRET, "jswtt")
@@ -452,6 +453,7 @@ export const BetGameJodi = async (req, res) => {
 
     const gameName = await getGameNameById(req.db, gameId);
     const gamePlay = await getGamePlayById(req.db , gameId)
+    console.log(gamePlay, "game play", "game name" , gameName)
      // ✅ Agar "unchecked" hai toh timeout error dena
      if (gamePlay.toLowerCase() === "unchecked") {
       return res.status(400).json({ success: false, message: "Game play timed out." });
@@ -463,6 +465,9 @@ export const BetGameJodi = async (req, res) => {
       return res.status(400).json({ success: false, message: err.message });
     }
 
+    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+
 
     // Transform data for bulk insert
     const result = filledBets.map(bet => [
@@ -471,13 +476,14 @@ export const BetGameJodi = async (req, res) => {
       gameId,               // game_id column
       "Jodi",
       mobile,
-      gameName               // type column
+      gameName,               // type column
+      betDateTime
     ]);
 
     console.log("Transformed result for insert:", result);
 
     // Bulk insert into 'bets' table
-    const query = `INSERT INTO bets (number, point, game_id, type, phone , game) VALUES ?`;
+    const query = `INSERT INTO bets (number, point, game_id, type, phone , game ,DATE_TIME) VALUES ?`;
     const [insertResult] = await req.db.query(query, [result]);
     console.log("Insert result:", insertResult);
 
@@ -515,6 +521,11 @@ export const BetGameManual = async (req, res) => {
     // Transform rows
     const result = [];
 
+
+    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameID]);
+    const betDateTime = getAdjustedBetDateTime(gameID, game.TIME2);
+
+
     rows.forEach(row => {
       const { rowId, jodiValues, point } = row;
 
@@ -527,7 +538,7 @@ export const BetGameManual = async (req, res) => {
         //   });
         // }
         if (value) { // Only process non-empty values
-          result.push([value, Number(point), gameID, "Manual", mobile, gameName]); // Prepare as array for bulk insert
+          result.push([value, Number(point), gameID, "Manual", mobile, gameName ,betDateTime]); // Prepare as array for bulk insert
         }
       });
     });
@@ -538,7 +549,7 @@ export const BetGameManual = async (req, res) => {
 
     if (result.length > 0) {
       // Bulk insert into 'bets' table
-      const query = `INSERT INTO bets (number, point , game_id , type, phone,game) VALUES ?`;
+      const query = `INSERT INTO bets (number, point , game_id , type, phone,game , date_time) VALUES ?`;
       const [insertResult] = await req.db.query(query, [result]); // mysql2 accepts array of arrays
       console.log("Insert result:", insertResult);
 
@@ -576,6 +587,10 @@ export const BetGameHarraf = async (req, res) => {
 
     const result = [];
 
+    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+
+
     // AndarHaraf bets
     if (andarHaraf && andarHaraf.length > 0) {
       andarHaraf.forEach(bet => {
@@ -585,7 +600,8 @@ export const BetGameHarraf = async (req, res) => {
           gameId,              // game_id column
           "AndarHaraf",
           mobile,
-          gameName    // type column
+          gameName ,   // type column
+          betDateTime
         ]);
       });
     }
@@ -599,7 +615,8 @@ export const BetGameHarraf = async (req, res) => {
           gameId,              // game_id column
           "BaharHaraf",
           mobile,
-          gameName       // type column
+          gameName,       // type column
+          betDateTime
         ]);
       });
     }
@@ -611,7 +628,7 @@ export const BetGameHarraf = async (req, res) => {
     console.log("Transformed result:", result);
 
     // Bulk insert
-    const query = `INSERT INTO bets (number, point, game_id, type,phone,game) VALUES ?`;
+    const query = `INSERT INTO bets (number, point, game_id, type,phone,game,date_time) VALUES ?`;
     const [insertResult] = await req.db.query(query, [result]);
 
     console.log("Insert result:", insertResult);
@@ -650,6 +667,9 @@ export const BetGameCrossing = async (req, res) => {
     }
 
 
+    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+
     // Transform data for bulk insert
     const result = bets.map(bet => [
       bet.number,          // number column
@@ -657,13 +677,14 @@ export const BetGameCrossing = async (req, res) => {
       gameId,              // game_id column
       "Crossing",           // type column
       mobile,
-      gameName
+      gameName,
+      betDateTime
     ]);
 
     console.log("Transformed result:", result);
 
     // Bulk insert into 'bets' table
-    const query = `INSERT INTO bets (number, point, game_id, type , phone,game) VALUES ?`;
+    const query = `INSERT INTO bets (number, point, game_id, type , phone,game,date_time) VALUES ?`;
     const [insertResult] = await req.db.query(query, [result]);
     console.log("Insert result:", insertResult);
 
@@ -699,6 +720,9 @@ export const BetGameCopyPaste = async (req, res) => {
       return res.status(400).json({ success: false, message: err.message });
     }
 
+    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+
     // Transform data for bulk insert
     const result = bets.map(bet => [
       bet.number,           // number column
@@ -707,13 +731,14 @@ export const BetGameCopyPaste = async (req, res) => {
       gameId,               // game_id column
       "CopyPaste",         // type column
       mobile,
-      gameName
+      gameName,
+      betDateTime
     ]);
 
     console.log("Transformed result:", result);
 
     // Bulk insert into 'bets' table
-    const query = `INSERT INTO bets (number, point , game_id, type , phone ,game) VALUES ?`;
+    const query = `INSERT INTO bets (number, point , game_id, type , phone ,game, date_time) VALUES ?`;
     const [insertResult] = await req.db.query(query, [result]);
     console.log("Insert result:", insertResult);
 
