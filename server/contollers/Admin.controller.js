@@ -1152,7 +1152,7 @@ export const getWinningNumberold = async (req, res) => {
       // Step 1: Check if any bets exist with given RESULT
       const resultQuery = `
         SELECT  
-          ID, DATE_FORMAT(CONVERT_TZ(DATE_TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
+          ID, (DATE_TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
         FROM bets
         WHERE DATE(DATE_TIME) = ?
           AND GAME_ID = ?

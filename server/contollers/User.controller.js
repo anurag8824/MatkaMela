@@ -164,7 +164,7 @@ export const SendOTP = async (req, res) => {
     const result = await response.json();
     console.log("SMS API Response:", result);
 
-    return res.json({ message: "OTP sent successfully" });
+    return res.json({ message: "OTP sent successfully" ,otp });
   } catch (error) {
     console.error("Send OTP error:", error);
     res.status(500).json({ message: "Server error" });
