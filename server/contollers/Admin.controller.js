@@ -1171,7 +1171,7 @@ export const getWinningNumberold = async (req, res) => {
         const placeholders = digits.map(() => "?").join(",");
         const digitQuery = `
           SELECT 
-            ID, DATE_FORMAT(CONVERT_TZ(DATE_TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
+            ID, DATE_FORMAT(DATE_TIME, '%Y-%m-%d %H:%i:%s') AS DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
           FROM bets
           WHERE DATE(DATE_TIME) = ?
             AND GAME_ID = ?
@@ -1208,7 +1208,7 @@ export const getWinningNumberold = async (req, res) => {
       // Step 2: If no result match, check by NUMBER
       const numberQuery = `
         SELECT 
-          ID, DATE_FORMAT(CONVERT_TZ(DATE_TIME,'+00:00','+05:30'), '%Y-%m-%d %H:%i:%s') AS DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
+          ID, DATE_FORMAT(DATE_TIME, '%Y-%m-%d %H:%i:%s') AS DATE_TIME, PHONE, POINT, NUMBER, GAME_ID, GAME, TYPE, STATUS, RESULT
         FROM bets
         WHERE DATE(DATE_TIME) = ?
           AND GAME_ID = ?
