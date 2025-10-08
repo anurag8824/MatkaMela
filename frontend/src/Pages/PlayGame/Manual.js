@@ -86,7 +86,7 @@ const Manual = () => {
     0
   );
 
-  
+
 
   return (
     <div className="">
@@ -127,6 +127,19 @@ const Manual = () => {
                       onChange={(e) =>
                         handleJodiChange(rowIndex, idx, e.target.value)
                       }
+                      onKeyDown={(e) => {
+                        // prevent letters and symbols except digits, backspace, delete, arrows
+                        if (
+                          !/[0-9]/.test(e.key) &&
+                          e.key !== "Backspace" &&
+                          e.key !== "Delete" &&
+                          e.key !== "ArrowLeft" &&
+                          e.key !== "ArrowRight" &&
+                          e.key !== "Tab"
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
                       className="w-14 h-7 border border-gray-400 rounded text-center text-sm focus:outline-none focus:border-blue-500"
                     />
                   ))}
