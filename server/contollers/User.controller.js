@@ -465,8 +465,13 @@ export const BetGameJodi = async (req, res) => {
       return res.status(400).json({ success: false, message: err.message });
     }
 
-    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
-    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+     // ✅ Fetch TIME2 correctly
+     const [gameRows] = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+     const gameTIME2 = gameRows.length ? gameRows[0]?.TIME2 : null;
+     console.log("TIME2 fetched:", gameTIME2);
+
+    
+    const betDateTime = getAdjustedBetDateTime(gameId, gameTIME2);
 
 
     // Transform data for bulk insert
@@ -522,8 +527,10 @@ export const BetGameManual = async (req, res) => {
     const result = [];
 
 
-    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameID]);
-    const betDateTime = getAdjustedBetDateTime(gameID, game.TIME2);
+      // ✅ Fetch TIME2 correctly
+      const [gameRows] = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameID]);
+      const gameTIME2 = gameRows.length ? gameRows[0]?.TIME2 : null;
+    const betDateTime = getAdjustedBetDateTime(gameID, gameTIME2);
 
 
     rows.forEach(row => {
@@ -587,8 +594,10 @@ export const BetGameHarraf = async (req, res) => {
 
     const result = [];
 
-    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
-    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+     // ✅ Fetch TIME2 correctly
+     const [gameRows] = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+     const gameTIME2 = gameRows.length ? gameRows[0]?.TIME2 : null;
+    const betDateTime = getAdjustedBetDateTime(gameId, gameTIME2);
 
 
     // AndarHaraf bets
@@ -667,8 +676,10 @@ export const BetGameCrossing = async (req, res) => {
     }
 
 
-    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
-    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+   // ✅ Fetch TIME2 correctly
+   const [gameRows] = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+   const gameTIME2 = gameRows.length ? gameRows[0]?.TIME2 : null;
+  const betDateTime = getAdjustedBetDateTime(gameId, gameTIME2);
 
     // Transform data for bulk insert
     const result = bets.map(bet => [
@@ -720,8 +731,10 @@ export const BetGameCopyPaste = async (req, res) => {
       return res.status(400).json({ success: false, message: err.message });
     }
 
-    const game = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
-    const betDateTime = getAdjustedBetDateTime(gameId, game.TIME2);
+    // ✅ Fetch TIME2 correctly
+    const [gameRows] = await req.db.query("SELECT TIME2 FROM games WHERE ID = ?", [gameId]);
+    const gameTIME2 = gameRows.length ? gameRows[0]?.TIME2 : null;
+   const betDateTime = getAdjustedBetDateTime(gameId, gameTIME2);
 
     // Transform data for bulk insert
     const result = bets.map(bet => [

@@ -46,6 +46,10 @@
 export const getAdjustedBetDateTime = (gameId, gameTIME2) => {
     const now = new Date(); // current datetime
     const adjusted = new Date(now); // copy
+
+    console.log("Current datetime:", now);
+    console.log("Game ID:", gameId, "TIME2:", gameTIME2);
+    console.log("Initial adjusted datetime:", adjusted);
   
     if (gameId === 5 && gameTIME2) {
       const [h2, m2, s2] = gameTIME2.split(":").map(Number);
@@ -64,6 +68,8 @@ export const getAdjustedBetDateTime = (gameId, gameTIME2) => {
     const hh = String(adjusted.getHours()).padStart(2, "0");
     const min = String(adjusted.getMinutes()).padStart(2, "0");
     const ss = String(adjusted.getSeconds()).padStart(2, "0");
+
+    console.log("Final adjusted datetime:", `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`);
   
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
   };
