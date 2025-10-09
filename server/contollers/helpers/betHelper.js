@@ -48,10 +48,10 @@ export const getAdjustedBetDateTime = (gameId, gameTIME2) => {
     const adjusted = new Date(now); // copy
 
     console.log("Current datetime:", now);
-    console.log("Game ID:", gameId, "TIME2:", gameTIME2);
+    console.log("Game ID:", typeof gameId, "TIME2:", gameTIME2);
     console.log("Initial adjusted datetime:", adjusted);
   
-    if (gameId === 5 && gameTIME2) {
+    if (Number(gameId) === 5 && gameTIME2) {
       const [h2, m2, s2] = gameTIME2.split(":").map(Number);
   
       // If current time is before TIME2 (early morning)
