@@ -1140,6 +1140,7 @@ export const getWinningNumberold = async (req, res) => {
 
   export const getWinningNumber = async (req, res) => {
     const { date, gameId, result } = req.body;
+    console.log(req.body, "in get winning number");
   
     if (!date || !gameId || !result) {
       return res.status(400).json({
@@ -1159,10 +1160,11 @@ export const getWinningNumberold = async (req, res) => {
           AND RESULT = ?
       `;
       const [resultRows] = await req.db.query(resultQuery, [date, gameId, result]);
+      console.log(resultRows, "Result rows for exact match");
   
       if (resultRows.length > 0) {
         // Only return rows where STATUS = 'win'
-        const winningBets = resultRows.filter(bet => bet.STATUS === 'Win' );
+        const winningBets = resultRows.filter(bet => bet.STATUS === 'Win' || bet.STATUS === 'Loss' );
 
           // Extra check: also fetch bets where RESULT is any digit of given result
       const digits = result.split(""); // "15" => ["1","5"]
@@ -1180,7 +1182,7 @@ export const getWinningNumberold = async (req, res) => {
         const [digitRows] = await req.db.query(digitQuery, [date, gameId, ...digits]);
 
            // ✅ Filter digit bets also where STATUS = 'Win'
-           const winningDigitBets = digitRows.filter(bet => bet.STATUS === "Win");
+           const winningDigitBets = digitRows.filter(bet => bet.STATUS === "Win" || bet.STATUS === 'Loss');
 
         // Merge both exact matches + digit matches
         // (avoid duplicates if same bet appears)

@@ -70,7 +70,7 @@ import CopyPaste from './CopyPaste';
 const PlayPage = () => {
   const tabs = [
     { key: "jodi", label: "Jodi" },
-    { key: "manual", label: "Manual" },
+    // { key: "manual", label: "Manual" },
     { key: "harraf", label: "Harraf" },
     { key: "crossing", label: "Crossing" },
     { key: "copy", label: "Copy Paste" },
@@ -107,7 +107,7 @@ const PlayPage = () => {
         <div className="p-4">
           {active === "jodi" && <Jodi />}
 
-          {active === "manual" && <Manual />}
+          {/* {active === "manual" && <Manual />} */}
 
           {active === "harraf" && <Haraf />}
 

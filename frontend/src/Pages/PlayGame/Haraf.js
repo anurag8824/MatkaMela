@@ -76,13 +76,16 @@ const Haraf = () => {
 
   const renderGrid = (type, data) => (
     <div className="grid grid-cols-5 gap-2">
-      {data.map((val, i) => (
+      {data.map((val, i) => {
+        const numberValue = String(i * 111).padStart(3, "0")
+        const displayValue = numberValue.slice(-1)
+        return (
         <div
           key={i}
           className="flex flex-col items-center justify-center gap-1"
         >
           <div className="number bg-[#094c73] text-white flex items-center justify-center w-full h-[52px] border border-[#094c73] text-center">
-            {String(i * 111).padStart(3, "0")}
+          {displayValue}
           </div>
           <input
             type="number"
@@ -103,8 +106,8 @@ const Haraf = () => {
             className="w-full h-[33px] text-center border bg-transparent focus:outline-none"
           />
 
-        </div>
-      ))}
+        </div>)
+      })}
     </div>
   );
 
