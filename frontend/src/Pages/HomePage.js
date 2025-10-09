@@ -194,6 +194,7 @@ const HomePage = () => {
       <div style={{ backgroundImage: "url(/images/home-back.jpeg)", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="w-full bg-yellow-100 border-4 border-[#4481eb] text-center py-2 px-2 mt-2 shadow-md">
         <h6 className="text-lg sm:text-base font-semibold text-white">🔥 भरोसे का एक ही नाम 🔥</h6>
         <h6 className="text-lg sm:text-base font-semibold text-white">🙏 matkamela.shop 🙏</h6>
+       <spna className="font-bold"> नोट -: मटका मेला के जो नियम है वह एक बार जरूर देखें धन्यवाद!!</spna>
         <h6 className="text-sm sm:text-xs mt-2 text-white">
           <span id="date">{dateTime}</span>
         </h6>

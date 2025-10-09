@@ -110,7 +110,7 @@ const Withdraw = () => {
         आप सिर्फ जीता हुआ पैसा ही अपने अकाउंट में निकाल सकते हो
       </p>
       <p className="text-red-500 text-center text-sm mb-2">
-        Withdraw Time :- सुबह 10 से रात 10 बजे तक
+        Withdraw Time :- सुबह 06:00 AM से 11:00 AM  बजे तक
       </p>
 
       {/* <p className="text-center text-sm mt-1 text-[#094c73]">Win Amount :- 0</p> */}
