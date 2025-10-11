@@ -274,10 +274,10 @@ const HomePage = () => {
 
             // Decide which result to show
             let displayResult;
-            if (latestGame?.ID === 5) {
+            if (latestGame?.ID == 5) {
               displayResult = yesterdayResult?.RESULT1 ?? "-";
             } else {
-              displayResult = latestGame?.RESULT1 ?? yesterdayResult?.RESULT1 ?? "-";
+              displayResult = latestGame?.RESULT1 ? latestGame?.RESULT1 : yesterdayResult?.RESULT1 ?? "-";
             }
 
             return (
