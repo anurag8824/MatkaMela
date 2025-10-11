@@ -38,7 +38,7 @@ const HelpPage = () => {
       {/* Info Card */}
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-4">
         <p className="text-center text-sm text-yellow-700 font-semibold mb-3">
-          🔥 Min Deposit: Rs. 100 | Min Withdraw: Rs. 490 | रेट 10 के 980 🔥
+          🔥 Min Deposit: Rs. 100 | Min Withdraw: Rs. 1000 | रेट 10 के 980 🔥
         </p>
 
         <p className="text-center text-base font-semibold text-green-700 mb-4">
