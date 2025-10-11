@@ -1,8 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-const HomeMarket = ({markets}) => {
-// console.log(markets)
+const HomeMarket = ({markets , result}) => {
+console.log(result, "disawr result")
   const marketsh = [
     {
       id: 1,
@@ -66,7 +66,11 @@ const HomeMarket = ({markets}) => {
 
             {/* Market Result Numbers */}
             <div className="flex justify-center items-center gap-2 text-white text-lg font-bold">
-              <span>{market?.RESULT1 ? market?.RESULT1 : "-" }</span>
+            <span>
+    {market?.ID == 5 
+      ? (result?.RESULT1 ?? "-") 
+      : (market?.RESULT1 ?? "-")}
+  </span>
             </div>
 
             {/* Market Timings */}

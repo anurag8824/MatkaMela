@@ -245,7 +245,7 @@ const Header = () => {
                 </li>
 
                 {/* Share */}
-                <li>
+                {/* <li>
                   <Link
                     to="/refercode"
                     className="flex items-center gap-3 px-3 py-2 rounded-md bg-white text-black"
@@ -259,7 +259,7 @@ const Header = () => {
                     </div>
                     <div className="flex-1">Share</div>
                   </Link>
-                </li>
+                </li> */}
 
                 {/* Rate Our App */}
                 {/* <li>

@@ -112,6 +112,42 @@ const HomePage = () => {
       });
   }, []);
 
+  const [results, setResults] = useState([]);
+  const [yesterdayResult, setYesterdayResult] = useState(null);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const res = await axiosInstance.get("/api/game-result-history");
+        const allResults = res.data.data || [];
+
+        // Get yesterday’s date (in YYYY-MM-DD format)
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 2);
+        const yesterdayStr = yesterday.toISOString().split("T")[0]; // e.g. "2025-10-10"
+
+        // Find the object where GAME_ID === "5" and DATE matches yesterday
+        const result = allResults.find((item) => {
+          const itemDate = new Date(item.DATE).toISOString().split("T")[0];
+          return item.GAME_ID === "5" && itemDate === yesterdayStr;
+        });
+
+        setResults(allResults);
+        setYesterdayResult(result || null);
+      } catch (err) {
+        console.error("Error fetching results:", err);
+      }
+    };
+
+    fetchResults();
+  }, []);
+
+  console.log("Yesterday's Result for GAME_ID 5:", yesterdayResult);
+ 
+
+ 
+
   return (
     <div className="bg-[#343c44]">
       {/* <HighlightMarquee /> */}
@@ -241,8 +277,11 @@ const HomePage = () => {
               <>
                 <p className="text-blue-950 font-bold text-xl">{latestGame?.NAME}</p>
                 <span className="font-bold text-xl text-blue-950">
-                  {latestGame?.RESULT1 ? latestGame.RESULT1 : "-"}
-                </span>
+  {latestGame?.ID == 5 
+    ? (yesterdayResult?.RESULT1 ?? "-") 
+    : (latestGame?.RESULT1 ?? "-")}
+</span>
+
               </>
             );
           })()}
@@ -317,7 +356,7 @@ const HomePage = () => {
 
 
 
-      <HomeMarket markets={games} />
+      <HomeMarket markets={games } result={yesterdayResult} />
 
 
 

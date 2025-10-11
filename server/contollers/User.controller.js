@@ -1247,6 +1247,8 @@ export const CalculateGameResults = async (req, res) => {
       [gameId, resultDate]
     );
 
+    console.log(existingRows, "existing rows check")
+
 
 
     if (existingRows.length > 0) {
