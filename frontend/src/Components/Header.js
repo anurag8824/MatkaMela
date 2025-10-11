@@ -77,7 +77,7 @@ const Header = () => {
           {/* <PWAInstallButton /> */}
             <div className="flex items-center gap-1">
               <img
-                src="https://khelomatka.com/static/media/points.8ca46c1daf68863799f4.gif"
+                src="https://img.icons8.com/emoji/48/coin-emoji.png"
                 alt="points"
                 className="h-4"
               />
@@ -146,7 +146,7 @@ const Header = () => {
                   >
                     <div className="w-6 h-6">
                       <img
-                        src="https://khelomatka.com/static/media/myplayhistory.a950ec7779a573168f00.png"
+                        src="https://img.icons8.com/plasticine/100/receipt.png"
                         alt="My Play History"
                         className="w-full h-full object-contain"
                       />
@@ -162,7 +162,7 @@ const Header = () => {
                   >
                     <div className="w-6 h-6">
                       <img
-                        src="https://khelomatka.com/static/media/resulthistory.9f8464e933b04b603f3d.png"
+                        src="https://img.icons8.com/clouds/100/hourglass.png"
                         alt="Refer List"
                         className="w-full h-full object-contain"
                       />
@@ -201,7 +201,7 @@ const Header = () => {
                   >
                     <div className="w-6 h-6">
                       <img
-                        src="https://khelomatka.com/static/media/referandearn.cdf27d282b9fb8783ebd.png"
+                        src="https://img.icons8.com/external-microdots-premium-microdot-graphic/64/external-earn-business-finance-vol1-microdots-premium-microdot-graphic.png"
                         alt="Refer & Earn"
                         className="w-full h-full object-contain"
                       />
@@ -218,7 +218,7 @@ const Header = () => {
                   >
                     <div className="w-6 h-6">
                       <img
-                        src="https://khelomatka.com/static/media/resulthistory.9f8464e933b04b603f3d.png"
+                        src="https://img.icons8.com/bubbles/100/list.png"
                         alt="Refer List"
                         className="w-full h-full object-contain"
                       />
@@ -235,7 +235,7 @@ const Header = () => {
                   >
                     <div className="w-6 h-6">
                       <img
-                        src="https://khelomatka.com/static/media/termsandcondition.5d0db50b742766e7ff50.png"
+                        src="https://img.icons8.com/stickers/100/term.png"
                         alt="Terms And Condition"
                         className="w-full h-full object-contain"
                       />
@@ -282,16 +282,16 @@ const Header = () => {
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-md bg-white text-red-600 font-semibold"
+                    className=" w-full flex items-center gap-3 px-3 py-2 rounded-md bg-white text-red-600 font-semibold"
                   >
                     <div className="w-6 h-6">
                       <img
-                        src="https://khelomatka.com/static/media/logout.3e41c72418fdc10a2e19.png"
+                        src="https://img.icons8.com/bubbles/100/exit.png"
                         alt="Logout"
                         className="w-full h-full object-contain"
                       />
                     </div>
-                    <div className="flex-1">Logout</div>
+                    <div className="flex-">Logout</div>
                   </button>
                 </li>
 
