@@ -56,6 +56,14 @@ const Withdraw = () => {
       return;
     }
 
+     // ⏰ Withdraw time check (06:00 AM - 11:00 AM)
+  const now = new Date();
+  const currentHour = now.getHours(); // local hour 0-23
+  if (currentHour < 6 || currentHour >= 11) {
+    toast.error('Withdrawals are allowed only between 06:00 AM and 11:00 AM');
+    return;
+  }
+
     try {
       setLoading(true); 
       const payload = { amount, ...bankData, status: "pending" };
