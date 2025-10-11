@@ -282,7 +282,7 @@ const HomePage = () => {
 
             return (
               <>
-                <p className="text-blue-950 font-bold text-xl">{latestGame?.NAME ?? "No Game"}</p>
+                <p className="text-blue-950 font-bold text-xl">{ latestGame?.RESULT1  ? latestGame?.NAME : yesterdayResult?.NAME}</p>
                 <span className="font-bold text-xl text-blue-950">{displayResult}</span>
               </>
             );
