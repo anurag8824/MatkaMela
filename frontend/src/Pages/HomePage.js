@@ -89,7 +89,7 @@ const HomePage = () => {
       .then((res) => {
         if (res.data?.success) {
           setIsAuth(true);
-        } 
+        }
       })
       .catch(() => navigate("/login"))
       .finally(() => setLoading(false));
@@ -144,9 +144,9 @@ const HomePage = () => {
   }, []);
 
   console.log("Yesterday's Result for GAME_ID 5:", yesterdayResult);
- 
 
- 
+
+
 
   return (
     <div className="bg-[#343c44]">
@@ -230,7 +230,7 @@ const HomePage = () => {
       <div style={{ backgroundImage: "url(/images/home-back.jpeg)", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="w-full bg-yellow-100 border-4 border-[#4481eb] text-center py-2 px-2 mt-2 shadow-md">
         <h6 className="text-lg sm:text-base font-semibold text-white">🔥 भरोसे का एक ही नाम 🔥</h6>
         <h6 className="text-lg sm:text-base font-semibold text-white">🙏 matkamela.shop 🙏</h6>
-       <spna className="font-bold"> नोट -: मटका मेला के जो नियम है वह एक बार जरूर देखें धन्यवाद!!</spna>
+        <spna className="font-bold"> नोट -: मटका मेला के जो नियम है वह एक बार जरूर देखें धन्यवाद!!</spna>
         <h6 className="text-sm sm:text-xs mt-2 text-white">
           <span id="date">{dateTime}</span>
         </h6>
@@ -263,7 +263,6 @@ const HomePage = () => {
           </div>
           {/* <p className="text-blue-950 font-bold text-xl">{games[7]?.NAME}</p>
           <span className="font-bold text-xl text-blue-950">{games[7]?.RESULT1 ? games[7]?.RESULT1 : "-"}</span> */}
-
           {(() => {
             if (!games || games?.length === 0) return <p>No Results</p>;
 
@@ -273,15 +272,18 @@ const HomePage = () => {
               return new Date(game.RESULT_TIME) > new Date(latest.RESULT_TIME) ? game : latest;
             }, null);
 
+            // Decide which result to show
+            let displayResult;
+            if (latestGame?.ID === 5) {
+              displayResult = yesterdayResult?.RESULT1 ?? "-";
+            } else {
+              displayResult = latestGame?.RESULT1 ?? yesterdayResult?.RESULT1 ?? "-";
+            }
+
             return (
               <>
-                <p className="text-blue-950 font-bold text-xl">{latestGame?.NAME}</p>
-                <span className="font-bold text-xl text-blue-950">
-  {latestGame?.ID == 5 
-    ? (yesterdayResult?.RESULT1 ?? "-") 
-    : (latestGame?.RESULT1 ?? "-")}
-</span>
-
+                <p className="text-blue-950 font-bold text-xl">{latestGame?.NAME ?? "No Game"}</p>
+                <span className="font-bold text-xl text-blue-950">{displayResult}</span>
               </>
             );
           })()}
@@ -356,7 +358,7 @@ const HomePage = () => {
 
 
 
-      <HomeMarket markets={games } result={yesterdayResult} />
+      <HomeMarket markets={games} result={yesterdayResult} />
 
 
 
